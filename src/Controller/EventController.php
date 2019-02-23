@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="event")
      */
     public function main()
     {
