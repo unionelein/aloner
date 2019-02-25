@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="app_main")
      */
     public function main()
     {

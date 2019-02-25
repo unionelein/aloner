@@ -9,8 +9,11 @@ class EventFixture extends BaseFixture
 {
     public function loadData()
     {
-        $this->createMany(Event::class, 10, function (Event $event, $index) {
+        $this->createMany('event', 10, function (int $index) {
+            $event = new Event();
             $event->setTitle($this->faker->company);
+
+            return $event;
         });
     }
 }

@@ -27,14 +27,13 @@ abstract class BaseFixture extends Fixture
         $this->manager->flush();
     }
 
-    public function createMany(string $className, int $count, callable $factory)
+    public function createMany(string $alias, int $count, callable $factory)
     {
         for ($i = 1; $i <= $count; $i++) {
-            $entity = new $className;
-            $factory($entity, $i);
+            $entity = $factory($i);
 
             $this->manager->persist($entity);
-            $this->addReference(\get_class($entity) . '_' . $i, $entity);
+            $this->addReference($alias . '_' . $i, $entity);
         }
     }
 }

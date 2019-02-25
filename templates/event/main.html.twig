@@ -2,5 +2,7 @@
 
 {% block body %}
     {{ soso }}<br>
-   <a href="{{ path('event') }}">event page</a>
+    <a href="{{ path('app_logout') }}">viiti 1x1</a>
+   <a href="https://oauth.vk.com/authorize?response_type=code&display=popup&client_id=6023328&redirect_uri=http://vk.unionelein.ru/main&v=5.92" onClick="window.open(this.href, 'auth', 'width=600,height=350'); return false;">event page</a>
 {% endblock %}
+{#scope=email%2Cphotos&redirect_uri=https%3A%2F%2Fbadoo.com%2Fexternal%2Fredirector.phtml%3Fstate%3DMjk4MjkxMTczMnxodHRwczovL2JhZG9vLmNvbS92ay9hdXRob3JpemUucGh0bWw%252FcnQ9MTAwMzE4#}
