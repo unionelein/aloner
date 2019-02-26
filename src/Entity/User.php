@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Component\Vk\DTO\AccessToken;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -42,7 +41,7 @@ class User implements UserInterface
     private $vkToken;
 
     /**
-     * @ORM\Column(type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=15, nullable=true)
      */
     private $phone;
 
@@ -59,13 +58,6 @@ class User implements UserInterface
     public function getLogin(): ?string
     {
         return $this->login;
-    }
-
-    public function setLogin(string $login): self
-    {
-        $this->login = $login;
-
-        return $this;
     }
 
     /**
@@ -122,16 +114,9 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getVkToken(): ?VkUserToken
@@ -139,14 +124,9 @@ class User implements UserInterface
         return $this->vkToken;
     }
 
-    public function setVkToken(VkUserToken $vkToken): self
+    public function addVkToken(AccessToken $accessToken): self
     {
-        $this->vkToken = $vkToken;
-
-        // set the owning side of the relation if necessary
-        if ($this !== $vkToken->getUser()) {
-            $vkToken->setUser($this);
-        }
+        $this->vkToken = new VkUserToken($accessToken, $this);
 
         return $this;
     }
@@ -156,7 +136,7 @@ class User implements UserInterface
         return $this->phone;
     }
 
-    public function setPhone(?string $phone): self
+    public function setPhone(string $phone): self
     {
         $this->phone = $phone;
 

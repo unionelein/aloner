@@ -38,7 +38,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
     {
         return [
             'userId' => $request->get('user_id'),
-            'token'  => $request->get('token'),
+            'token'  => $request->get('token_hash'),
         ];
     }
 

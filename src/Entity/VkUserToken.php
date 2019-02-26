@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\Vk\DTO\AccessToken;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,6 +16,11 @@ class VkUserToken
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $vkUserId;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -32,27 +38,23 @@ class VkUserToken
      */
     private $user;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $vkUserId;
+    public function __construct(AccessToken $accessToken, User $user)
+    {
+        $this->vkUserId  = $accessToken->getUserId();
+        $this->token     = $accessToken->getAccessToken();
+        $this->expiresAt = $accessToken->getExpiresAt();
 
+        $this->user = $user;
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getToken(): ?string
+    public function getToken(): string
     {
         return $this->token;
-    }
-
-    public function setToken(string $token): self
-    {
-        $this->token = $token;
-
-        return $this;
     }
 
     public function getExpiresAt(): ?\DateTimeInterface
@@ -65,34 +67,13 @@ class VkUserToken
         return null !== $this->expiresAt && $this->expiresAt < new \DateTime();
     }
 
-    public function setExpiresAt(?\DateTimeInterface $expiresAt): self
-    {
-        $this->expiresAt = $expiresAt;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getVkUserId(): ?int
+    public function getVkUserId(): int
     {
         return $this->vkUserId;
-    }
-
-    public function setVkUserId(int $vkUserId): self
-    {
-        $this->vkUserId = $vkUserId;
-
-        return $this;
     }
 }

@@ -10,7 +10,7 @@ class AccessToken
     /** @var string */
     private $accessToken;
 
-    /** @var \DateTime */
+    /** @var null|\DateTime */
     private $expiresAt;
 
     /** @var array */
@@ -19,10 +19,10 @@ class AccessToken
     /**
      * @param int $userId
      * @param string $accessToken
-     * @param \DateTime $expiresAt
+     * @param null|\DateTime $expiresAt
      * @param array $extraFields
      */
-    public function __construct(int $userId, string $accessToken, \DateTime $expiresAt, array $extraFields = [])
+    public function __construct(int $userId, string $accessToken, ?\DateTime $expiresAt, array $extraFields = [])
     {
         $this->userId = $userId;
         $this->accessToken = $accessToken;
@@ -47,9 +47,9 @@ class AccessToken
     }
 
     /**
-     * @return \DateTime
+     * @return null|\DateTime
      */
-    public function getExpiresAt(): \DateTime
+    public function getExpiresAt(): ?\DateTime
     {
         return $this->expiresAt;
     }

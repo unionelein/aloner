@@ -2,9 +2,10 @@
 
 namespace App\Component\Vk;
 
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\ClientInterface;
 
-class VkApiClient
+class VkClient
 {
     private const API_URL  = 'https://api.vk.com';
 
@@ -15,7 +16,7 @@ class VkApiClient
     /** @var ClientInterface */
     private $guzzleClient;
 
-    public function __construct(ClientInterface $guzzleClient)
+    public function __construct(EntityManagerInterface $guzzleClient)
     {
         $this->guzzleClient = $guzzleClient;
     }

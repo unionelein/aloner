@@ -10,6 +10,8 @@
 
 <div class="example-wrapper">
 
-    <a href="https://oauth.vk.com/authorize?response_type=code&display=popup&client_id=6023328&redirect_uri=http://vk.unionelein.ru/main&v=5.92" onClick="window.open(this.href, 'auth', 'width=600,height=350'); return false;">event page</a>
+    <a href="{{ path('app_vk_auth', {code: '123123123123'}) }}">Войти через VK</a>
+
+    {#<a href="https://oauth.vk.com/authorize?response_type=code&display=popup&client_id={{ clientId }}8&redirect_uri={{ redirect_uri }}&v={{ version }}" onClick="window.open(this.href, 'vk_auth', 'width=600,height=350'); return false;">Войти через VK</a>#}
 </div>
 {% endblock %}
