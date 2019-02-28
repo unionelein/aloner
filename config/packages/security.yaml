@@ -8,7 +8,7 @@ security:
                 property: login
 
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_ADMIN_COMMENT, ROLE_ADMIN_ARTICLE]
+        ROLE_FULL_REG: [ROLE_PARTIAL_REG]
 
     firewalls:
         dev:
@@ -18,14 +18,19 @@ security:
             anonymous: true
             guard:
                 authenticators:
-                    - App\Security\VkAuthenticator
-                entry_point: App\Security\VkAuthenticator
+                    - App\Security\Authenticator\VkAuthenticator
+                    - App\Security\Authenticator\RememberMeAuthenticator
+                entry_point: App\Security\Authenticator\VkAuthenticator
 
             logout:
                 path: app_logout
 
             remember_me:
                 secret: '%kernel.secret%'
+                #always_remember_me: true
+
+
+            access_denied_handler: App\Security\AccessDeniedHandler
 
             # activate different ways to authenticate
 
@@ -39,5 +44,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/vk_auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: IS_AUTHENTICATED_REMEMBERED }
+        - { path: ^/(fill_user|remember_me), roles: ROLE_PARTIAL_REG}
+        - { path: ^/, roles: ROLE_FULL_REG }
 

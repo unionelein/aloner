@@ -12,6 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    public const ROLE_PARTIAL_REG = 'ROLE_PARTIAL_REG';
+
+    public const ROLE_FULL_REG = 'ROLE_FULL_REG';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -41,6 +45,11 @@ class User implements UserInterface
     private $vkToken;
 
     /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $sex;
+    
+    /**
      * @ORM\Column(type="string", length=15, nullable=true)
      */
     private $phone;
@@ -48,6 +57,8 @@ class User implements UserInterface
     public function __construct(string $name)
     {
         $this->name = $name;
+
+        $this->addRole(self::ROLE_PARTIAL_REG);
     }
 
     public function getId(): ?int
@@ -76,15 +87,22 @@ class User implements UserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return \array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        $this->roles = \array_unique($roles);
+
+        return $this;
+    }
+
+    public function addRole(string $role): self
+    {
+        if (!\in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
 
         return $this;
     }
@@ -131,6 +149,18 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getSex(): ?bool
+    {
+        return $this->sex;
+    }
+
+    public function setSex(bool $sex): self
+    {
+        $this->sex = $sex;
+
+        return $this;
+    }
+
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -141,5 +171,10 @@ class User implements UserInterface
         $this->phone = $phone;
 
         return $this;
+    }
+
+    public function isFullFilled(): bool
+    {
+        return $this->phone && null !== $this->sex;
     }
 }

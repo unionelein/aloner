@@ -19,7 +19,8 @@
         "symfony/translation": "4.2.*",
         "symfony/twig-bundle": "4.2.*",
         "symfony/web-server-bundle": "4.2.*",
-        "symfony/yaml": "4.2.*"
+        "symfony/yaml": "4.2.*",
+        "vkcom/vk-php-sdk": "^5.80"
     },
     "config": {
         "preferred-install": {
