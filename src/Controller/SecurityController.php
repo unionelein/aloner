@@ -15,7 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class SecurityController extends BaseController
 {
@@ -28,7 +30,9 @@ class SecurityController extends BaseController
         VkSignUpService $vkSignUpService,
         VkUserTokenRepository $vkTokenRepo,
         GuardAuthenticatorHandler $guardHandler,
-        VkAuthenticator $vkAuthenticator
+        VkAuthenticator $vkAuthenticator,
+        RememberMeServicesInterface $rememberMeServices,
+        TokenStorageInterface $tokenStorage
     ) {
         $accessCode  = $request->get('code');
         $redirectUrl = $this->generateUrl('app_vk_auth', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -36,18 +40,22 @@ class SecurityController extends BaseController
         if ($accessCode && ($accessToken = $vkAuth->getAccessToken($accessCode, $redirectUrl))) {
             $vkToken = $vkTokenRepo->findOneBy(['vkUserId' => $accessToken->getUserId()]);
 
-            if (!$vkToken ) {
+            if (!$vkToken) {
                 // create new user with vk token
                 $user = $vkSignUpService->execute($accessToken);
                 $vkToken = $user->getVkToken();
             }
 
-            return $guardHandler->authenticateUserAndHandleSuccess(
+            $response =  $guardHandler->authenticateUserAndHandleSuccess(
                 $vkToken->getUser(),
                 $request,
                 $vkAuthenticator,
                 'main'
             );
+
+            $rememberMeServices->loginSuccess($request, $response, $tokenStorage->getToken());
+
+            return $response;
         }
 
         return $this->render('security/vk_auth.html.twig', [
@@ -59,8 +67,12 @@ class SecurityController extends BaseController
      * @IsGranted(User::ROLE_PARTIAL_REG)
      * @Route("/fill_user", name="app_fill_user")
      */
-    public function fillUser(Request $request, EntityManagerInterface $em): Response
-    {
+    public function fillUser(
+        Request $request,
+        EntityManagerInterface $em,
+        GuardAuthenticatorHandler $guardHandler,
+        VkAuthenticator $vkAuthenticator
+    ): Response {
         $sex = $request->get('sex');
         $phone = $request->get('phone');
 
@@ -73,7 +85,10 @@ class SecurityController extends BaseController
             $em->persist($user);
             $em->flush();
 
-            return $this->redirectToRoute('app_remember_me');
+            // authenticate when update role
+            $guardHandler->authenticateUserAndHandleSuccess($user, $request, $vkAuthenticator, 'main');
+
+            return $this->redirectToRoute('app_main');
         }
 
         return $this->render('security/fill_user.twig');
@@ -84,13 +99,5 @@ class SecurityController extends BaseController
      */
     public function logout()
     {
-    }
-
-    /**
-     * @Route("/remember_me", name="app_remember_me")
-     */
-    public function rememberMe()
-    {
-        return new RedirectResponse($this->generateUrl('app_main'));
     }
 }
