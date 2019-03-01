@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Component\Vk\DTO\AccessToken;
+use App\Component\VO\Sex;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -48,7 +49,17 @@ class User implements UserInterface
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $sex;
-    
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="users")
+     */
+    private $city;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $birthday;
+
     /**
      * @ORM\Column(type="string", length=15, nullable=true)
      */
@@ -137,6 +148,13 @@ class User implements UserInterface
         return $this->name;
     }
 
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getVkToken(): ?VkUserToken
     {
         return $this->vkToken;
@@ -149,14 +167,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getSex(): ?bool
+    public function getSex(): Sex
     {
-        return $this->sex;
+        return new Sex($this->sex);
     }
 
-    public function setSex(bool $sex): self
+    public function setSex(Sex $sex): self
     {
-        $this->sex = $sex;
+        $this->sex = $sex->toValue();
 
         return $this;
     }
@@ -175,6 +193,33 @@ class User implements UserInterface
 
     public function isFullFilled(): bool
     {
-        return $this->phone && null !== $this->sex;
+        return $this->phone
+            && $this->city
+            && $this->birthday
+            && null !== $this->sex;
+    }
+
+    public function getCity(): ?City
+    {
+        return $this->city;
+    }
+
+    public function setCity(?City $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?\DateTimeInterface
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?\DateTimeInterface $birthday): self
+    {
+        $this->birthday = $birthday;
+
+        return $this;
     }
 }

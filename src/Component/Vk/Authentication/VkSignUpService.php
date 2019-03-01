@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Component\Authentication;
+namespace App\Component\Vk\Authentication;
 
 use App\Component\Vk\DTO\AccessToken;
-use App\Component\Vk\VkApiProvider;
 use App\Entity\User;
-use App\Entity\VkUserToken;
 use Doctrine\ORM\EntityManagerInterface;
 use VK\Client\VKApiClient;
 

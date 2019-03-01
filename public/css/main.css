@@ -13,10 +13,6 @@ body {
     background-color: #fff;
 }
 
-.logo-wrapper {
-
-}
-
 .logo {
     width: 25px;
     height: 25px;
@@ -30,6 +26,7 @@ body {
 
 .app-content {
     position: relative;
+    padding: 15px 0;
 }
 
 .app-footer {

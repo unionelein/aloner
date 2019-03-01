@@ -5,13 +5,17 @@
 }
 
 .vk-auth-info-text .lead {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .fa-article-p {
     margin-right: 10px;
     color: rgb(199, 199, 199);
     font-size: 10px;
+}
+
+.vk-auth-btn-wrapper {
+    margin-top: 70px;
 }
 
 .vk-auth-btn {
