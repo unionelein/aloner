@@ -59,3 +59,8 @@
         transform: skewY(-45deg) translateX(12.5em);
     }
 }
+
+.vk-auth-btn-help {
+    color: #999;
+    font-size: 14px;
+}
