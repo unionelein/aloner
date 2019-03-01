@@ -25,6 +25,7 @@
     transition: all 0.2s ease-in-out;
     position: relative;
     overflow: hidden;
+    margin-bottom: 2px;
 }
 
 .vk-auth-btn:before {
@@ -44,6 +45,7 @@
     background-color: #456fa7;
     color: #fff;
     border-bottom: 4px solid #365783;
+    margin-bottom: 0;
 }
 
 .vk-auth-btn:hover:before {
