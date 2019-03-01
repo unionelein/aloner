@@ -1,0 +1,61 @@
+.vk-auth-info-text {
+    margin: 100px 150px 50px 150px;
+    color: rgb(106, 106, 106);
+
+}
+
+.vk-auth-info-text .lead {
+    margin-bottom: 50px;
+}
+
+.fa-article-p {
+    margin-right: 10px;
+    color: rgb(199, 199, 199);
+    font-size: 10px;
+}
+
+.vk-auth-btn {
+    padding: 0.3em 1.1em;
+    text-decoration: none;
+    color: #456fa7;
+    border: 2px solid #456fa7;
+    font-size: 36px;
+    display: inline-block;
+    border-radius: 0.3em;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.vk-auth-btn:before {
+    content: "";
+    background-color: rgba(255,255,255,0.5);
+    height: 100%;
+    width: 3em;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -4.5em;
+    transform: skewX(-45deg) translateX(0);
+    transition: none;
+}
+
+.vk-auth-btn:hover {
+    background-color: #456fa7;
+    color: #fff;
+    border-bottom: 4px solid #365783;
+}
+
+.vk-auth-btn:hover:before {
+    transform: skewX(-45deg) translateX(13.5em);
+    transition: all 0.5s ease-in-out;
+}
+
+@keyframes sheen {
+    0% {
+        transform: skewY(-45deg) translateX(0);
+    }
+    100% {
+        transform: skewY(-45deg) translateX(12.5em);
+    }
+}

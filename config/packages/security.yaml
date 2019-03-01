@@ -43,6 +43,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/vk_auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/(fill_user|remember_me), roles: ROLE_PARTIAL_REG}
+        - { path: ^/fill_user, roles: ROLE_PARTIAL_REG}
         - { path: ^/, roles: ROLE_FULL_REG }
 
