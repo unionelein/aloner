@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Component\DTO\Entity\UserDTO;
-use App\Component\VO\Sex;
 use App\Entity\User;
-use App\Form\FillUserType;
+use App\Form\UserType;
 use App\Security\Authenticator\VkAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -30,27 +28,19 @@ class UserController extends BaseController
         RememberMeServicesInterface $rememberMeServices,
         TokenStorageInterface $tokenStorage
     ): Response {
-        $user = $this->getUser();
-        $form = $this->createForm(FillUserType::class, UserDTO::create($user))
+        $form = $this->createForm(UserType::class, $this->getUser())
             ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UserDTO $userDTO */
-            $userDTO = $form->getData();
-
-            $user->setName($userDTO->getName())
-                ->setCity($userDTO->getCity())
-                ->setBirthday($userDTO->getBirthday())
-                ->setSex(new Sex($userDTO->getSex()))
-                ->setPhone($userDTO->getPhone());
-
+            /** @var User $user */
+            $user = $form->getData();
             $user->addRole(User::ROLE_FULL_REG);
 
             $em->persist($user);
             $em->flush();
 
             $response = $this->redirectToRoute('app_main');
-            // authenticate when update role
+            // authenticate user when update role
             $guardHandler->authenticateUserAndHandleSuccess($user, $request, $vkAuthenticator, 'main');
             $rememberMeServices->loginSuccess($request, $response, $tokenStorage->getToken());
 

@@ -7,6 +7,7 @@ use App\Component\VO\Sex;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -25,6 +26,7 @@ class User implements UserInterface
     private $id;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $name;
@@ -46,21 +48,25 @@ class User implements UserInterface
     private $vkToken;
 
     /**
+     * @Assert\NotNull()
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $sex;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="users")
      */
     private $city;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="date", nullable=true)
      */
     private $birthday;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=15, nullable=true)
      */
     private $phone;
@@ -167,9 +173,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getSex(): Sex
+    public function getSex(): ?Sex
     {
-        return new Sex($this->sex);
+        return null !== $this->sex ? new Sex($this->sex) : null;
     }
 
     public function setSex(Sex $sex): self

@@ -9,21 +9,21 @@ namespace App\Component\VO;
 
 class Sex
 {
-    public const FEMALE    = 0;
+    public const FEMALE = 0;
 
-    public const MALE      = 1;
+    public const MALE   = 1;
 
     public const SEX = [
         self::FEMALE    => 'Девушка',
         self::MALE      => 'Парень',
     ];
 
-    /** @var bool|null */
+    /** @var bool */
     private $sex;
 
-    public function __construct(?bool $isMan)
+    public function __construct(bool $sex)
     {
-        $this->sex = $isMan;
+        $this->sex = $sex;
     }
 
     public function isMale(): bool
@@ -36,12 +36,7 @@ class Sex
         return self::FEMALE === $this->sex;
     }
 
-    public function isUndefined(): bool
-    {
-        return null === $this->sex;
-    }
-
-    public function toValue(): ?bool
+    public function toValue(): bool
     {
         return $this->sex;
     }

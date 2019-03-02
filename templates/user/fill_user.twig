@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Ваш аккаунт{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -22,7 +22,9 @@
                     {{ form_row(form.sex) }}
                 </div>
                 <div class="col-sm-3">
-                    {{ form_row(form.birthday) }}
+                    <div class="float-right">
+                        {{ form_row(form.birthday) }}
+                    </div>
                 </div>
             </div>
 
@@ -33,12 +35,12 @@
             </div>
 
         <div class="row">
-            <div class="col-sm-4 offset-sm-3">
+            <div class="col-sm-4 offset-sm-3 abc-checkbox abc-checkbox-primary">
                 {{ form_row(form.acceptLicense) }}
             </div>
             <div class="col-sm-2">
-                <button class="btn btn-lg btn-primary float-right" type="submit">
-                    гоу гоу
+                <button class="btn btn-md btn-primary float-right" type="submit">
+                    Сохранить
                 </button>
             </div>
         </div>
