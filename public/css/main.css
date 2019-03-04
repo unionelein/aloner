@@ -1,39 +1,5 @@
-body {
-    padding: 0;
-    margin: 0;
-    min-height: 98vh;
-    position: relative;
-    background-color: rgb(250, 250, 250);
-}
-
-.app-header {
-    height: 65px;
-    padding: 20px 10px;
-    border-bottom: 1px solid rgba(0,0,0,.0975);
-    background-color: #fff;
-}
-
-.logo {
-    width: 25px;
-    height: 25px;
-}
-
-.logo-text {
-    padding-left: 6px;
-    font: 18px 'comic sans ms';
-    line-height: 1;
-}
-
-.app-content {
-    position: relative;
-    padding: 15px 0;
-}
-
-.app-footer {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    font: 14px Tahoma;
-    color: rgb(106, 106, 106);
+.search-criteria-wrapper {
+    padding: 15px;
+    border-left: 1px solid rgba(0,0,0,.0975);
+    padding-bottom: 500px;
 }

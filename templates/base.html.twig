@@ -8,7 +8,7 @@
             <link rel="stylesheet" href="{{ asset('css/bootstrap/awesome-bootstrap-checkbox.css') }}">
             <link rel="stylesheet" href="{{ asset('css/font-awesome/css/all.min.css') }}">
             <link rel="stylesheet" href="{{ asset('css/bootstrap/font-awesome.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/base.css') }}">
         {% endblock %}
     </head>
     <body>
@@ -18,6 +18,10 @@
                     <div class="col-sm-12 logo-wrapper">
                         <img class="logo" src="{{ asset('img/app_logo.png') }}" alt="AL">
                         <span class="logo-text">Aloner</span>
+
+                        {% if is_granted(constant('App\\Entity\\User::ROLE_FULL_REG')) %}
+                            <a class="float-right" href="{{ path('app_logout') }}">Выйти</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

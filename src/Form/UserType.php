@@ -35,6 +35,7 @@ class UserType extends AbstractType
             ])
             ->add('birthday', DateType::class, [
                 'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
                 'label' => false,
                 'help' => 'Дата рождения'
             ])

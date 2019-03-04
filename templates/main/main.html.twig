@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 ">
+                <p class="lead text-center mb-5 mt-3">
+                    Вы можете 2 раза изменить компанию, нажав кнопку [Дальше]
+                </p>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary">Поиск</button>
+                </div>
+            </div>
+
+            <div class="col-sm-4 search-criteria-wrapper">
+                <p>Возраст чиликов</p>
+                18|-0--------------|118
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

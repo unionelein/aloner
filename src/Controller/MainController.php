@@ -7,22 +7,18 @@
 
 namespace App\Controller;
 
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/")
  */
-class MainController extends AbstractController
+class MainController extends BaseController
 {
     /**
      * @Route("/", name="app_main")
      */
     public function main()
     {
-        return $this->render('event/main.html.twig', [
-            'soso' => 'Jay Avfsfs',
-        ]);
+        return $this->render('main/main.html.twig');
     }
 }
