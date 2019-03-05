@@ -3,24 +3,49 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/article.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-8 ">
-                <p class="lead text-center mb-5 mt-3">
-                    Вы можете 2 раза изменить компанию, нажав кнопку [Дальше]
-                </p>
-                <div class="text-center">
-                    <button type="button" class="btn btn-primary">Поиск</button>
+            <div class="col-sm-9 ">
+                <div class="article">
+                    <div class="article-header">
+                        Привет!<br> Здесь ты сможешь найти полезную информацию, а так же новости сайта
+                    </div>
+                    <div class="article-body">
+                        <p><i class="far fa-check-circle"></i> Чтобы начать поиск компании нажми кнопку [Поиск] справа</p>
+                        <p><i class="far fa-check-circle"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку [Дальше]. Так можно сделать только 2 раза в день.</p>
+                        <p>
+                            <i class="far fa-check-circle"></i>
+                            Ну вроде пока все :) И помни: <br>
+                            Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление
+                        </p>
+
+                        <div class="text-center">
+                            <img src="{{ asset('img/gatsby_mativation.png') }}" class="m-4">
+                        </div>
+
+                        <blockquote class="blockquote text-right">
+                            <p class="mb-0">Живешь ведь только раз! Решайся!</p>
+                            <footer class="blockquote-footer">Великий Гэтсби</footer>
+                        </blockquote>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-sm-4 search-criteria-wrapper">
-                <p>Возраст чиликов</p>
-                18|-0--------------|118
+            <div class="col-sm-3 menu-wrapper">
+                <div class="menu-party-wrapper">
+                    <div class="float-left text-center">
+                        <img src="https://lh3.googleusercontent.com/-j93KwITfA74/V0RzNtjSp-I/AAAAAAAAACU/Y6nW6XXAJMY7YFBqUFU8Xvt6PXLnpci3g/w800-h800/YOUTUBE%2BAVATAR.jpg" width="30" height="30"><br>
+                        {{ app.user.name }}
+                    </div>
+                </div>
 
+                <div class="search-btn-wrapper">
+                    <button type="button" class="btn btn-md btn-primary">Поиск</button>
+                </div>
             </div>
         </div>
     </div>

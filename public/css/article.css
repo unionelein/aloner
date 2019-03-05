@@ -1,0 +1,19 @@
+.article {
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,.0975);
+    padding: 40px 35px 20px 35px;
+    margin: 15px;
+}
+
+.article-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 25px;
+    color: #1d2124;
+}
+
+.article-body {
+    font-size: 16px;
+}

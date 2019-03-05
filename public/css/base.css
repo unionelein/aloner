@@ -20,6 +20,7 @@ body {
 }
 
 .logo-text {
+    color: #1d2124;
     padding-left: 6px;
     font: 18px 'comic sans ms';
     line-height: 1;
