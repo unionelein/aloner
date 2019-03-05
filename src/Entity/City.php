@@ -28,10 +28,16 @@ class City
      */
     private $users;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Event", mappedBy="city")
+     */
+    private $events;
+
     public function __construct(string $name)
     {
         $this->name = $name;
         $this->users = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -62,5 +68,23 @@ class City
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return Collection|Event[]
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->setCity($this);
+        }
+
+        return $this;
     }
 }

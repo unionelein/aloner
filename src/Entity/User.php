@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Component\Vk\DTO\AccessToken;
 use App\Component\VO\Sex;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -71,11 +73,17 @@ class User implements UserInterface
      */
     private $phone;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\EventParty", mappedBy="users")
+     */
+    private $eventParties;
+
     public function __construct(string $name)
     {
         $this->name = $name;
 
         $this->addRole(self::ROLE_PARTIAL_REG);
+        $this->eventParties = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -228,4 +236,44 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection|EventParty[]
+     */
+    public function getEventParties(): Collection
+    {
+        return $this->eventParties;
+    }
+
+    public function joinToEventParty(EventParty $eventParty): self
+    {
+        if (!$eventParty->isActive()) {
+            throw new \LogicException('Невозможно присоединиться в неактивное евент пати ');
+        }
+
+        if (!$this->eventParties->contains($eventParty)) {
+            $this->eventParties[] = $eventParty;
+            $eventParty->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function getActiveEventParty(): ?EventParty
+    {
+        foreach ($this->getEventParties() as $eventParty) {
+            if ($eventParty->isActive()) {
+                return $eventParty;
+            }
+        }
+
+        return null;
+    }
+
+    public function hasActiveEventParty(): bool
+    {
+        return null !== $this->getActiveEventParty();
+    }
+
+
 }

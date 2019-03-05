@@ -31,6 +31,17 @@ class Event
      */
     private $slug;
 
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="events")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $city;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,5 +62,29 @@ class Event
     public function getSlug(): ?string
     {
         return $this->slug;
+    }
+
+    public function getCity(): ?City
+    {
+        return $this->city;
+    }
+
+    public function setCity(?City $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

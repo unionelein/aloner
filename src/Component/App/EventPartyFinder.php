@@ -5,22 +5,20 @@
  * https://gitlab.cybercoder.site/vj/policies-procedures-standards/blob/master/licensing/GHCM-LICENSE.
  */
 
-namespace App\Controller;
+namespace App\Component\App;
 
+use App\Entity\EventParty;
+use App\Entity\User;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-
-/**
- * @Route("/event")
- */
-class EventController
+class EventPartyFinder
 {
-    /**
-     * @Route("/", name="app_event")
-     */
-    public function main()
+    public function findForUser(User $user): EventParty
     {
-        return new Response('event');
+
+    }
+
+    public function createForUser(User $user)
+    {
+
     }
 }

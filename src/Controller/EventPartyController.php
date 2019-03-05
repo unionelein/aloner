@@ -12,20 +12,35 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted(User::ROLE_PARTIAL_REG)
- * @Route("/")
+ * @Route("/event_party")
  */
-class MainController extends BaseController
+class EventPartyController extends BaseController
 {
     /**
-     * @Route("/", name="app_main")
+     * @Route("/", name="app_current_event_party")
      */
-    public function main()
+    public function currentEventParty()
+    {
+        $user = $this->getUser();
+        if (!($eventParty = $user->getActiveEventParty())) {
+            return $this->forward('App\Controller\MainController::main');
+        }
+
+        return $this->render('eventParty/event_party.html.twig', [
+            'eventParty' => $eventParty,
+        ]);
+    }
+
+    /**
+     * @Route("/join, name="app_join_to_event_party")
+     */
+    public function join()
     {
         $user = $this->getUser();
         if ($user->hasActiveEventParty()) {
             return $this->forward('App\Controller\EventPartyController::currentEventParty');
         }
 
-        return $this->render('main/main.html.twig');
+        return $this->forward('App\Controller\EventPartyController::currentEventParty');
     }
 }
