@@ -10,9 +10,9 @@ namespace App\Component\App;
 use App\Entity\EventParty;
 use App\Entity\User;
 
-class EventPartyFinder
+class EventPartyService
 {
-    public function findForUser(User $user): ?EventParty
+    public function createForUser(User $user): EventParty
     {
 
     }

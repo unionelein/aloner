@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class EventParty
 {
+    public const STATUS_PENDING = 1;
+
+    public const STATUS_READY = 2;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -39,9 +43,25 @@ class EventParty
      */
     private $meetingPoint;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $numberOfGirls;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $numberOfGuys;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $status;
+
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->status = self::STATUS_PENDING;
+        $this->users  = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,5 +134,46 @@ class EventParty
     public function isActive(): bool
     {
         return $this->meetingAt > new \DateTime();
+    }
+
+    public function getNumberOfGirls(): ?int
+    {
+        return $this->numberOfGirls;
+    }
+
+    public function setNumberOfGirls(int $numberOfGirls): self
+    {
+        $this->numberOfGirls = $numberOfGirls;
+
+        return $this;
+    }
+
+    public function getNumberOfGuys(): ?int
+    {
+        return $this->numberOfGuys;
+    }
+
+    public function setNumberOfGuys(int $numberOfGuys): self
+    {
+        $this->numberOfGuys = $numberOfGuys;
+
+        return $this;
+    }
+
+    public function getNumberOfPeople(): int
+    {
+        return $this->getNumberOfGuys() + $this->getNumberOfGirls();
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
+
+        return $this;
     }
 }

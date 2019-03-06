@@ -7,6 +7,8 @@
 
 namespace App\Controller;
 
+use App\Component\App\EventPartyFinder;
+use App\Component\App\EventPartyService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -21,8 +23,10 @@ class EventPartyController extends BaseController
      */
     public function currentEventParty()
     {
-        $user = $this->getUser();
-        if (!($eventParty = $user->getActiveEventParty())) {
+        $user       = $this->getUser();
+        $eventParty = $user->getActiveEventParty();
+
+        if (!$eventParty) {
             return $this->forward('App\Controller\MainController::main');
         }
 
@@ -34,12 +38,19 @@ class EventPartyController extends BaseController
     /**
      * @Route("/join, name="app_join_to_event_party")
      */
-    public function join()
+    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService)
     {
         $user = $this->getUser();
+
         if ($user->hasActiveEventParty()) {
             return $this->forward('App\Controller\EventPartyController::currentEventParty');
         }
+
+        $eventParty = $eventPartyFinder->findForUser($user);
+        if (!$eventParty) {
+            $eventPartyService->createForUser($user);
+        }
+        $user->joinToEventParty($eventParty);
 
         return $this->forward('App\Controller\EventPartyController::currentEventParty');
     }

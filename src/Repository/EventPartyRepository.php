@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\EventParty;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -19,32 +20,19 @@ class EventPartyRepository extends ServiceEntityRepository
         parent::__construct($registry, EventParty::class);
     }
 
-    // /**
-    //  * @return EventParty[] Returns an array of EventParty objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param User $user
+     *
+     * @return EventParty[]
+     */
+    public function findAvailableEventPartiesForUser(User $user): array
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
+        $this->createQueryBuilder('event_party')
+            ->innerJoin('event_party.event', 'event')
+            ->andWhere('event.city = :userCity')
+            ->andWhere('event_party.meetingAt')
+            ->setParameter('userCity', $user->getCity())
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?EventParty
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

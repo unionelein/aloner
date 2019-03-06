@@ -78,12 +78,18 @@ class User implements UserInterface
      */
     private $eventParties;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\EventParty")
+     */
+    private $skippedEventParties;
+
     public function __construct(string $name)
     {
         $this->name = $name;
 
         $this->addRole(self::ROLE_PARTIAL_REG);
         $this->eventParties = new ArrayCollection();
+        $this->skippedEventParties = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -275,5 +281,20 @@ class User implements UserInterface
         return null !== $this->getActiveEventParty();
     }
 
+    /**
+     * @return Collection|EventParty[]
+     */
+    public function getSkippedEventParties(): Collection
+    {
+        return $this->skippedEventParties;
+    }
 
+    public function skipEventParty(EventParty $skippedEventParty): self
+    {
+        if (!$this->skippedEventParties->contains($skippedEventParty)) {
+            $this->skippedEventParties[] = $skippedEventParty;
+        }
+
+        return $this;
+    }
 }
