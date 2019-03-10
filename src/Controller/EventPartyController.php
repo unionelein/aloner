@@ -10,6 +10,7 @@ namespace App\Controller;
 use App\Component\App\EventPartyFinder;
 use App\Component\App\EventPartyService;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,7 +29,7 @@ class EventPartyController extends BaseController
         $eventParty = $user->getActiveEventParty();
 
         if (!$eventParty) {
-            return $this->forward('App\Controller\MainController::main');
+            return $this->redirectToRoute('app_main');
         }
 
         return $this->render('eventParty/event_party.html.twig', [
@@ -39,17 +40,20 @@ class EventPartyController extends BaseController
     /**
      * @Route("/join", name="app_join_to_event_party")
      */
-    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService)
+    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService, EntityManagerInterface $em)
     {
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->forward('App\Controller\EventPartyController::currentEventParty');
+            return $this->redirectToRoute('app_current_event_party');
         }
 
         $eventParty = $eventPartyFinder->findForUser($user) ?? $eventPartyService->createForUser($user);
         $user->joinToEventParty($eventParty);
 
-        return $this->forward('App\Controller\EventPartyController::currentEventParty');
+        $em->persist($eventParty);
+        $em->flush();
+
+        return $this->redirectToRoute('app_current_event_party');
     }
 }

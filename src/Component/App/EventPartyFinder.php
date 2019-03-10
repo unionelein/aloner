@@ -29,6 +29,10 @@ class EventPartyFinder
 
         $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
 
+        \usort($eventParties, function (EventParty $eventParty1, EventParty $eventParty2) {
+            return $eventParty1->getNumberOfPeople() <=> $eventParty2->getNumberOfPeople();
+        });
+
         $resultEventParties = [];
         foreach ($eventParties as $eventParty) {
             if (\in_array($eventParty, $user->getSkippedEventParties()->toArray(), true)) {

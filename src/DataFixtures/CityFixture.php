@@ -6,7 +6,7 @@ use App\Entity\City;
 
 class CityFixture extends BaseFixture
 {
-    private const CITIES = [
+    public const CITIES = [
         'Гомель',
         'Минск',
         'Витебск',

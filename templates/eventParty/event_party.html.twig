@@ -1,6 +1,39 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+
+    <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/event_party.css') }}">
+{% endblock %}
+
 {% block body %}
-    {{ dump(eventParty) }}
-    {{ dump(eventParty.event) }}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="block">
+                    <div class="block-header">{{ eventParty.event.title }} ({{ eventParty.event.city }})</div>
+                    <div class="block-body">{{ eventParty.event.description }}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="block">
+                    <div class="block-body">
+                        <p>Участники: ({{ eventParty.users|length }}/{{ eventParty.numberOfPeople }})</p>
+                        <div class="participants-wrapper">
+                            {% for user in eventParty.users %}
+                                <div class="user-icon-block float-left">
+                                    <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.name }}">
+                                    <br>
+                                    {{ user.name }}
+                                </div>
+                            {% endfor %}
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

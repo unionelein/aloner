@@ -29,7 +29,7 @@ class MainController extends BaseController
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->forward('App\Controller\EventPartyController::currentEventParty');
+            return $this->redirectToRoute('app_current_event_party');
         }
 
         $searchCriteriaForm = $this->createForm(SearchCriteriaType::class, $user->getSearchCriteria())
@@ -42,7 +42,7 @@ class MainController extends BaseController
             $em->persist($searchCriteria);
             $em->flush();
 
-            return $this->forward('App\Controller\EventPartyController::join');
+            return $this->redirectToRoute('app_join_to_event_party');
         }
 
         return $this->render('main/main.html.twig', [

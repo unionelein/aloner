@@ -28,6 +28,7 @@ class EventPartyRepository extends ServiceEntityRepository
     public function findAvailableEventPartiesForUser(User $user): array
     {
         return $this->createQueryBuilder('event_party')
+            ->select('event_party, event')
             ->innerJoin('event_party.event', 'event')
             ->andWhere('event_party.status = :status')
             ->andWhere('event.city = :userCity')

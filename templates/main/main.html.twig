@@ -3,7 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/block_markup.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -37,7 +37,7 @@
                     <div class="block-body">
                         <div class="user-party-wrapper">
                             <div class="user-icon-block float-left">
-                                <img src="{{ asset(app.user.avatarPath) }}" alt="Аватар пользователя {{ app.user.name }}" width="40px" height="40px">
+                                <img src="{{ asset(app.user.avatarPath) }}" alt="Аватар пользователя {{ app.user.name }}">
                                 <br>
                                 {{ app.user.name }}
                             </div>

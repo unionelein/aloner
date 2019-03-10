@@ -16,3 +16,14 @@
 .block-body {
     font-size: 16px;
 }
+
+.user-icon-block {
+    text-align: center;
+    margin: 5px;
+    font-size: 12px;
+}
+
+.user-icon-block img {
+    width: 40px;
+    height: 40px;
+}

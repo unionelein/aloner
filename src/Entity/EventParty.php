@@ -63,8 +63,10 @@ class EventParty
      */
     private $status;
 
-    public function __construct()
+    public function __construct(Event $event)
     {
+        $this->event = $event;
+
         $this->status = self::STATUS_PENDING;
         $this->users  = new ArrayCollection();
     }

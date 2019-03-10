@@ -9,11 +9,34 @@ namespace App\Component\App;
 
 use App\Entity\EventParty;
 use App\Entity\User;
+use App\Repository\EventRepository;
 
 class EventPartyService
 {
+    /**
+     * @var EventRepository
+     */
+    private $eventRepo;
+
+    public function __construct(EventRepository $eventRepo)
+    {
+        $this->eventRepo = $eventRepo;
+    }
+
     public function createForUser(User $user): EventParty
     {
+        $events = $this->eventRepo->findAppropriateEventsForUser($user);
 
+        if (!\count($events)) {
+            throw new \LogicException('Нет евентов для юзера');
+        }
+
+        $event = \reset(\shuffle($events));
+
+        $eventParty = new EventParty($event);
+        $eventParty->setNumberOfGuys(2);
+        $eventParty->setNumberOfGirls(1);
+
+        return $eventParty;
     }
 }

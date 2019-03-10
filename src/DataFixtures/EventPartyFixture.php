@@ -9,10 +9,9 @@ class EventPartyFixture extends BaseFixture
     public function loadData()
     {
         $this->createMany('event_party', 10, function (int $index) {
-            $eventParty = new EventParty();
-            $eventParty->setEvent($this->getReference('event_' . \random_int(1, 10)));
-            $eventParty->setNumberOfGirls(2);
-            $eventParty->setNumberOfGuys(2);
+            $eventParty = new EventParty($this->getReference('event_' . $this->faker->numberBetween(1, \count(EventFixture::EVENT_TITLES))));
+            $eventParty->setNumberOfGirls($this->faker->numberBetween(2, 3));
+            $eventParty->setNumberOfGuys($this->faker->numberBetween(2, 3));
 
             return $eventParty;
         });
