@@ -9,9 +9,9 @@ namespace App\Component\VO;
 
 class Sex
 {
-    public const FEMALE = 0;
+    public const FEMALE = false;
 
-    public const MALE   = 1;
+    public const MALE = true;
 
     public const SEX = [
         self::FEMALE    => 'Девушка',

@@ -16,7 +16,7 @@ class CityFixture extends BaseFixture
 
     protected function loadData()
     {
-        $this->createMany('city', 5, function (int $index) {
+        $this->createMany('city', \count(self::CITIES), function (int $index) {
             $name = self::CITIES[$index - 1];
 
             return new City($name);

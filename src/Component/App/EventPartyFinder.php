@@ -9,11 +9,39 @@ namespace App\Component\App;
 
 use App\Entity\EventParty;
 use App\Entity\User;
+use App\Repository\EventPartyRepository;
 
 class EventPartyFinder
 {
+    /**
+     * @var EventPartyRepository
+     */
+    private $eventPartyRepo;
+
+    public function __construct(EventPartyRepository $eventPartyRepo)
+    {
+        $this->eventPartyRepo = $eventPartyRepo;
+    }
+
     public function findForUser(User $user): ?EventParty
     {
+        $criteria = $user->getSearchCriteria();
 
+        $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
+
+        $resultEventParties = [];
+        foreach ($eventParties as $eventParty) {
+            if (\in_array($eventParty, $user->getSkippedEventParties()->toArray(), true)) {
+                continue;
+            }
+
+            if (!$eventParty->canAddUser($user)) {
+                continue;
+            }
+
+            $resultEventParties[] = $eventParty;
+        }
+
+        return $resultEventParties[0] ?? null;
     }
 }

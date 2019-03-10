@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\App\Infrastructure\ResourceLocator;
 use App\Component\Vk\DTO\AccessToken;
 use App\Component\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -83,6 +84,16 @@ class User implements UserInterface
      */
     private $skippedEventParties;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $avatar;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\SearchCriteria", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $searchCriteria;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -90,6 +101,7 @@ class User implements UserInterface
         $this->addRole(self::ROLE_PARTIAL_REG);
         $this->eventParties = new ArrayCollection();
         $this->skippedEventParties = new ArrayCollection();
+        $this->setSearchCriteria(new SearchCriteria($this));
     }
 
     public function getId(): ?int
@@ -253,10 +265,6 @@ class User implements UserInterface
 
     public function joinToEventParty(EventParty $eventParty): self
     {
-        if (!$eventParty->isActive()) {
-            throw new \LogicException('Невозможно присоединиться в неактивное евент пати ');
-        }
-
         if (!$this->eventParties->contains($eventParty)) {
             $this->eventParties[] = $eventParty;
             $eventParty->addUser($this);
@@ -293,6 +301,48 @@ class User implements UserInterface
     {
         if (!$this->skippedEventParties->contains($skippedEventParty)) {
             $this->skippedEventParties[] = $skippedEventParty;
+        }
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(string $avatar): self
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getAvatarPath(): string
+    {
+        if ($this->avatar) {
+            return ResourceLocator::USER_AVATAR_DIR . $this->avatar;
+        }
+
+        if ($sex = $this->getSex()) {
+            return ResourceLocator::USER_AVATAR_DIR . ($sex->isMale() ? 'guy_default.png' : 'girl_default.png');
+        }
+
+        return ResourceLocator::USER_AVATAR_DIR . 'unknown_default.png';
+    }
+
+    public function getSearchCriteria(): SearchCriteria
+    {
+        return $this->searchCriteria;
+    }
+
+    private function setSearchCriteria(SearchCriteria $searchCriteria): self
+    {
+        $this->searchCriteria = $searchCriteria;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $searchCriteria->getUser()) {
+            $searchCriteria->setUser($this);
         }
 
         return $this;

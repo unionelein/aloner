@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,7 +14,11 @@ class EventParty
 {
     public const STATUS_PENDING = 1;
 
-    public const STATUS_READY = 2;
+    public const STATUS_PREPARATION = 2;
+
+    public const STATUS_READY = 3;
+
+    public const STATUS_DONE = 4;
 
     /**
      * @ORM\Id()
@@ -79,17 +84,40 @@ class EventParty
 
     public function addUser(User $user): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
+        if ($this->users->contains($user)) {
+            return $this;
+        }
+        
+        if (!$this->canAddUser($user)) {
+            throw new \LogicException('Невозможно добавить пользователя в евент пати');
+        }
+
+        $this->users[] = $user;
+        
+        if ($this->isFilled()) {
+            $this->status = self::STATUS_PREPARATION;
         }
 
         return $this;
+    }
+
+    public function canAddUser(User $user): bool
+    {
+        $maxNumber     = $user->getSex()->isFemale() ? $this->getNumberOfGirls() : $this->getNumberOfGuys();
+        $currentNumber = $user->getSex()->isFemale() ? $this->getCurrentNumberOfGirls() : $this->getCurrentNumberOfGuys();
+
+        if ($currentNumber >= $maxNumber) {
+            return false;
+        }
+        
+        return true;
     }
 
     public function removeUser(User $user): self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
+            $this->status = self::STATUS_PENDING;
         }
 
         return $this;
@@ -133,7 +161,7 @@ class EventParty
 
     public function isActive(): bool
     {
-        return $this->meetingAt > new \DateTime();
+        return $this->meetingAt === null || $this->meetingAt > new \DateTime();
     }
 
     public function getNumberOfGirls(): ?int
@@ -165,15 +193,32 @@ class EventParty
         return $this->getNumberOfGuys() + $this->getNumberOfGirls();
     }
 
+    public function getCurrentNumberOfGirls()
+    {
+        $girls = \array_filter($this->getUsers()->toArray(), function (User $user) {
+            return $user->getSex()->isFemale();
+        });
+
+        return \count($girls);
+    }
+
+    public function getCurrentNumberOfGuys()
+    {
+        $guys = \array_filter($this->getUsers()->toArray(), function (User $user) {
+            return $user->getSex()->isMale();
+        });
+
+        return \count($guys);
+    }
+
+    public function isFilled(): bool
+    {
+        return $this->getCurrentNumberOfGuys() === $this->getNumberOfGuys()
+            && $this->getCurrentNumberOfGirls() === $this->getNumberOfGirls();
+    }
+
     public function getStatus(): ?int
     {
         return $this->status;
-    }
-
-    public function setStatus(int $status): self
-    {
-        $this->status = $status;
-
-        return $this;
     }
 }

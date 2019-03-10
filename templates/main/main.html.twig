@@ -3,31 +3,28 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/article.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/block_markup.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-9 ">
-                <div class="article">
-                    <div class="article-header">
-                        Привет!<br> Здесь ты сможешь найти полезную информацию, а так же новости сайта
+            <div class="col-sm-8 ">
+                <div class="block">
+                    <div class="block-header">
+                        Здесь ты сможешь найти полезную информацию и новости сайта
                     </div>
-                    <div class="article-body">
-                        <p><i class="far fa-check-circle"></i> Чтобы начать поиск компании нажми кнопку [Поиск] справа</p>
-                        <p><i class="far fa-check-circle"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку [Дальше]. Так можно сделать только 2 раза в день.</p>
-                        <p>
-                            <i class="far fa-check-circle"></i>
-                            Ну вроде пока все :) И помни: <br>
-                            Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление
-                        </p>
+                    <div class="block-body ml-4">
+                        <p><i class="fas fa-angle-right"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
+                        <p><i class="fas fa-angle-right"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
+                        <p><i class="fas fa-angle-right"></i> Ну вроде пока все :) И помни: <br></p>
+                        <p><i>Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление</i></p>
 
                         <div class="text-center">
-                            <img src="{{ asset('img/gatsby_mativation.png') }}" class="m-4">
+                            <img src="{{ asset('img/gatsby_motivation.png') }}" class="m-3">
                         </div>
 
-                        <blockquote class="blockquote text-right">
+                        <blockquote class="blockquote text-right mb-0">
                             <p class="mb-0">Живешь ведь только раз! Решайся!</p>
                             <footer class="blockquote-footer">Великий Гэтсби</footer>
                         </blockquote>
@@ -35,16 +32,37 @@
                 </div>
             </div>
 
-            <div class="col-sm-3 menu-wrapper">
-                <div class="menu-party-wrapper">
-                    <div class="float-left text-center">
-                        <img src="https://lh3.googleusercontent.com/-j93KwITfA74/V0RzNtjSp-I/AAAAAAAAACU/Y6nW6XXAJMY7YFBqUFU8Xvt6PXLnpci3g/w800-h800/YOUTUBE%2BAVATAR.jpg" width="30" height="30"><br>
-                        {{ app.user.name }}
-                    </div>
-                </div>
+            <div class="col-sm-4 position-relative">
+                <div class="block">
+                    <div class="block-body">
+                        <div class="user-party-wrapper">
+                            <div class="user-icon-block float-left">
+                                <img src="{{ asset(app.user.avatarPath) }}" alt="Аватар пользователя {{ app.user.name }}" width="40px" height="40px">
+                                <br>
+                                {{ app.user.name }}
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
 
-                <div class="search-btn-wrapper">
-                    <button type="button" class="btn btn-md btn-primary">Поиск</button>
+                        <div class="event-party-history-wrapper">
+                            <button type="button" class="btn btn-light event-party-history-btn">История</button>
+                        </div>
+
+                        <div class="search-criteria-wrapper">
+                            {{ form_start(searchCriteriaForm) }}
+                                <p>В какое время вы cможете пойти?</p>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeFrom) }}</div>
+                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeTo) }}</div>
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary search-event-party-btn">Найти</button>
+                                </div>
+                            {{ form_end(searchCriteriaForm) }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
