@@ -31,7 +31,8 @@ class EventPartyService
             throw new \LogicException('Нет евентов для юзера');
         }
 
-        $event = \reset(\shuffle($events));
+        \shuffle($events);
+        $event = \reset($events);
 
         $eventParty = new EventParty($event);
         $eventParty->setNumberOfGuys(2);

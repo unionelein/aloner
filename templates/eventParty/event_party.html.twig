@@ -11,25 +11,77 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <div class="block">
-                    <div class="block-header">{{ eventParty.event.title }} ({{ eventParty.event.city }})</div>
-                    <div class="block-body">{{ eventParty.event.description }}</div>
+                <h4 class="text-center event-party-title">{{ eventParty.event.title }} ({{ eventParty.event.city }})</h4>
+
+                <nav>
+                    <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">Информация</a>
+                        <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">Контакты</a>
+                        <a class="nav-item nav-link" id="nav-todo-tab" href="#nav-todo" data-toggle="tab" role="tab" aria-controls="nav-todo" aria-selected="false">А что нужно делать?</a>
+                    </div>
+                </nav>
+                <div class="tab-content nav-block-content-wrapper" id="nav-tabContent">
+                    <div class="tab-pane fade show active block nav-block" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
+                        <div class="block-body">
+                            {{ eventParty.event.description }}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade block nav-block" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
+                        <div class="block-body">
+                            <p>Номер <i>мобилы +3242342342</i></p>
+                            <p>Адрес <i>331, ул. Ильича, Гомель</i></p>
+                            <p><img src="https://pzik.ru/uploads/afd3e.jpg" alt=""></p>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade block nav-block" id="nav-todo" role="tabpanel" aria-labelledby="nav-todo-tab">
+                        <div class="block-body">
+                            <p>1. Вам нужно выбрать время, когда вы сможете пойти.</p>
+                            <p>2. Теперь нужно позвонить по номеру, указанному на вкладке "Котакты" и забронировать место для участников</p>
+                            <p>3. Встречайтесь в назначенное время и веселитесь!</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-sm-4">
+                <p class="participants-number-info">Участники: ({{ eventParty.users|length }}/{{ eventParty.numberOfPeople }})</p>
+                <div class="participants-wrapper">
+                    {% for user in eventParty.users %}
+                        <div class="user-icon-block float-left">
+                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.name }}">
+                            <br>
+                            {{ user.name }}
+                        </div>
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                </div>
+
                 <div class="block">
                     <div class="block-body">
-                        <p>Участники: ({{ eventParty.users|length }}/{{ eventParty.numberOfPeople }})</p>
-                        <div class="participants-wrapper">
-                            {% for user in eventParty.users %}
-                                <div class="user-icon-block float-left">
-                                    <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.name }}">
-                                    <br>
-                                    {{ user.name }}
+                        <div class="block chat-wrapper">
+
+                            <div class="block-body" >
+                                <p><b>Алексей:</b> Привет, ты как здесь очутилась, реклама вк?</p>
+                                <p><b>Аня:</b> Привет, ага)</p>
+
+                                <div class="block" style="margin-top: 210px;">
+                                    <div class="block-body">
+                                        |
+                                        <span class="float-right">|></span>
+                                    </div>
                                 </div>
-                            {% endfor %}
-                            <div class="clearfix"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="row event-party-actions-wrapper">
+                            <div class="col-sm-6">
+                                <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <a href="{{ path('app_leave_event_party', {id: eventParty.id}) }}" class="btn btn-danger w-100">Выход</a>
+                            </div>
                         </div>
                     </div>
                 </div>

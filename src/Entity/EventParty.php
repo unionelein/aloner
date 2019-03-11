@@ -28,7 +28,7 @@ class EventParty
     private $id;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="eventParty")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="eventParties")
      */
     private $users;
 

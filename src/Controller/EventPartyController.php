@@ -9,6 +9,7 @@ namespace App\Controller;
 
 use App\Component\App\EventPartyFinder;
 use App\Component\App\EventPartyService;
+use App\Entity\EventParty;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -55,5 +56,35 @@ class EventPartyController extends BaseController
         $em->flush();
 
         return $this->redirectToRoute('app_current_event_party');
+    }
+
+    /**
+     * @Route("/skip/{id}", name="app_skip_event_party")
+     */
+    public function skip(EventParty $eventParty, EntityManagerInterface $em)
+    {
+        $user = $this->getUser();
+        $user->skipEventParty($eventParty);
+
+        $em->persist($eventParty);
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_join_to_event_party');
+    }
+
+    /**
+     * @Route("/leave/{id}", name="app_leave_event_party")
+     */
+    public function leave(EventParty $eventParty, EntityManagerInterface $em)
+    {
+        $user = $this->getUser();
+        $user->skipEventParty($eventParty);
+
+        $em->persist($eventParty);
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_main');
     }
 }

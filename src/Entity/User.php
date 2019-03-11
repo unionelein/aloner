@@ -300,6 +300,7 @@ class User implements UserInterface
     public function skipEventParty(EventParty $skippedEventParty): self
     {
         if (!$this->skippedEventParties->contains($skippedEventParty)) {
+            $skippedEventParty->removeUser($this);
             $this->skippedEventParties[] = $skippedEventParty;
         }
 

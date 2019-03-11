@@ -5,6 +5,10 @@
     padding: 25px;
 }
 
+.nav-block-content-wrapper .block:first-child {
+    border-top-left-radius: 0;
+}
+
 .block-header {
     text-align: center;
     font-weight: bold;
