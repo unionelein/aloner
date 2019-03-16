@@ -11,7 +11,9 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h4 class="text-center event-party-title">{{ eventParty.event.title }} ({{ eventParty.event.city }})</h4>
+                <h5 class="text-center">
+                    Ожидаем еще 2 игроков <span style="font-size: 12px">(<a class="more" href="#">?</a>)</span>
+                </h5>
 
                 <nav>
                     <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
@@ -23,6 +25,7 @@
                 <div class="tab-content nav-block-content-wrapper" id="nav-tabContent">
                     <div class="tab-pane fade show active block nav-block" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
                         <div class="block-body">
+                            <h4 class="text-center event-party-title">{{ eventParty.event.title }} ({{ eventParty.event.city }})</h4>
                             {{ eventParty.event.description }}
                         </div>
                     </div>
@@ -58,31 +61,27 @@
 
                 <div class="block">
                     <div class="block-body">
-                        <div class="block chat-wrapper">
-
-                            <div class="block-body" >
-                                <p><b>Алексей:</b> Привет, ты как здесь очутилась, реклама вк?</p>
-                                <p><b>Аня:</b> Привет, ага)</p>
-
-                                <div class="block" style="margin-top: 210px;">
-                                    <div class="block-body">
-                                        |
-                                        <span class="float-right">|></span>
-                                    </div>
-                                </div>
-                            </div>
-
+                        <div class="chat-wrapper">
+                            <p><b>Алексей:</b> Привет, ты как здесь очутилась, реклама вк?</p>
+                            <p><b>Аня:</b> Привет, ага)</p>
                         </div>
 
-                        <div class="row event-party-actions-wrapper">
-                            <div class="col-sm-6">
-                                <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
-                            </div>
+                        <hr>
 
-                            <div class="col-sm-6">
-                                <a href="{{ path('app_leave_event_party', {id: eventParty.id}) }}" class="btn btn-danger w-100">Выход</a>
-                            </div>
+                        <div>
+                            &nbsp;&nbsp;&nbsp;Написать
+                            <span class="float-right">|></span>
                         </div>
+
+                    </div>
+                </div>
+                <div class="row event-party-actions-wrapper mt-4">
+                    <div class="col-sm-6">
+                        <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <a href="{{ path('app_leave_event_party', {id: eventParty.id}) }}" class="btn btn-danger w-100">Выход</a>
                     </div>
                 </div>
             </div>

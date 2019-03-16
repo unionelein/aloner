@@ -42,6 +42,16 @@ class Event
      */
     private $city;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $site;
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $media = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,6 +94,30 @@ class Event
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getSite(): ?string
+    {
+        return $this->site;
+    }
+
+    public function setSite(?string $site): self
+    {
+        $this->site = $site;
+
+        return $this;
+    }
+
+    public function getMedia(): ?array
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?array $media): self
+    {
+        $this->media = $media;
 
         return $this;
     }
