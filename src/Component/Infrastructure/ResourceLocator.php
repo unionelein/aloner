@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Component\App\Infrastructure;
+namespace App\Component\Infrastructure;
 
 class ResourceLocator
 {

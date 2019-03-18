@@ -5,7 +5,7 @@
  * https://gitlab.cybercoder.site/vj/policies-procedures-standards/blob/master/licensing/GHCM-LICENSE.
  */
 
-namespace App\Component\VO;
+namespace App\Component\Model\VO;
 
 class Sex
 {

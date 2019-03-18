@@ -68,10 +68,17 @@
 
                         <hr>
 
-                        <div>
-                            &nbsp;&nbsp;&nbsp;Написать
-                            <span class="float-right">|></span>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="chat-message-input">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-primary" id="chat-send-message" data-user-name="{{ app.user.name }}">
+                                    <i class="fa fa-caret-right"></i>
+                                </button>
+                            </div>
                         </div>
+
 
                     </div>
                 </div>
@@ -87,4 +94,10 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('js/event_party.js') }}"></script>
 {% endblock %}

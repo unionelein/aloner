@@ -5,7 +5,7 @@
  * https://gitlab.cybercoder.site/vj/policies-procedures-standards/blob/master/licensing/GHCM-LICENSE.
  */
 
-namespace App\Component\App;
+namespace App\Component\EventParty;
 
 use App\Entity\EventParty;
 use App\Entity\User;

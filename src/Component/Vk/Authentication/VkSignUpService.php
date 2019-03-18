@@ -3,7 +3,7 @@
 namespace App\Component\Vk\Authentication;
 
 use App\Component\Vk\DTO\AccessToken;
-use App\Component\VO\Sex;
+use App\Component\Model\VO\Sex;
 use App\Entity\User;
 use App\Repository\CityRepository;
 use Doctrine\ORM\EntityManagerInterface;

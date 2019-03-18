@@ -7,8 +7,8 @@
 
 namespace App\Controller;
 
-use App\Component\App\EventPartyFinder;
-use App\Component\App\EventPartyService;
+use App\Component\EventParty\EventPartyFinder;
+use App\Component\EventParty\EventPartyService;
 use App\Entity\EventParty;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;

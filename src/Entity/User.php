@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Component\App\Infrastructure\ResourceLocator;
+use App\Component\Infrastructure\ResourceLocator;
 use App\Component\Vk\DTO\AccessToken;
-use App\Component\VO\Sex;
+use App\Component\Model\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

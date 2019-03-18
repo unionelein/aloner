@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Component\VO\Sex;
+use App\Component\Model\VO\Sex;
 use App\Entity\City;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
