@@ -78,7 +78,7 @@
                                 </button>
                             </div>
                         </div>
-
+                        <button type="button" class="test-pusher" data-url="{{ path('app_test_pusher') }}">test pusher</button>
 
                     </div>
                 </div>
@@ -98,6 +98,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-
+    <script src="{{ asset('js/socket/autobahn.min.js') }}"></script>
     <script src="{{ asset('js/event_party.js') }}"></script>
 {% endblock %}

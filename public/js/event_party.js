@@ -4,7 +4,7 @@ $(document).ready(() => {
         // You can add more information in a static object
     };
 
-    let conn = new WebSocket('ws://localhost:8080');
+    let conn = new WebSocket('ws://localhost:8080/chat');
 
     conn.onopen = () => {
         console.info("Connection established succesfully");
@@ -46,4 +46,34 @@ $(document).ready(() => {
             this.appendMessage(clientInformation.username, clientInformation.message);
         }
     };
+
+
+    $('.test-pusher').on('click', (e) => {
+        const url = $(e.currentTarget).data('url');
+
+        $.ajax({
+            url: url,
+            success: function(data){
+                console.log(data);
+            }
+        });
+    });
+
+    // var conn2 = new WebSocket('ws://localhost:8080/push');
+    // conn2.subscribe('pusher',function(topic, data) {
+    //     console.log(topic, data);
+    // });
+
+    var conn2 = new autobahn.Session('ws://localhost:8080/push',
+        function() {
+            conn.subscribe('pusher', function(topic, data) {
+                console.log(topic, data);
+            });
+        },
+        function() {
+            console.warn('WebSocket connection closed');
+        },
+        {'skipSubprotocolCheck': true}
+    );
+
 });
