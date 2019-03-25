@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Component\Messaging\Chat;
-use App\Component\Messaging\Pusher;
+use App\Component\Messaging\Announcement;
 use Ratchet\App;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class PushRunCommand extends Command
+class AnnouncementRunCommand extends Command
 {
     protected static $defaultName = 'app:push:run';
 
@@ -28,7 +28,7 @@ class PushRunCommand extends Command
         $output->writeln('push start');
 
         $loop   = Factory::create();
-        $pusher = new Pusher();
+        $pusher = new Announcement();
 
         // Listen for the web server to make a ZeroMQ push after an ajax request
         $context = new Context($loop);
@@ -37,8 +37,7 @@ class PushRunCommand extends Command
         $pull->on('message', array($pusher, 'onBlogEntry'));
 
         // Set up our WebSocket server for clients wanting real-time updates
-        $webSock = new Server('0.0.0.0:8080', $loop); // Binding to 0.0.0.0 means remotes can connect
-        $webSock->listeners(8080);
+        $webSock = new Server('0.0.0.0:8888/pusher', $loop); // Binding to 0.0.0.0 means remotes can connect
         $webServer = new IoServer(
             new HttpServer(
                 new WsServer(

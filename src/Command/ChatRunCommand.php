@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Component\Messaging\Chat;
-use App\Component\Messaging\Pusher;
+use App\Component\Messaging\Announcement;
 use Ratchet\App;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;

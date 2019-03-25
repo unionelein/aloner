@@ -7,6 +7,10 @@ use Ratchet\ConnectionInterface;
 
 class Chat implements MessageComponentInterface
 {
+    private const TYPE_IDENTIFY = 'identify';
+
+    private const TYPE_MESSAGE = 'message';
+
     protected $clients;
 
     public function __construct()
@@ -16,24 +20,21 @@ class Chat implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        // Store the new connection to send messages to later
         $this->clients->attach($conn);
 
         echo "New connection! ({$conn->resourceId})\n";
     }
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $json)
     {
-        $numRecv = count($this->clients) - 1;
+        $data = \json_decode($json, true);
 
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
-            }
+        switch ($data['type'] ?? 0) {
+            case self::TYPE_IDENTIFY:
+                $this->identify($from, $data);
+                break;
+            case self::TYPE_MESSAGE:
+                $this->message($data);
         }
     }
 
@@ -50,5 +51,17 @@ class Chat implements MessageComponentInterface
         echo "An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
+    }
+
+    private function identify(ConnectionInterface $from, array $data)
+    {
+        $data['userTempHash'];
+    }
+
+    private function message(array $data)
+    {
+        foreach ($this->clients as $client) {
+            $client->send($data);
+        }
     }
 }

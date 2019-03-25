@@ -41,3 +41,7 @@ body {
     font: 14px Tahoma;
     color: rgb(106, 106, 106);
 }
+
+.btn-light {
+    border-color: rgba(0,0,0,.0975);
+}

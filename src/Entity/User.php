@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\Infrastructure\HashGenerator;
 use App\Component\Infrastructure\ResourceLocator;
 use App\Component\Vk\DTO\AccessToken;
 use App\Component\Model\VO\Sex;
@@ -93,6 +94,11 @@ class User implements UserInterface
      * @ORM\OneToOne(targetEntity="App\Entity\SearchCriteria", mappedBy="user", cascade={"persist", "remove"})
      */
     private $searchCriteria;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tempHash;
 
     public function __construct(string $name)
     {
@@ -345,6 +351,25 @@ class User implements UserInterface
         if ($this !== $searchCriteria->getUser()) {
             $searchCriteria->setUser($this);
         }
+
+        return $this;
+    }
+
+    public function getTempHash(): ?string
+    {
+        return $this->tempHash;
+    }
+
+    public function setTempHash(?string $tempHash): self
+    {
+        $this->tempHash = $tempHash;
+
+        return $this;
+    }
+
+    public function updateTempHash(): self
+    {
+        $this->tempHash = HashGenerator::createUnique();
 
         return $this;
     }

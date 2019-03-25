@@ -5,7 +5,7 @@ namespace App\Component\Messaging;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
-class Pusher implements WampServerInterface {
+class Announcement implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
