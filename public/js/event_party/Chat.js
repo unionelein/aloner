@@ -10,14 +10,16 @@ class Chat {
 
     constructor() {
         this.$currentUser = $('#current-user');
-        this.$chatSendMsgBtn = $('.chat-send-message-btn');
+        this.$sendMessageBtn = $('.chat-send-message-btn');
+        this.$messageInput = $('.chat-message-input');
+        this.$messagesBlock = $('.chat-messages-block');
 
         $.ajax(this.$currentUser.data('temp-hash-url')).done((data) => {
             this.userTempHash = data.tempHash;
             this.setUpConnection();
         });
 
-        this.$chatSendMsgBtn.on('click', this.handleClickSendMessageBtn.bind(this));
+        this.$sendMessageBtn.on('click', this.handleClickSendMessageBtn.bind(this));
     }
 
     setUpConnection() {
@@ -45,17 +47,15 @@ class Chat {
     }
 
     handleClickSendMessageBtn(e) {
-        const $input = $('#chat-message-input');
+        this.sendMessage(this.$messageInput.val());
 
-        this.sendMessage($input.val());
-
-        $input.val('');
+        this.$messageInput.val('');
     }
 
     appendMessage (username, message) {
-        const $msg  = $('<p>').html(`<b>${username}</b>: ${message}`);
+        const $msg = $('<p>').html(`<b>${username}</b>: ${message}`);
 
-        $('.chat-wrapper').append($msg);
+        this.$messagesBlock.append($msg);
     }
 
     sendMessage (text) {
@@ -63,10 +63,9 @@ class Chat {
             return;
         }
 
-        this.clientData.message = text;
-
-        this.connection.send(JSON.stringify(this.clientData));
-
-        this.appendMessage(this.clientData.username, this.clientData.message);
+        this.sendData({
+            type: Chat.TYPE_MESSAGE,
+            message: text
+        });
     }
-};
+}

@@ -2,6 +2,9 @@
 
 namespace App\Component\Messaging;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
@@ -13,14 +16,25 @@ class Chat implements MessageComponentInterface
 
     protected $clients;
 
-    public function __construct()
+    protected $clientsData = [];
+
+    /** @var EntityManagerInterface */
+    private $em;
+
+    /** @var UserRepository  */
+    private $userRepo;
+
+    public function __construct(EntityManagerInterface $em)
     {
         $this->clients = new \SplObjectStorage;
+        $this->em = $em;
+        $this->userRepo = $em->getRepository(User::class);
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
+        $this->clientsData[$conn->resourceId] = [];
 
         echo "New connection! ({$conn->resourceId})\n";
     }
@@ -34,14 +48,14 @@ class Chat implements MessageComponentInterface
                 $this->identify($from, $data);
                 break;
             case self::TYPE_MESSAGE:
-                $this->message($data);
+                $this->message($from, $data);
         }
     }
 
     public function onClose(ConnectionInterface $conn)
     {
-        // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
+        unset($this->clientsData[$conn->resourceId]);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
@@ -55,13 +69,44 @@ class Chat implements MessageComponentInterface
 
     private function identify(ConnectionInterface $from, array $data)
     {
-        $data['userTempHash'];
+        $this->checkDBConnection();
+        $user = $this->userRepo->findByTempHash($data['userTempHash'] ?? '');
+
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $this->clientsData[$from->resourceId] = [
+            'userId'   => $user->getId(),
+            'username' => $user->getName(),
+        ];
+
+        echo "Identified user: '{$user->getName()}' ({$from->resourceId})\n";
     }
 
-    private function message(array $data)
+    private function checkDBConnection(): void
     {
-        foreach ($this->clients as $client) {
-            $client->send($data);
+        if ($this->em->getConnection()->ping() === false) {
+            $this->em->getConnection()->close();
+            $this->em->getConnection()->connect();
         }
+    }
+
+    private function message(ConnectionInterface $from, array $data)
+    {
+        if (empty($data['message']) || empty($this->clientsData[$from->resourceId]['username'])) {
+            return;
+        }
+
+        $msg = [
+            'username' => $this->clientsData[$from->resourceId]['username'],
+            'message'  => $data['message'],
+        ];
+
+        foreach ($this->clients as $client) {
+            $client->send(\json_encode($msg));
+        }
+
+        echo "New message from {$msg['username']}: {$msg['message']}\n";
     }
 }
