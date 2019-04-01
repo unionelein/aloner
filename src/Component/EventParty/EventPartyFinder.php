@@ -28,18 +28,15 @@ class EventPartyFinder
         $criteria = $user->getSearchCriteria();
 
         $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
-
-        \usort($eventParties, function (EventParty $eventParty1, EventParty $eventParty2) {
-            return $eventParty1->getNumberOfPeople() <=> $eventParty2->getNumberOfPeople();
-        });
+        $this->sortByRelevance($eventParties);
 
         $resultEventParties = [];
         foreach ($eventParties as $eventParty) {
-            if (\in_array($eventParty, $user->getSkippedEventParties()->toArray(), true)) {
+            if ($user->getSkippedEventParties()->contains($eventParty)) {
                 continue;
             }
 
-            if (!$eventParty->canAddUser($user)) {
+            if (!$eventParty->canUserJoin($user)) {
                 continue;
             }
 
@@ -47,5 +44,12 @@ class EventPartyFinder
         }
 
         return $resultEventParties[0] ?? null;
+    }
+
+    private function sortByRelevance(array &$eventParties)
+    {
+        \usort($eventParties, function (EventParty $eventParty1, EventParty $eventParty2) {
+            return $eventParty1->getNumberOfPeople() <=> $eventParty2->getNumberOfPeople();
+        });
     }
 }

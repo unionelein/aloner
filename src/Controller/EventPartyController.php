@@ -11,12 +11,11 @@ use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyService;
 use App\Entity\EventParty;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @IsGranted(User::ROLE_PARTIAL_REG)
+ * @IsGranted(User::ROLE_FULL_REG)
  * @Route("/event_party")
  */
 class EventPartyController extends BaseController
@@ -41,7 +40,7 @@ class EventPartyController extends BaseController
     /**
      * @Route("/join", name="app_join_to_event_party")
      */
-    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService, EntityManagerInterface $em)
+    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService)
     {
         $user = $this->getUser();
 
@@ -50,10 +49,12 @@ class EventPartyController extends BaseController
         }
 
         $eventParty = $eventPartyFinder->findForUser($user) ?? $eventPartyService->createForUser($user);
-        $user->joinToEventParty($eventParty);
 
-        $em->persist($eventParty);
-        $em->flush();
+        if (!$eventParty) {
+            $this->redirectToRoute('app_no_events_found');
+        }
+
+        $eventPartyService->join($user, $eventParty);
 
         return $this->redirectToRoute('app_current_event_party');
     }
@@ -61,14 +62,9 @@ class EventPartyController extends BaseController
     /**
      * @Route("/skip/{id}", name="app_skip_event_party")
      */
-    public function skip(EventParty $eventParty, EntityManagerInterface $em)
+    public function skip(EventParty $eventParty, EventPartyService $eventPartyService)
     {
-        $user = $this->getUser();
-        $user->skipEventParty($eventParty);
-
-        $em->persist($eventParty);
-        $em->persist($user);
-        $em->flush();
+        $eventPartyService->skip($this->getUser(), $eventParty);
 
         return $this->redirectToRoute('app_join_to_event_party');
     }
@@ -76,16 +72,19 @@ class EventPartyController extends BaseController
     /**
      * @Route("/leave/{id}", name="app_leave_event_party")
      */
-    public function leave(EventParty $eventParty, EntityManagerInterface $em)
+    public function leave(EventParty $eventParty, EventPartyService $eventPartyService)
     {
-        $user = $this->getUser();
-        $user->skipEventParty($eventParty);
-
-        $em->persist($eventParty);
-        $em->persist($user);
-        $em->flush();
+        $eventPartyService->skip($this->getUser(), $eventParty);
 
         return $this->redirectToRoute('app_main');
+    }
+
+    /**
+     * @Route("/no_events_found", name="app_no_events_found")
+     */
+    public function noEventsFound()
+    {
+        return $this->render('eventParty/no_events_found.html.twig');
     }
 
     /**

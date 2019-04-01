@@ -8,6 +8,7 @@ use App\Component\Vk\DTO\AccessToken;
 use App\Component\Model\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -81,9 +82,11 @@ class User implements UserInterface
     private $eventParties;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\EventParty")
+     * @var ArrayCollection|EventPartyHistory[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", mappedBy="user")
      */
-    private $skippedEventParties;
+    private $eventPartyHistories;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -104,9 +107,10 @@ class User implements UserInterface
     {
         $this->name = $name;
 
-        $this->addRole(self::ROLE_PARTIAL_REG);
         $this->eventParties = new ArrayCollection();
-        $this->skippedEventParties = new ArrayCollection();
+        $this->eventPartyHistories = new ArrayCollection();
+
+        $this->addRole(self::ROLE_PARTIAL_REG);
         $this->setSearchCriteria(new SearchCriteria($this));
     }
 
@@ -300,14 +304,30 @@ class User implements UserInterface
      */
     public function getSkippedEventParties(): Collection
     {
-        return $this->skippedEventParties;
+        $skipped = [];
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->isActionSkip()) {
+                $skipped[] = $history->getEventParty();
+            }
+        }
+
+        return $skipped;
     }
 
-    public function skipEventParty(EventParty $skippedEventParty): self
+    public function skipEventParty(EventParty $eventParty): self
     {
-        if (!$this->skippedEventParties->contains($skippedEventParty)) {
-            $skippedEventParty->removeUser($this);
-            $this->skippedEventParties[] = $skippedEventParty;
+        if ($this->eventParties->contains($eventParty)) {
+            $eventParty->removeUser($this);
+            $this->eventParties->removeElement($eventParty);
+        }
+
+        return $this;
+    }
+
+    public function addEventPartyHistory(EventPartyHistory $history): self
+    {
+        if (!$this->eventPartyHistories->contains($history)) {
+            $this->eventPartyHistories[] = $history;
         }
 
         return $this;

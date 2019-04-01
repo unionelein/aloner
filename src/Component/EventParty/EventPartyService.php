@@ -7,9 +7,11 @@
 
 namespace App\Component\EventParty;
 
+use App\Component\Infrastructure\TransactionalService;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class EventPartyService
 {
@@ -18,9 +20,15 @@ class EventPartyService
      */
     private $eventRepo;
 
-    public function __construct(EventRepository $eventRepo)
+    /**
+     * @var TransactionalService
+     */
+    private $transactional;
+
+    public function __construct(EventRepository $eventRepo, TransactionalService $transactional)
     {
         $this->eventRepo = $eventRepo;
+        $this->transactional = $transactional;
     }
 
     public function createForUser(User $user): EventParty
@@ -34,10 +42,29 @@ class EventPartyService
         \shuffle($events);
         $event = \reset($events);
 
-        $eventParty = new EventParty($event);
-        $eventParty->setNumberOfGuys(2);
-        $eventParty->setNumberOfGirls(1);
+        $girlsNum = \rand(1, 3);
+        $guysNum  = \rand(1, 3);
 
-        return $eventParty;
+        return new EventParty($event, $girlsNum, $guysNum);
+    }
+
+    public function join(User $user, EventParty $eventParty)
+    {
+        $this->transactional->execute(function (EntityManagerInterface $em) use ($user, $eventParty) {
+            $user->joinToEventParty($eventParty);
+
+            $em->persist($user);
+            $em->persist($eventParty);
+        });
+    }
+
+    public function skip(User $user, EventParty $eventParty)
+    {
+        $this->transactional->execute(function (EntityManagerInterface $em) use ($user, $eventParty) {
+            $user->skipEventParty($eventParty);
+
+            $em->persist($user);
+            $em->persist($eventParty);
+        });
     }
 }

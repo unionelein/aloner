@@ -63,12 +63,21 @@ class EventParty
      */
     private $status;
 
-    public function __construct(Event $event)
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", cascade={"persist","remove"}, mappedBy="eventParty")
+     */
+    private $histories;
+
+    public function __construct(Event $event, int $numberOfGuys, int $numberOfGirls)
     {
         $this->event = $event;
+        $this->numberOfGuys = $numberOfGuys;
+        $this->numberOfGirls = $numberOfGirls;
+
+        $this->users  = new ArrayCollection();
+        $this->histories = new ArrayCollection();
 
         $this->status = self::STATUS_PENDING;
-        $this->users  = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,11 +99,12 @@ class EventParty
             return $this;
         }
         
-        if (!$this->canAddUser($user)) {
+        if (!$this->canUserJoin($user)) {
             throw new \LogicException('Невозможно добавить пользователя в евент пати');
         }
 
         $this->users[] = $user;
+        $this->storeHistory($user, EventPartyHistory::ACTION_JOIN);
         
         if ($this->isFilled()) {
             $this->status = self::STATUS_PREPARATION;
@@ -103,22 +113,29 @@ class EventParty
         return $this;
     }
 
-    public function canAddUser(User $user): bool
+    public function canUserJoin(User $user): bool
+    {
+        if (!$this->hasSlotForUser($user)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasSlotForUser(User $user): bool
     {
         $maxNumber     = $user->getSex()->isFemale() ? $this->getNumberOfGirls() : $this->getNumberOfGuys();
         $currentNumber = $user->getSex()->isFemale() ? $this->getCurrentNumberOfGirls() : $this->getCurrentNumberOfGuys();
 
-        if ($currentNumber >= $maxNumber) {
-            return false;
-        }
-        
-        return true;
+        return $maxNumber > $currentNumber;
     }
 
     public function removeUser(User $user): self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
+            $this->storeHistory($user, EventPartyHistory::ACTION_LEAVE);
+
             $this->status = self::STATUS_PENDING;
         }
 
@@ -222,5 +239,28 @@ class EventParty
     public function getStatus(): ?int
     {
         return $this->status;
+    }
+
+    /**
+     * @return Collection|EventPartyHistory[]
+     */
+    public function getHistories(): Collection
+    {
+        return $this->histories;
+    }
+
+    private function storeHistory(User $user, int $action): void
+    {
+        // in constructor the history is added to user and event party via adders
+        new EventPartyHistory($this, $user, $action);
+    }
+
+    public function addHistory(EventPartyHistory $history): self
+    {
+        if (!$this->histories->contains($history)) {
+            $this->histories[] = $history;
+        }
+
+        return $this;
     }
 }

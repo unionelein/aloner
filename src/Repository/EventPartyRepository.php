@@ -30,9 +30,9 @@ class EventPartyRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('event_party')
             ->select('event_party, event')
             ->innerJoin('event_party.event', 'event')
-            ->andWhere('event_party.status = :status')
+            ->andWhere('event_party.status = :pendingStatus')
             ->andWhere('event.city = :userCity')
-            ->setParameter('status', EventParty::STATUS_PENDING)
+            ->setParameter('pendingStatus', EventParty::STATUS_PENDING)
             ->setParameter('userCity', $user->getCity())
             ->getQuery()
             ->getResult();
