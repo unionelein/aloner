@@ -12,13 +12,13 @@ class VkAuthService
     /** @var VKOAuth */
     private $vkOAuth;
 
-    /** @var string */
+    /** @var int */
     private $vkAppId;
 
     /** @var string */
     private $vkAppSecret;
 
-    public function __construct(string $vkAppId, string $vkAppSecret)
+    public function __construct(int $vkAppId, string $vkAppSecret)
     {
         $this->vkOAuth = new VKOAuth();
         $this->vkAppId = $vkAppId;

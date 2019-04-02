@@ -2,6 +2,8 @@
 
 namespace App\Component\Messaging\EventParty;
 
+use App\Component\Messaging\EventParty\Model\ClientData;
+use App\Component\Messaging\EventParty\Model\MessageData;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +18,7 @@ class Chat implements MessageComponentInterface
 
     protected $clients;
 
+    /** @var ClientData[] */
     protected $clientsData = [];
 
     /** @var EntityManagerInterface */
@@ -34,7 +37,6 @@ class Chat implements MessageComponentInterface
     public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
-        $this->clientsData[$conn->resourceId] = [];
 
         echo "New connection! ({$conn->resourceId})\n";
     }
@@ -76,10 +78,7 @@ class Chat implements MessageComponentInterface
             return;
         }
 
-        $this->clientsData[$from->resourceId] = [
-            'userId'   => $user->getId(),
-            'username' => $user->getName(),
-        ];
+        $this->clientsData[$from->resourceId] = ClientData::extract($user);
 
         echo "Identified user: '{$user->getName()}' ({$from->resourceId})\n";
     }
@@ -94,12 +93,14 @@ class Chat implements MessageComponentInterface
 
     private function message(ConnectionInterface $from, array $data)
     {
-        if (empty($data['message']) || empty($this->clientsData[$from->resourceId]['username'])) {
+        $clientData = $this->clientsData[$from->resourceId] ?? null;
+
+        if (empty($data['message']) || !$clientData) {
             return;
         }
 
         $msg = [
-            'username' => $this->clientsData[$from->resourceId]['username'],
+            'username' => $clientData->getUsername(),
             'message'  => $data['message'],
         ];
 
@@ -107,6 +108,25 @@ class Chat implements MessageComponentInterface
             $client->send(\json_encode($msg));
         }
 
+        $this->storeMessage($clientData, $data['message']);
+
         echo "New message from {$msg['username']}: {$msg['message']}\n";
+    }
+
+    private function storeMessage(ClientData $clientData, string $message)
+    {
+        $this->checkDBConnection();
+
+        $this->em->getConnection()->executeQuery('
+            INSERT INTO event_party_message SET 
+            user_id        = :userId,
+            event_party_id = :eventPartyId,
+            message        = :message,
+            created_at     = NOW()
+        ', [
+            'userId'       => $clientData->getUserId(),
+            'eventPartyId' => $clientData->getEventPartyId(),
+            'message'      => $message,
+        ]);
     }
 }

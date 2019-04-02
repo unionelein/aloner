@@ -61,7 +61,14 @@
 
                 <div class="block chat-block">
                     <div class="block-body chat-wrapper">
-                        <div class="chat-messages-block"></div>
+                        <div class="chat-messages-block">
+                            {% for message in messagesHistory %}
+                                <p>
+                                    <b>{{ message.user.name }}: </b>
+                                    {{ message.message }}
+                                </p>
+                            {% endfor %}
+                        </div>
 
                         <textarea class="chat-message-input float-left" placeholder="Напишите что-нибудь"></textarea>
 
@@ -85,7 +92,7 @@
         </div>
 
         <div class="d-none js-data">
-            <div id="current-user" data-temp-hash-url="{{ path('app_user_temp_hash') }}"></div>
+            <div id="current-user" data-temp-hash="{{ app.user.tempHash }}"></div>
         </div>
     </div>
 {% endblock %}

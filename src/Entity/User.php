@@ -84,6 +84,7 @@ class User implements UserInterface
      * @var ArrayCollection|EventPartyHistory[]
      *
      * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", mappedBy="user")
+     * @ORM\OrderBy({"createdAt"="DESC"})
      */
     private $eventPartyHistories;
 
@@ -299,6 +300,14 @@ class User implements UserInterface
     }
 
     /**
+     * @return ArrayCollection|EventPartyHistory[]
+     */
+    public function getEventPartyHistories(): ArrayCollection
+    {
+        return $this->eventPartyHistories;
+    }
+
+    /**
      * @return Collection|EventParty[]
      */
     public function getSkippedEventParties(): Collection
@@ -331,6 +340,17 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EventPartyHistory
+    {
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->getEventParty() === $eventParty && $history->getAction() === $action) {
+                return $history;
+            }
+        }
+
+        return null;
     }
 
     public function getAvatar(): ?string

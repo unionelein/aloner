@@ -13,11 +13,9 @@ class Chat {
         this.$sendMessageBtn = $('.chat-send-message-btn');
         this.$messageInput = $('.chat-message-input');
         this.$messagesBlock = $('.chat-messages-block');
+        this.userTempHash = this.$currentUser.data('temp-hash');
 
-        $.ajax(this.$currentUser.data('temp-hash-url')).done((data) => {
-            this.userTempHash = data.tempHash;
-            this.setUpConnection();
-        });
+        this.setUpConnection();
 
         this.$sendMessageBtn.on('click', this.handleClickSendMessageBtn.bind(this));
     }

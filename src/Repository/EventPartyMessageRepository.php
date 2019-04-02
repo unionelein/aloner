@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\EventParty;
+use App\Entity\EventPartyHistory;
 use App\Entity\EventPartyMessage;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -19,32 +22,28 @@ class EventPartyMessageRepository extends ServiceEntityRepository
         parent::__construct($registry, EventPartyMessage::class);
     }
 
-    // /**
-    //  * @return Chat[] Returns an array of Chat objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param User $user
+     * @param EventParty $eventParty
+     *
+     * @return EventPartyMessage[]
+     */
+    public function getMessageHistoryFor(EventParty $eventParty, User $user = null): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $qb = $this->createQueryBuilder('chat_msg');
 
-    /*
-    public function findOneBySomeField($value): ?Chat
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if ($user) {
+            $historyJoin = $user->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN);
+
+            if (!$historyJoin) {
+                return [];
+            }
+
+            $qb->andWhere('chat_msg.createdAt > :joinedAt')
+                ->setParameter('joinedAt', $historyJoin->getCreatedAt());
+        }
+
+        return $qb->getQuery()
+            ->getResult();
     }
-    */
 }

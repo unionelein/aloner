@@ -6,6 +6,6 @@ class HashGenerator
 {
     public static function createUnique(): string
     {
-        return \md5(\uniqid(\rand(), true)) . time();
+        return \md5(\uniqid((string) \rand(), true)) . time();
     }
 }

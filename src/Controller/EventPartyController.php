@@ -6,6 +6,8 @@ use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyService;
 use App\Entity\EventParty;
 use App\Entity\User;
+use App\Repository\EventPartyMessageRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,7 +20,7 @@ class EventPartyController extends BaseController
     /**
      * @Route("/", name="app_current_event_party")
      */
-    public function currentEventParty()
+    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EntityManagerInterface $em)
     {
         $user       = $this->getUser();
         $eventParty = $user->getActiveEventParty();
@@ -27,8 +29,15 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_main');
         }
 
+        // update hash on each load of page for better chat and other security
+        $user->updateTempHash();
+
+        $em->persist($user);
+        $em->flush();
+
         return $this->render('eventParty/event_party.html.twig', [
-            'eventParty' => $eventParty,
+            'eventParty'      => $eventParty,
+            'messagesHistory' => $epMsgRepo->getMessageHistoryFor($eventParty, $user),
         ]);
     }
 
