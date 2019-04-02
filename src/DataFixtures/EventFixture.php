@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-
+use App\Entity\City;
 use App\Entity\Event;
 
 class EventFixture extends BaseFixture
@@ -27,11 +27,14 @@ class EventFixture extends BaseFixture
 
     public function loadData()
     {
-        $this->createMany('event', \count(self::EVENT_TITLES), function (int $index) {
+        $this->createMany('event', 20, function (int $index) {
+            /** @var City $city */
+            $city = $this->getReference('city_' . \rand(1, \count(CityFixture::CITIES)));
+
             $event = new Event();
-            $event->setTitle(self::EVENT_TITLES[$this->faker->numberBetween(0, \count(self::EVENT_TITLES) - 1)]);
+            $event->setTitle($this->faker->randomElement(self::EVENT_TITLES));
             $event->setDescription($this->faker->text);
-            $event->setCity($this->getReference('city_' . $this->faker->numberBetween(1, \count(CityFixture::CITIES))));
+            $event->setCity($city);
 
             return $event;
         });

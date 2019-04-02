@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Component\Vk\Authentication;
 
 use App\Component\Vk\DTO\AccessToken;
-use App\Component\Vk\VkClient;
-use VK\OAuth\Scopes\VKOAuthUserScope;
 use VK\OAuth\VKOAuth;
 use VK\OAuth\VKOAuthDisplay;
 use VK\OAuth\VKOAuthResponseType;

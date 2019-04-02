@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -8,7 +8,6 @@ use App\Component\Vk\DTO\AccessToken;
 use App\Component\Model\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -304,7 +303,8 @@ class User implements UserInterface
      */
     public function getSkippedEventParties(): Collection
     {
-        $skipped = [];
+        $skipped = new ArrayCollection();
+
         foreach ($this->eventPartyHistories as $history) {
             if ($history->isActionSkip()) {
                 $skipped[] = $history->getEventParty();

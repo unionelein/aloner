@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Component\Model\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -251,8 +250,7 @@ class EventParty
 
     private function storeHistory(User $user, int $action): void
     {
-        // in constructor the history is added to user and event party via adders
-        new EventPartyHistory($this, $user, $action);
+        $this->addHistory(new EventPartyHistory($this, $user, $action));
     }
 
     public function addHistory(EventPartyHistory $history): self

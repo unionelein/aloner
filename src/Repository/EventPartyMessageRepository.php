@@ -1,22 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Chat;
+use App\Entity\EventPartyMessage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method Chat|null find($id, $lockMode = null, $lockVersion = null)
- * @method Chat|null findOneBy(array $criteria, array $orderBy = null)
- * @method Chat[]    findAll()
- * @method Chat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method EventPartyMessage|null find($id, $lockMode = null, $lockVersion = null)
+ * @method EventPartyMessage|null findOneBy(array $criteria, array $orderBy = null)
+ * @method EventPartyMessage[]    findAll()
+ * @method EventPartyMessage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ChatRepository extends ServiceEntityRepository
+class EventPartyMessageRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Chat::class);
+        parent::__construct($registry, EventPartyMessage::class);
     }
 
     // /**

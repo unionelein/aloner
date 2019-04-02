@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Command\EventParty;
 
-use App\Component\Messaging\Chat;
-use App\Component\Messaging\Announcement;
-use Ratchet\App;
+use App\Component\Messaging\EventParty\Pusher;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
@@ -13,22 +11,19 @@ use React\EventLoop\Factory;
 use React\Socket\Server;
 use React\ZMQ\Context;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
-class AnnouncementRunCommand extends Command
+class PusherRunCommand extends Command
 {
-    protected static $defaultName = 'app:push:run';
+    protected static $defaultName = 'event_party:pusher:run';
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('push start');
 
         $loop   = Factory::create();
-        $pusher = new Announcement();
+        $pusher = new Pusher();
 
         // Listen for the web server to make a ZeroMQ push after an ajax request
         $context = new Context($loop);

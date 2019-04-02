@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -22,7 +22,7 @@ class EventPartyHistory
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="eventPartyHistories")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;

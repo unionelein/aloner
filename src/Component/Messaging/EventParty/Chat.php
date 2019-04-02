@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Component\Messaging;
+namespace App\Component\Messaging\EventParty;
 
 use App\Entity\User;
 use App\Repository\UserRepository;

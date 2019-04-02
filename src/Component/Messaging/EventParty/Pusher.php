@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Component\Messaging;
+namespace App\Component\Messaging\EventParty;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
-class Announcement implements WampServerInterface {
+class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
