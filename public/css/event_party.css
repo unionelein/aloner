@@ -19,19 +19,25 @@
 .chat-messages-block {
     font-size: 14px;
     margin-bottom: 20px;
-    height: 300px;
+    height: 40vh;
+    min-height: 250px;
+    max-height: 350px;
     overflow-y: auto;
-    margin-right: -22px;
+    margin-right: -18px;
+    padding-right: 24px;
+    word-wrap: break-word;
+}
+
+.chat-messages-block p {
+    margin-bottom: 10px;
 }
 
 .chat-message-input {
-    width: 80%;
-    height: 70px;
+    height: 45px;
     resize:none;
     border: none;
     padding-top: 15px;
-    margin-right: 5px;
-    border-top: 1px solid rgba(0,0,0,.0975);
+    width: 100%;
 }
 
 .chat-message-input:focus {
@@ -43,8 +49,11 @@
 }
 
 .chat-send-message-btn {
-    font-size: 20px;
-    margin-top: 13px;
+    font-size: 16px;
+}
+
+.chat-send-message-btn:hover {
+    text-decoration: none;
 }
 
 .more {

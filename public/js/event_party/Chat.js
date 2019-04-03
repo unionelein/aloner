@@ -15,9 +15,12 @@ class Chat {
         this.$messagesBlock = $('.chat-messages-block');
         this.userTempHash = this.$currentUser.data('temp-hash');
 
+        this.scrollMessagesBlockToBottom();
+        this.$messagesBlock.removeClass('invisible');
         this.setUpConnection();
 
         this.$sendMessageBtn.on('click', this.handleClickSendMessageBtn.bind(this));
+        this.$messageInput.on('keypress', this.handleKeyPressAtInput.bind(this));
     }
 
     setUpConnection() {
@@ -45,15 +48,32 @@ class Chat {
     }
 
     handleClickSendMessageBtn(e) {
+        e.preventDefault();
+
         this.sendMessage(this.$messageInput.val());
 
         this.$messageInput.val('');
+    }
+
+    handleKeyPressAtInput(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            e.preventDefault();
+            this.sendMessage(this.$messageInput.val());
+            this.$messageInput.val('');
+        }
+    }
+
+    scrollMessagesBlockToBottom() {
+        this.$messagesBlock.animate({
+            scrollTop: this.$messagesBlock.height() * 10
+        }, 0);
     }
 
     appendMessage (username, message) {
         const $msg = $('<p>').html(`<b>${username}</b>: ${message}`);
 
         this.$messagesBlock.append($msg);
+        this.scrollMessagesBlockToBottom();
     }
 
     sendMessage (text) {

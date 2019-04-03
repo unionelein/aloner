@@ -16,6 +16,9 @@ class Chat implements MessageComponentInterface
 
     private const TYPE_MESSAGE = 'message';
 
+    private const MAX_MESSAGE_LENGTH = 500;
+
+    /** @var \SplObjectStorage */
     protected $clients;
 
     /** @var ClientData[] */
@@ -95,7 +98,7 @@ class Chat implements MessageComponentInterface
     {
         $clientData = $this->clientsData[$from->resourceId] ?? null;
 
-        if (empty($data['message']) || !$clientData) {
+        if (!$clientData || empty($data['message']) || \strlen($data['message']) > self::MAX_MESSAGE_LENGTH) {
             return;
         }
 

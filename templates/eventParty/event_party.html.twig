@@ -53,7 +53,11 @@
                     {% for user in eventParty.users %}
                         <div class="user-icon-block float-left">
                             <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.name }}"><br>
-                            {{ user.name }}
+                            {% if user == app.user %}
+                                <b>{{ user.name }}</b>
+                            {% else %}
+                                {{ user.name }}
+                            {% endif %}
                         </div>
                     {% endfor %}
                     <div class="clearfix"></div>
@@ -61,7 +65,7 @@
 
                 <div class="block chat-block">
                     <div class="block-body chat-wrapper">
-                        <div class="chat-messages-block">
+                        <div class="chat-messages-block invisible" >
                             {% for message in messagesHistory %}
                                 <p>
                                     <b>{{ message.user.name }}: </b>
@@ -70,12 +74,14 @@
                             {% endfor %}
                         </div>
 
-                        <textarea class="chat-message-input float-left" placeholder="Напишите что-нибудь"></textarea>
+                        <div class="delimiter"></div>
 
-                        <button type="button" class="btn btn-light float-left chat-send-message-btn">
-                            <i class="fas fa-arrow-circle-right"></i>
-                        </button>
-                        <div class="clearfix"></div>
+
+                        <textarea class="chat-message-input" maxlength="500" placeholder="Напишите что-нибудь..."></textarea>
+
+                        <div class="text-right">
+                            <a href="#" class="chat-send-message-btn">Отправить</a>
+                        </div>
                     </div>
                 </div>
 

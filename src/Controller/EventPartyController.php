@@ -29,7 +29,7 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_main');
         }
 
-        // update hash on each load of page for better chat and other security
+        // update hash on each load of page for better security
         $user->updateTempHash();
 
         $em->persist($user);

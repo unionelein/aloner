@@ -1,6 +1,6 @@
 .block {
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid rgba(0,0,0,.0975);
     padding: 25px;
 }
@@ -30,4 +30,8 @@
 .user-icon-block img {
     width: 40px;
     height: 40px;
+}
+
+.delimiter {
+    border-top: 1px solid rgba(0,0,0,.0975);
 }
