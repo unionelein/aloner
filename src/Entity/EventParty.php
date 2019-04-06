@@ -103,7 +103,9 @@ class EventParty
         }
 
         $this->users[] = $user;
-        $this->storeHistory($user, EventPartyHistory::ACTION_JOIN);
+
+        $nickname = $this->createNicknameForUser($user);
+        $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $nickname));
         
         if ($this->isFilled()) {
             $this->status = self::STATUS_PREPARATION;
@@ -129,11 +131,32 @@ class EventParty
         return $maxNumber > $currentNumber;
     }
 
+    private function createNicknameForUser(User $user): string
+    {
+        $existingNames = [];
+        foreach ($this->users as $epUser) {
+            if ($epUser !== $user) {
+                $existingNames[] = \strtolower($epUser->getName());
+            }
+        }
+
+        if (!\in_array(\strtolower($user->getName()), $existingNames, true)) {
+            return $user->getName();
+        }
+
+        $i = 2;
+        do {
+            $nickname = $user->getName() . ' ' . $i++; // begins from add 2: "user 2"
+        } while (\in_array(\strtolower($nickname), $existingNames, true));
+
+        return $nickname;
+    }
+
     public function removeUser(User $user): self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
-            $this->storeHistory($user, EventPartyHistory::ACTION_LEAVE);
+            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE));
 
             $this->status = self::STATUS_PENDING;
         }
@@ -211,6 +234,11 @@ class EventParty
         return $this->getNumberOfGuys() + $this->getNumberOfGirls();
     }
 
+    public function getPeopleRemaining(): int
+    {
+        return $this->getNumberOfPeople() - $this->users->count();
+    }
+
     public function getCurrentNumberOfGirls()
     {
         $girls = \array_filter($this->getUsers()->toArray(), function (User $user) {
@@ -246,11 +274,6 @@ class EventParty
     public function getHistories(): Collection
     {
         return $this->histories;
-    }
-
-    private function storeHistory(User $user, int $action): void
-    {
-        $this->addHistory(new EventPartyHistory($this, $user, $action));
     }
 
     public function addHistory(EventPartyHistory $history): self

@@ -22,6 +22,7 @@ class EventPartyFinder
     {
         $criteria = $user->getSearchCriteria();
 
+        // TODO: чтобы в 1 день не повторялись евенты, в которые закидывает юзера
         $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
         $this->sortByRelevance($eventParties);
 
@@ -44,7 +45,7 @@ class EventPartyFinder
     private function sortByRelevance(array &$eventParties)
     {
         \usort($eventParties, function (EventParty $eventParty1, EventParty $eventParty2) {
-            return $eventParty1->getNumberOfPeople() <=> $eventParty2->getNumberOfPeople();
+            return $eventParty1->getPeopleRemaining() <=> $eventParty2->getPeopleRemaining();
         });
     }
 }

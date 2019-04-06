@@ -44,14 +44,21 @@ class EventPartyHistory
      */
     private $action;
 
-    public function __construct(EventParty $eventParty, User $user, int $action)
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nickname;
+
+    public function __construct(EventParty $eventParty, User $user, int $action, ?string $nickname = null)
     {
         $this->eventParty = $eventParty;
         $this->user       = $user;
         $this->action     = $action;
+        $this->nickname   = $nickname;
 
         $eventParty->addHistory($this);
         $user->addEventPartyHistory($this);
+
     }
 
     public function getId(): ?int
@@ -87,5 +94,10 @@ class EventPartyHistory
     public function isActionSkip(): bool
     {
         return $this->action === self::ACTION_LEAVE;
+    }
+
+    public function getNickname(): string
+    {
+        return $this->nickname ?? $this->user->getName();
     }
 }

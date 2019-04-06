@@ -26,7 +26,7 @@ class ClientData
     {
         return new self(
             $user->getId(),
-            $user->getName(),
+            $user->getNicknameFor($user->getActiveEventParty()),
             $user->getActiveEventParty()->getId()
         );
     }

@@ -52,11 +52,11 @@
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
                         <div class="user-icon-block float-left">
-                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.name }}"><br>
+                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameFor(eventParty) }}"><br>
                             {% if user == app.user %}
-                                <b>{{ user.name }}</b>
+                                <b>{{ user.nicknameFor(eventParty) }}</b>
                             {% else %}
-                                {{ user.name }}
+                                {{ user.nicknameFor(eventParty) }}
                             {% endif %}
                         </div>
                     {% endfor %}
