@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Component\Model\Collection\TimetableCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -32,7 +34,7 @@ class Event
     private $slug;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $description;
 
@@ -48,9 +50,29 @@ class Event
     private $site;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="json")
      */
     private $media = [];
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $address;
+
+    /**
+     * @var ArrayCollection|Timetable[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Timetable", mappedBy="event", orphanRemoval=true)
+     */
+    private $timetables;
+
+    public function __construct(string $title, City $city)
+    {
+        $this->timetables = new ArrayCollection();
+
+        $this->title = $title;
+        $this->city  = $city;
+    }
 
     public function getId(): ?int
     {
@@ -62,13 +84,6 @@ class Event
         return $this->title;
     }
 
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
     public function getSlug(): ?string
     {
         return $this->slug;
@@ -77,13 +92,6 @@ class Event
     public function getCity(): ?City
     {
         return $this->city;
-    }
-
-    public function setCity(?City $city): self
-    {
-        $this->city = $city;
-
-        return $this;
     }
 
     public function getDescription(): ?string
@@ -103,21 +111,62 @@ class Event
         return $this->site;
     }
 
-    public function setSite(?string $site): self
+    public function setSite(string $site): self
     {
         $this->site = $site;
 
         return $this;
     }
 
-    public function getMedia(): ?array
+    public function getMedia(): array
     {
         return $this->media;
     }
 
-    public function setMedia(?array $media): self
+    public function addMedia(string $mediaSrc): self
     {
-        $this->media = $media;
+        $this->media[] = $mediaSrc;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getTimetables(): TimetableCollection
+    {
+        $timetableCollection = new TimetableCollection();
+
+        foreach ($this->timetables as $timetable) {
+            $timetableCollection->add($timetable);
+        }
+
+        return $timetableCollection;
+    }
+
+    public function addTimetable(Timetable $timetable): self
+    {
+        if (!$this->timetables->contains($timetable)) {
+            $this->timetables[] = $timetable;
+        }
+
+        return $this;
+    }
+
+    public function removeTimetable(Timetable $timetable): self
+    {
+        if ($this->timetables->contains($timetable)) {
+            $this->timetables->removeElement($timetable);
+        }
 
         return $this;
     }
