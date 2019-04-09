@@ -62,9 +62,14 @@ class Event
     /**
      * @var ArrayCollection|Timetable[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Timetable", mappedBy="event", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Timetable", mappedBy="event", cascade={"persist", "remove"})
      */
     private $timetables;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     */
+    private $phone;
 
     public function __construct(string $title, City $city)
     {
@@ -167,6 +172,18 @@ class Event
         if ($this->timetables->contains($timetable)) {
             $this->timetables->removeElement($timetable);
         }
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

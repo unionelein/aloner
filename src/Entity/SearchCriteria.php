@@ -10,6 +10,10 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class SearchCriteria
 {
+    public const DEFAULT_TIME_FROM = '18:00';
+
+    public const DEFAULT_TIME_TO = '23:00';
+
     use TimestampableEntity;
 
     /**
@@ -34,6 +38,11 @@ class SearchCriteria
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $day;
 
     public function __construct(User $user)
     {
@@ -84,5 +93,17 @@ class SearchCriteria
     public function isInitialised(): bool
     {
         return $this->getUpdatedAt() > $this->getCreatedAt();
+    }
+
+    public function getDay(): ?\DateTimeInterface
+    {
+        return $this->day;
+    }
+
+    public function setDay(\DateTimeInterface $day): self
+    {
+        $this->day = $day;
+
+        return $this;
     }
 }

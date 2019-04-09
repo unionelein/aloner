@@ -18,19 +18,19 @@ class Timetable
         self::TYPE_DAY,
     ];
 
-    public const SUNDAY = 1;
+    public const MONDAY = 1;
 
-    public const MONDAY = 2;
+    public const TUESDAY = 2;
 
-    public const TUESDAY = 3;
+    public const WEDNESDAY = 3;
 
-    public const WEDNESDAY = 4;
+    public const THURSDAY = 4;
 
-    public const THURSDAY = 5;
+    public const FRIDAY = 5;
 
-    public const FRIDAY = 6;
+    public const SATURDAY = 6;
 
-    public const SATURDAY = 7;
+    public const SUNDAY = 7;
 
     public const WEEK_DAYS = [
         self::MONDAY    => 'Понедельник',
@@ -56,6 +56,7 @@ class Timetable
         $this->timeFrom = $timeFrom;
         $this->timeTo   = $timeTo;
 
+        $event->addTimetable($this);
     }
 
     /**
@@ -134,7 +135,7 @@ class Timetable
 
     private function setWeekDay(int $weekDay): self
     {
-        if (!\in_array($weekDay, self::WEEK_DAYS, true)) {
+        if (!\array_key_exists($weekDay, self::WEEK_DAYS)) {
             throw new \InvalidArgumentException('Такого дня недели нет');
         }
 

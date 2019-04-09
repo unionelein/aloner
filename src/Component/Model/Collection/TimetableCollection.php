@@ -25,4 +25,15 @@ class TimetableCollection
     {
         return \iterator_to_array($this->timetables);
     }
+
+    /**
+     * @param int $weekDay
+     * @return Timetable[]
+     */
+    public function getForWeekDay(int $weekDay): array
+    {
+        return \array_filter($this->get(), function (Timetable $timetable) use ($weekDay) {
+            return $timetable->getWeekDay() === $weekDay;
+        });
+    }
 }

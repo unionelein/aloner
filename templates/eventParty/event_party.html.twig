@@ -31,9 +31,14 @@
                     </div>
                     <div class="tab-pane fade block nav-block" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
                         <div class="block-body">
-                            <p>Номер <i>мобилы +3242342342</i></p>
-                            <p>Адрес <i>331, ул. Ильича, Гомель</i></p>
-                            <p><img src="https://pzik.ru/uploads/afd3e.jpg" alt=""></p>
+                            <p>Номер мобилы <i>{{ eventParty.event.phone }}</i></p>
+                            <p>Адрес <i>{{ eventParty.event.address }}</i></p>
+                            <p>Время работы сегодня:</p>
+                            <p>
+                                {% for timetable in eventParty.event.timetables.forWeekDay('now'|date('w')) %}
+                                    {{ timetable.timeFrom|date('H:i') }}-{{ timetable.timeTo|date('H:i') }}<br>
+                                {% endfor %}
+                            </p>
                         </div>
                     </div>
                     <div class="tab-pane fade block nav-block" id="nav-todo" role="tabpanel" aria-labelledby="nav-todo-tab">

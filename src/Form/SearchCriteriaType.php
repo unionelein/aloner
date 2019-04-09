@@ -3,17 +3,16 @@
 namespace App\Form;
 
 use App\Entity\SearchCriteria;
+use App\Entity\Timetable;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchCriteriaType extends AbstractType
 {
-    private const DEFAULT_TIME_FROM = '18:00';
-
-    private const DEFAULT_TIME_TO = '23:00';
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var SearchCriteria $criteria */
@@ -26,7 +25,7 @@ class SearchCriteriaType extends AbstractType
                 'widget' => 'single_text',
                 'data' => ($criteria && $criteria->isInitialised())
                     ? $criteria->getTimeFrom()
-                    : new \DateTime(self::DEFAULT_TIME_FROM),
+                    : new \DateTime(SearchCriteria::DEFAULT_TIME_FROM),
             ])
             ->add('timeTo', TimeType::class, [
                 'label' => false,
@@ -34,7 +33,14 @@ class SearchCriteriaType extends AbstractType
                 'widget' => 'single_text',
                 'data' => ($criteria && $criteria->isInitialised())
                     ? $criteria->getTimeTo()
-                    : new \DateTime(self::DEFAULT_TIME_TO),
+                    : new \DateTime(SearchCriteria::DEFAULT_TIME_TO),
+            ])
+            ->add('day', ChoiceType::class, [
+                'label' => false,
+                'choices' => [
+                    'Cегодня' => new \DateTime(),
+                    'Завтра'  => new \DateTime('+1 day'),
+                ],
             ]);
     }
 

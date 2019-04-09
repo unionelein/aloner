@@ -50,17 +50,17 @@
 
                         <div class="search-criteria-wrapper">
                             {{ form_start(searchCriteriaForm) }}
-                                <p>В какое время вы cможете пойти?</p>
+                                <p>В какое время вы сможете пойти?</p>
 
-                                <div class="row mb-3">
+                                <div class="row mb-1">
                                     <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeFrom) }}</div>
                                     <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeTo) }}</div>
                                 </div>
 
                                 <p>В какой день?</p>
-                                сегодня
-                                сегодня-завтра
-                                на выходных
+                                <div class="row mb-3">
+                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.day) }}</div>
+                                </div>
 
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary search-event-party-btn">Найти</button>
