@@ -32,6 +32,10 @@
     height: 40px;
 }
 
+.current-user .user-icon-name {
+    font-weight: bold;
+}
+
 .delimiter {
     border-top: 1px solid rgba(0,0,0,.0975);
 }

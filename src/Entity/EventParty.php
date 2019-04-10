@@ -13,11 +13,16 @@ class EventParty
 {
     public const STATUS_PENDING = 1;
 
-    public const STATUS_PREPARATION = 2;
+    public const STATUS_PLANING = 2;
 
     public const STATUS_READY = 3;
 
     public const STATUS_DONE = 4;
+
+    private const STATUSES = [
+        self::STATUS_PENDING => 'Ожидаем еще {{ N }} человек',
+        self::STATUS_PLANING => 'Заполнение плана',
+    ];
 
     /**
      * @ORM\Id()
@@ -36,6 +41,11 @@ class EventParty
      * @ORM\JoinColumn(nullable=false)
      */
     private $event;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $status;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -58,25 +68,20 @@ class EventParty
     private $numberOfGuys;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $status;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", cascade={"persist","remove"}, mappedBy="eventParty")
      */
     private $histories;
 
     public function __construct(Event $event, int $numberOfGuys, int $numberOfGirls)
     {
-        $this->event = $event;
-        $this->numberOfGuys = $numberOfGuys;
+        $this->event         = $event;
+        $this->numberOfGuys  = $numberOfGuys;
         $this->numberOfGirls = $numberOfGirls;
 
-        $this->users  = new ArrayCollection();
-        $this->histories = new ArrayCollection();
-
         $this->status = self::STATUS_PENDING;
+
+        $this->users     = new ArrayCollection();
+        $this->histories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,88 +97,22 @@ class EventParty
         return $this->users;
     }
 
-    public function addUser(User $user): self
-    {
-        if ($this->users->contains($user)) {
-            return $this;
-        }
-        
-        if (!$this->canUserJoin($user)) {
-            throw new \LogicException('Невозможно добавить пользователя в евент пати');
-        }
-
-        $this->users[] = $user;
-
-        $nickname = $this->createNicknameForUser($user);
-        $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $nickname));
-        
-        if ($this->isFilled()) {
-            $this->status = self::STATUS_PREPARATION;
-        }
-
-        return $this;
-    }
-
-    public function canUserJoin(User $user): bool
-    {
-        if (!$this->hasSlotForUser($user)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function hasSlotForUser(User $user): bool
-    {
-        $maxNumber     = $user->getSex()->isFemale() ? $this->getNumberOfGirls() : $this->getNumberOfGuys();
-        $currentNumber = $user->getSex()->isFemale() ? $this->getCurrentNumberOfGirls() : $this->getCurrentNumberOfGuys();
-
-        return $maxNumber > $currentNumber;
-    }
-
-    private function createNicknameForUser(User $user): string
-    {
-        $existingNames = [];
-        foreach ($this->users as $epUser) {
-            if ($epUser !== $user) {
-                $existingNames[] = \strtolower($epUser->getName());
-            }
-        }
-
-        if (!\in_array(\strtolower($user->getName()), $existingNames, true)) {
-            return $user->getName();
-        }
-
-        $i = 2;
-        do {
-            $nickname = $user->getName() . ' ' . $i++; // begins from add 2: "user 2"
-        } while (\in_array(\strtolower($nickname), $existingNames, true));
-
-        return $nickname;
-    }
-
-    public function removeUser(User $user): self
-    {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE));
-
-            $this->status = self::STATUS_PENDING;
-        }
-
-        return $this;
-    }
-
-    public function getEvent(): ?Event
+    public function getEvent(): Event
     {
         return $this->event;
     }
 
-    public function setEvent(?Event $event): self
+    public function getStatus(): int
     {
-        $this->event = $event;
+        return $this->status;
+    }
 
-        return $this;
+    /**
+     * @return Collection|EventPartyHistory[]
+     */
+    public function getHistories(): Collection
+    {
+        return $this->histories;
     }
 
     public function getMeetingAt(): ?\DateTimeInterface
@@ -200,21 +139,9 @@ class EventParty
         return $this;
     }
 
-    public function isActive(): bool
-    {
-        return $this->meetingAt === null || $this->meetingAt > new \DateTime();
-    }
-
     public function getNumberOfGirls(): ?int
     {
         return $this->numberOfGirls;
-    }
-
-    public function setNumberOfGirls(int $numberOfGirls): self
-    {
-        $this->numberOfGirls = $numberOfGirls;
-
-        return $this;
     }
 
     public function getNumberOfGuys(): ?int
@@ -222,11 +149,85 @@ class EventParty
         return $this->numberOfGuys;
     }
 
-    public function setNumberOfGuys(int $numberOfGuys): self
+    public function isDone(): bool
     {
-        $this->numberOfGuys = $numberOfGuys;
+        return self::STATUS_DONE === $this->status;
+    }
+
+    public function addUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            return $this;
+        }
+
+        if (!$this->canUserJoin($user)) {
+            throw new \LogicException('Невозможно добавить пользователя в евент пати');
+        }
+
+        $this->users[] = $user;
+
+        $nickname = $this->createNicknameForUser($user);
+        $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $nickname));
+
+        if ($this->isFilled()) {
+            $this->status = self::STATUS_PLANING;
+        }
 
         return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE));
+
+            $this->status = self::STATUS_PENDING;
+        }
+
+        return $this;
+    }
+
+    public function canUserJoin(User $user): bool
+    {
+        if (!$this->hasSlotForUser($user)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasSlotForUser(User $user): bool
+    {
+        $maxNumber     = $user->getSex()->isFemale() ? $this->getNumberOfGirls() : $this->getNumberOfGuys();
+        $currentNumber = $user->getSex()->isFemale() ? $this->getCurrentNumberOfGirls() : $this->getCurrentNumberOfGuys();
+
+        return $maxNumber > $currentNumber;
+    }
+
+    /**
+     * If in party already exists user with same name we need to add sequence to user name
+     */
+    private function createNicknameForUser(User $user): string
+    {
+        $existingNames = [];
+        foreach ($this->users as $epUser) {
+            if ($epUser !== $user) {
+                $existingNames[] = \strtolower($epUser->getName());
+            }
+        }
+
+        if (!\in_array(\strtolower($user->getName()), $existingNames, true)) {
+            return $user->getName();
+        }
+
+        $i = 2;
+        do {
+            $nickname = "{$user->getName()} {$i}";
+            ++$i;
+        } while (\in_array(\strtolower($nickname), $existingNames, true));
+
+        return $nickname;
     }
 
     public function getNumberOfPeople(): int
@@ -263,19 +264,6 @@ class EventParty
             && $this->getCurrentNumberOfGirls() === $this->getNumberOfGirls();
     }
 
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    /**
-     * @return Collection|EventPartyHistory[]
-     */
-    public function getHistories(): Collection
-    {
-        return $this->histories;
-    }
-
     public function addHistory(EventPartyHistory $history): self
     {
         if (!$this->histories->contains($history)) {
@@ -283,5 +271,27 @@ class EventParty
         }
 
         return $this;
+    }
+
+    public function getCurrentStatusTitle(): string
+    {
+        switch ($this->status) {
+            case self::STATUS_PENDING:
+                $desc  = self::STATUSES[self::STATUS_PENDING];
+                $title = \str_replace('{{ N }}', $this->getPeopleRemaining(), $desc);
+
+                // ожидаем 1 человекА
+                if ($this->getPeopleRemaining() === 1) {
+                    $title .= 'а';
+                }
+
+                return $title . " ({$this->users->count()}/{$this->getNumberOfPeople()})";
+
+            case self::STATUS_PLANING:
+                return self::STATUSES[self::STATUS_PLANING];
+
+            default:
+                return 'Текущий статус не распознан';
+        }
     }
 }

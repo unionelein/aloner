@@ -80,7 +80,7 @@ class EventFixture extends BaseFixture
             }
 
             if ($type === Timetable::TYPE_VISIT) {
-                $interval  = $this->faker->randomElement([15, 30, 45, 60]);
+                $interval  = $this->faker->randomElement([45, 60, 120]);
                 $total     = 600 / $interval + \rand(-3, +3);
                 $workStart = \rand(7, 12);
                 for ($i = 0; $i < $total; $i++) {

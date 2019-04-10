@@ -11,18 +11,20 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h5 class="text-center event-party-status">
-                    Ожидаем еще 2 игроков <span style="font-size: 12px">(<a class="more" href="#">?</a>)</span>
-                </h5>
+                <div class="event-party-status">{{ eventParty.currentStatusTitle }}</div>
 
                 <nav>
                     <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">Информация</a>
-                        <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">Контакты</a>
+                        <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">
+                            <i class="fas fa-cat"></i> Инфо
+                        </a>
+                        <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">
+                            <i class="fas fa-address-book"></i> Контакты
+                        </a>
                     </div>
                 </nav>
 
-                <div class="tab-content nav-block-content-wrapper" id="nav-tabContent">
+                <div class="tab-content nav-block-content-wrapper">
                     <div class="tab-pane fade show active block nav-block" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
                         <div class="block-body">
                             {% include 'eventParty/tab_info.html.twig' %}
@@ -37,17 +39,11 @@
             </div>
 
             <div class="col-sm-4">
-                <p class="participants-number-info">Участники: ({{ eventParty.users|length }}/{{ eventParty.numberOfPeople }})</p>
-
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
-                        <div class="user-icon-block float-left">
-                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameFor(eventParty) }}"><br>
-                            {% if user == app.user %}
-                                <b>{{ user.nicknameFor(eventParty) }}</b>
-                            {% else %}
-                                {{ user.nicknameFor(eventParty) }}
-                            {% endif %}
+                        <div class="user-icon-block{% if user == app.user %} current-user{% endif %}">
+                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameFor(eventParty) }}">
+                            <div class="user-icon-name">{{ user.nicknameFor(eventParty) }}</div>
                         </div>
                     {% endfor %}
                     <div class="clearfix"></div>
@@ -55,7 +51,7 @@
 
                 <div class="block chat-block">
                     <div class="block-body chat-wrapper">
-                        <div class="chat-messages-block invisible" >
+                        <div class="chat-messages-block invisible">
                             {% for message in messagesHistory %}
                                 <p>
                                     <b>{{ message.user.name }}: </b>
@@ -66,7 +62,6 @@
 
                         <div class="delimiter"></div>
 
-
                         <textarea class="chat-message-input" maxlength="500" placeholder="Напишите что-нибудь..."></textarea>
 
                         <div class="text-right">
@@ -74,8 +69,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="row event-party-actions-wrapper mt-4">
+        <div class="row mt-4">
+            <div class="offset-sm-8 col-sm-4">
+                <div class="row">
                     <div class="col-sm-6">
                         <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
                     </div>

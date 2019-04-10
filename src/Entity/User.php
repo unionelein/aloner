@@ -286,7 +286,7 @@ class User implements UserInterface
     public function getActiveEventParty(): ?EventParty
     {
         foreach ($this->getEventParties() as $eventParty) {
-            if ($eventParty->isActive()) {
+            if (!$eventParty->isDone()) {
                 return $eventParty;
             }
         }

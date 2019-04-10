@@ -1,33 +1,25 @@
 .event-party-status {
-    margin: 17px 0 17px 0;
-}
-
-.event-description {
-    font-size: 15px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .event-party-tabs-wrapper {
     border-bottom: none;
 }
 
-.event-party-title {
-    height: 47px;
-    margin-bottom: 0;
-}
-
-.participants-number-info {
-    font-size: 13px;
-    margin-bottom: 6px;
-}
-
 .participants-wrapper {
     margin-bottom: 5px;
+}
+
+.chat-block {
+    padding: 20px 20px 15px 20px;
 }
 
 .chat-messages-block {
     font-size: 14px;
     margin-bottom: 20px;
-    height: 505px;
+    min-height: 250px;
     overflow-y: auto;
     margin-right: -18px;
     padding-right: 24px;
@@ -48,10 +40,6 @@
 
 .chat-message-input:focus {
     outline: none;
-}
-
-.chat-block {
-    padding: 20px 20px 15px 20px;
 }
 
 .chat-send-message-btn {
@@ -88,4 +76,8 @@
     padding: 5px;
 }
 
+.event-party-title {
+    height: 47px;
+    margin-bottom: 0;
+}
 
