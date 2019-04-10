@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Component\Model\Collection\TimetableCollection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -50,11 +51,6 @@ class Event
     private $site;
 
     /**
-     * @ORM\Column(type="json")
-     */
-    private $media = [];
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $address;
@@ -71,9 +67,15 @@ class Event
      */
     private $phone;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Media", cascade={"persist"})
+     */
+    private $media;
+
     public function __construct(string $title, City $city)
     {
         $this->timetables = new ArrayCollection();
+        $this->media = new ArrayCollection();
 
         $this->title = $title;
         $this->city  = $city;
@@ -119,18 +121,6 @@ class Event
     public function setSite(string $site): self
     {
         $this->site = $site;
-
-        return $this;
-    }
-
-    public function getMedia(): array
-    {
-        return $this->media;
-    }
-
-    public function addMedia(string $mediaSrc): self
-    {
-        $this->media[] = $mediaSrc;
 
         return $this;
     }
@@ -184,6 +174,32 @@ class Event
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Media[]
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedia(Media $medium): self
+    {
+        if (!$this->media->contains($medium)) {
+            $this->media[] = $medium;
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $medium): self
+    {
+        if ($this->media->contains($medium)) {
+            $this->media->removeElement($medium);
+        }
 
         return $this;
     }

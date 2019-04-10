@@ -42,6 +42,16 @@ class Timetable
         self::SUNDAY    => 'Воскресенье',
     ];
 
+    public const SHORT_WEEK_DAYS = [
+        self::MONDAY    => 'Пн',
+        self::TUESDAY   => 'Вт',
+        self::WEDNESDAY => 'Ср',
+        self::THURSDAY  => 'Чт',
+        self::FRIDAY    => 'Пт',
+        self::SATURDAY  => 'Сб',
+        self::SUNDAY    => 'Вс',
+    ];
+
     public function __construct(
         Event $event,
         int $weekDay,

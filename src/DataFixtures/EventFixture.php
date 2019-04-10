@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\City;
 use App\Entity\Event;
+use App\Entity\Media;
 use App\Entity\Timetable;
 
 class EventFixture extends BaseFixture
@@ -30,14 +31,31 @@ class EventFixture extends BaseFixture
     {
         $this->createMany('event', 20, function (int $index) {
             /** @var City $city */
-            $city  = $this->getReference('city_' . \rand(1, \count(CityFixture::CITIES)));
+            $city  = $this->getReference('city_1');
             $title = $this->faker->randomElement(self::EVENT_TITLES);
 
             $event = new Event($title, $city);
-            $event->setDescription($this->faker->text);
+            $event->setDescription(
+                'Батутная арена это отличное место повеселиться с детьми, друзьями и самостоятельно получить заряд позитива.
+                
+                12 батутов(один из которых гимнастический), самая большая поролоновая яма в Беларуси в которую можно прыгать как с батутов и тумб (парапетов), так и со стены для скалолазания, канат, два настольных футбола(кикер), аэрохоккей, баскетбольное кольцо, Sony Playstation 4, настольный тенниc, а так-же крутая фото зона.
+                Все эти радости входят в стоимость входного билета.'
+            );
             $event->setPhone('+375292052239');
             $event->setAddress('Гомель, ул. Советская, ' . \rand(1, 100));
             $event->setSite('https://carte.by/gomel/bubbles/');
+
+            $event->addMedia(new Media('/media/img/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
+            $event->addMedia(new Media('/media/img/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));
+            $event->addMedia(new Media('/media/img/neoland_3.jpg', Media::TYPE_IMAGE));
+            $event->addMedia(new Media('/media/video/gorka.mp4', Media::TYPE_VIDEO));
+            $event->addMedia(
+                new Media(
+                    '//vk.com/video_ext.php?oid=-162658447&id=456239021&hash=37e3bddfeff1ad45&hd=2',
+                    Media::TYPE_IFRAME,
+                    'микрочелики прыгают на батутах'
+                )
+            );
 
             $this->addTimeTables($event);
 

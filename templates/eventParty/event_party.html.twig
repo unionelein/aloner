@@ -11,7 +11,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h5 class="text-center">
+                <h5 class="text-center event-party-status">
                     Ожидаем еще 2 игроков <span style="font-size: 12px">(<a class="more" href="#">?</a>)</span>
                 </h5>
 
@@ -19,33 +19,18 @@
                     <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
                         <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">Информация</a>
                         <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">Контакты</a>
-                        <a class="nav-item nav-link" id="nav-todo-tab" href="#nav-todo" data-toggle="tab" role="tab" aria-controls="nav-todo" aria-selected="false">А что нужно делать?</a>
                     </div>
                 </nav>
+
                 <div class="tab-content nav-block-content-wrapper" id="nav-tabContent">
                     <div class="tab-pane fade show active block nav-block" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
                         <div class="block-body">
-                            <h4 class="text-center event-party-title">{{ eventParty.event.title }} ({{ eventParty.event.city }})</h4>
-                            {{ eventParty.event.description }}
+                            {% include 'eventParty/tab_info.html.twig' %}
                         </div>
                     </div>
                     <div class="tab-pane fade block nav-block" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
                         <div class="block-body">
-                            <p>Номер мобилы <i>{{ eventParty.event.phone }}</i></p>
-                            <p>Адрес <i>{{ eventParty.event.address }}</i></p>
-                            <p>Время работы сегодня:</p>
-                            <p>
-                                {% for timetable in eventParty.event.timetables.forWeekDay('now'|date('w')) %}
-                                    {{ timetable.timeFrom|date('H:i') }}-{{ timetable.timeTo|date('H:i') }}<br>
-                                {% endfor %}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade block nav-block" id="nav-todo" role="tabpanel" aria-labelledby="nav-todo-tab">
-                        <div class="block-body">
-                            <p>1. Вам нужно выбрать время, когда вы сможете пойти.</p>
-                            <p>2. Теперь нужно позвонить по номеру, указанному на вкладке "Котакты" и забронировать место для участников</p>
-                            <p>3. Встречайтесь в назначенное время и веселитесь!</p>
+                            {% include 'eventParty/tab_contacts.html.twig' %}
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 body {
-    padding: 0 0 30px 0;
+    padding: 0 0 50px 0;
     margin: 0;
     min-height: 98vh;
     position: relative;
@@ -29,7 +29,7 @@ body {
 
 .app-content {
     position: relative;
-    padding: 15px 0;
+    padding: 0;
 }
 
 .app-footer {
@@ -44,4 +44,8 @@ body {
 
 .btn-light {
     border-color: rgba(0,0,0,.0975);
+}
+
+.help-text {
+    font-size: 13px;
 }
