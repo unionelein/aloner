@@ -3,6 +3,8 @@
 {% block stylesheets %}
     {{ parent() }}
 
+    <link rel="stylesheet" href="{{ asset('css/lightgallery/lightgallery.css') }}">
+    <link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
     <link rel="stylesheet" href="{{ asset('css/event_party.css') }}">
 {% endblock %}
@@ -77,12 +79,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="offset-sm-8 col-sm-4">
-                <div class="row">
+                <div class="row event-party-actions">
                     <div class="col-sm-6">
                         <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
                     </div>
@@ -103,6 +101,9 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/libs/authoban.js') }}"></script>
+    <script src="{{ asset('js/libs/lightgallery/lg-utils.js') }}"></script>
+    <script src="{{ asset('js/libs/lightgallery/lightgallery.js') }}"></script>
+    <script src="http://vjs.zencdn.net/4.12/video.js"></script>
     <script src="{{ asset('js/event_party/Chat.js') }}"></script>
     <script src="{{ asset('js/event_party/Announcement.js') }}"></script>
     <script src="{{ asset('js/event_party/event_party.js') }}"></script>

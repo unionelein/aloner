@@ -1,3 +1,22 @@
+<div class="d-none" id="video1">
+    <video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="none">
+        <source src="{{ asset('media/video/gorka.mp4') }}" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+</div>
+
+<div id="event-gallery" class="media-wrapper">
+    <a href="{{ asset('media/img/neoland_1.jpg') }}" class="media">
+        <img src="{{ asset('media/img/neoland_1.jpg') }}"/>
+    </a>
+    <a href="{{ asset('media/img/neoland_2.jpg') }}" class="media">
+        <img src="{{ asset('media/img/neoland_2.jpg') }}"/>
+    </a>
+    <a class="media" data-poster="video-poster1.jpg" data-sub-html="video caption1" data-html="#video1" >
+        <img src="{{ asset('media/img/neoland_3.jpg') }}"/>
+    </a>
+</div>
+
 <div class="row media-wrapper">
     {% for media in eventParty.event.media|slice(0, 6)  %}
         <div class="col-sm-4 p5">
