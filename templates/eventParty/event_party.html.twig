@@ -16,7 +16,7 @@
                 <nav>
                     <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
                         <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">
-                            <i class="fas fa-cat"></i> Инфо
+                            <i class="far fa-list-alt"></i> Инфо
                         </a>
                         <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">
                             <i class="fas fa-address-book"></i> Контакты
@@ -41,7 +41,7 @@
             <div class="col-sm-4">
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
-                        <div class="user-icon-block{% if user == app.user %} current-user{% endif %}">
+                        <div class="user-icon-block {% if user == app.user %} current-user{% endif %}">
                             <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameFor(eventParty) }}">
                             <div class="user-icon-name">{{ user.nicknameFor(eventParty) }}</div>
                         </div>

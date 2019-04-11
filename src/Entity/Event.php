@@ -72,6 +72,11 @@ class Event
      */
     private $media;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $priceText;
+
     public function __construct(string $title, City $city)
     {
         $this->timetables = new ArrayCollection();
@@ -200,6 +205,18 @@ class Event
         if ($this->media->contains($medium)) {
             $this->media->removeElement($medium);
         }
+
+        return $this;
+    }
+
+    public function getPriceText(): ?string
+    {
+        return $this->priceText;
+    }
+
+    public function setPriceText(?string $priceText): self
+    {
+        $this->priceText = $priceText;
 
         return $this;
     }

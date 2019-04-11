@@ -8,6 +8,7 @@
         "ext-zmq": "^1.1",
         "cboden/ratchet": "^0.4.1",
         "guzzlehttp/guzzle": "^6.3",
+        "knplabs/knp-markdown-bundle": "^1.7",
         "react/zmq": "^0.4.0",
         "sensio/framework-extra-bundle": "^5.2",
         "stof/doctrine-extensions-bundle": "^1.3",

@@ -1,5 +1,8 @@
-<h4 class="text-center event-party-title">{{ eventParty.event.title }}</h4>
-<div class="event-description">{{ eventParty.event.description|nl2br }}</div>
+<h4 class="event-title">{{ eventParty.event.title }}</h4>
+<div class="event-description">{{ eventParty.event.description|e|markdown }}</div>
+{% if eventParty.event.priceText %}
+    <div class="event-price"><b>Цена</b>: {{ eventParty.event.priceText }}</div>
+{% endif %}
 
 <div class="row media-wrapper">
     {% for media in eventParty.event.media|slice(0, 6)  %}

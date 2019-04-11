@@ -281,7 +281,7 @@ class EventParty
                 $title = \str_replace('{{ N }}', $this->getPeopleRemaining(), $desc);
 
                 // ожидаем 1 человекА
-                if ($this->getPeopleRemaining() === 1) {
+                if ($this->getPeopleRemaining() < 5) {
                     $title .= 'а';
                 }
 

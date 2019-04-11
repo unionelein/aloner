@@ -22,6 +22,7 @@
 }
 
 .user-icon-block {
+    float: left;
     text-align: center;
     margin: 5px;
     font-size: 12px;
