@@ -1,0 +1,15 @@
+<div class="row media-wrapper">
+    {% for media in eventParty.event.media|slice(0, 6)  %}
+        <div class="col-sm-4 p5">
+            <div class="media d-inline-block align-middle">
+                {% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}
+                    <img src="{{ media.src }}" alt="{{ media.alt }}">
+                {% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}
+                    <video controls="controls"><source src="{{ media.src }}" type="video/mp4"></video>
+                {% elseif media.type == constant('App\\Entity\\Media::TYPE_IFRAME') %}
+                    <iframe src="{{ media.src }}" frameborder="0" allowfullscreen></iframe>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
