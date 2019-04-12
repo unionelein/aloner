@@ -1,60 +1,28 @@
-<div class="d-none" id="video1">
-    <video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="none">
-        <source src="{{ asset('media/video/gorka.mp4') }}" type="video/mp4">
-        Your browser does not support HTML5 video.
-    </video>
-</div>
-
-<div class="media-wrapper justified-gallery" id="event-gallery">
-    <a class="media" href="{{ asset('media/img/neoland_1.jpg') }}">
-        <img src="{{ asset('media/img/neoland_1.jpg') }}"/>
-    </a>
-    <a class="media" href="{{ asset('media/img/neoland_2.jpg') }}">
-        <img src="{{ asset('media/img/neoland_2.jpg') }}"/>
-    </a>
-    <a class="media" data-poster="video-poster1.jpg" data-html="#video1" >
-        <img src="{{ asset('media/img/neoland_3.jpg') }}"/>
-    </a>
-</div>
-<div class="clearfix"></div>
-
-{#<div class="row media-wrapper">#}
-    {#{% for media in eventParty.event.media|slice(0, 6)  %}#}
-        {#<div class="col-sm-4 p5">#}
-            {#<div class="media d-inline-block align-middle">#}
-                {#{% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}#}
-                    {#<img src="{{ media.src }}" alt="{{ media.alt }}">#}
-                {#{% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}#}
-                    {#<video controls="controls"><source src="{{ media.src }}" type="video/mp4"></video>#}
-                {#{% elseif media.type == constant('App\\Entity\\Media::TYPE_IFRAME') %}#}
-                    {#<iframe src="{{ media.src }}" frameborder="0" allowfullscreen></iframe>#}
-                {#{% endif %}#}
-            {#</div>#}
-        {#</div>#}
-    {#{% endfor %}#}
-{#</div>#}
-
-<div class="demo-gallery dark mrb35">
-    <ul id="html5-videos-videojs" class="list-unstyled row justified-gallery">
-        <li class="video" data-html="#video1" data-poster="{{ asset('media/img/neoland_3.jpg') }}">
-            <a href="">
-                <img class="img-responsive" src="{{ asset('media/img/neoland_3.jpg') }}">
-                <div class="demo-gallery-poster">
-                    <img src="{{ asset('img/play-button.png') }}">
+<div class="row media-wrapper gallery" id="event-gallery">
+    {% for media in eventParty.event.media|slice(0, 9)  %}
+        {% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}
+            <a class="col-sm-4 media" href="{{ media.src }}">
+                <img src="{{ media.src }}"/>
+                <div class="gallery-poster">
+                    <img src="{{ asset('img/zoom.png') }}" alt="{{ media.alt }}">
                 </div>
             </a>
-        </li>
-        <li>
-            <a class="jg-entry" href="{{ asset('media/img/neoland_1.jpg') }}">
-
-                <img class="img-responsive" src="{{ asset('media/img/neoland_1.jpg') }}">
-                <div class="demo-gallery-poster">
-                    <img src="{{ asset('img/zoom.png') }}">
+        {% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}
+            <a class="col-sm-4 media" data-poster="{{ media.videoPoster }}" data-sub-html="video caption1" data-html="#video-{{ media.id }}" >
+                <img src="{{ media.videoPoster }}" alt="{{ media.alt }}"/>
+                <div class="gallery-poster video-poster">
+                    <img src="{{ asset('img/play-button.png') }}" alt="{{ media.alt }}">
                 </div>
-
             </a>
-        </li>
-    </ul>
+
+            <div class="d-none" id="video-{{ media.id }}">
+                <video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="true">
+                    <source src="{{ media.src }}" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="col-sm-12 text-center">В галерее пусто</div>
+    {% endfor %}
 </div>
-
-

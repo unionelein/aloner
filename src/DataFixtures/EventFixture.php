@@ -59,14 +59,7 @@ EOF
             $event->addMedia(new Media('/media/img/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
             $event->addMedia(new Media('/media/img/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));
             $event->addMedia(new Media('/media/img/neoland_3.jpg', Media::TYPE_IMAGE));
-            $event->addMedia(new Media('/media/video/gorka.mp4', Media::TYPE_VIDEO));
-            $event->addMedia(
-                new Media(
-                    '//vk.com/video_ext.php?oid=-162658447&id=456239021&hash=37e3bddfeff1ad45&hd=2',
-                    Media::TYPE_IFRAME,
-                    'микрочелики прыгают на батутах'
-                )
-            );
+            $event->addMedia(new Media('/media/video/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', '/media/img/neoland_3.jpg'));
 
             $this->addTimeTables($event);
 

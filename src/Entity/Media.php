@@ -43,11 +43,17 @@ class Media
      */
     private $alt;
 
-    public function __construct(string $src, int $type, string $alt = null)
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $videoPoster;
+
+    public function __construct(string $src, int $type, string $alt = null, ?string $videoPoster = null)
     {
         $this->src = $src;
         $this->alt = $alt;
         $this->setType($type);
+        $this->videoPoster = $videoPoster;
     }
 
     public function getId(): ?int
@@ -84,6 +90,18 @@ class Media
     public function setAlt(?string $alt): self
     {
         $this->alt = $alt;
+
+        return $this;
+    }
+
+    public function getVideoPoster(): ?string
+    {
+        return $this->videoPoster;
+    }
+
+    public function setVideoPoster(?string $videoPoster): self
+    {
+        $this->videoPoster = $videoPoster;
 
         return $this;
     }
