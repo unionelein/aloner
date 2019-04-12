@@ -2,11 +2,9 @@ $(document).ready(() => {
     new Chat();
     new Announcement();
 
-    const gallery = document.getElementById('event-gallery');
-    lightGallery(gallery, {
+    $('#event-gallery').lightGallery({
         videojs: true,
-        thumbnail:true,
-        animateThumb: false,
-        showThumbByDefault: false
+        thumbnail:false
     });
 });
+

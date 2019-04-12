@@ -5,30 +5,56 @@
     </video>
 </div>
 
-<div id="event-gallery" class="media-wrapper">
-    <a href="{{ asset('media/img/neoland_1.jpg') }}" class="media">
+<div class="media-wrapper justified-gallery" id="event-gallery">
+    <a class="media" href="{{ asset('media/img/neoland_1.jpg') }}">
         <img src="{{ asset('media/img/neoland_1.jpg') }}"/>
     </a>
-    <a href="{{ asset('media/img/neoland_2.jpg') }}" class="media">
+    <a class="media" href="{{ asset('media/img/neoland_2.jpg') }}">
         <img src="{{ asset('media/img/neoland_2.jpg') }}"/>
     </a>
-    <a class="media" data-poster="video-poster1.jpg" data-sub-html="video caption1" data-html="#video1" >
+    <a class="media" data-poster="video-poster1.jpg" data-html="#video1" >
         <img src="{{ asset('media/img/neoland_3.jpg') }}"/>
     </a>
 </div>
+<div class="clearfix"></div>
 
-<div class="row media-wrapper">
-    {% for media in eventParty.event.media|slice(0, 6)  %}
-        <div class="col-sm-4 p5">
-            <div class="media d-inline-block align-middle">
-                {% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}
-                    <img src="{{ media.src }}" alt="{{ media.alt }}">
-                {% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}
-                    <video controls="controls"><source src="{{ media.src }}" type="video/mp4"></video>
-                {% elseif media.type == constant('App\\Entity\\Media::TYPE_IFRAME') %}
-                    <iframe src="{{ media.src }}" frameborder="0" allowfullscreen></iframe>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
+{#<div class="row media-wrapper">#}
+    {#{% for media in eventParty.event.media|slice(0, 6)  %}#}
+        {#<div class="col-sm-4 p5">#}
+            {#<div class="media d-inline-block align-middle">#}
+                {#{% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}#}
+                    {#<img src="{{ media.src }}" alt="{{ media.alt }}">#}
+                {#{% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}#}
+                    {#<video controls="controls"><source src="{{ media.src }}" type="video/mp4"></video>#}
+                {#{% elseif media.type == constant('App\\Entity\\Media::TYPE_IFRAME') %}#}
+                    {#<iframe src="{{ media.src }}" frameborder="0" allowfullscreen></iframe>#}
+                {#{% endif %}#}
+            {#</div>#}
+        {#</div>#}
+    {#{% endfor %}#}
+{#</div>#}
+
+<div class="demo-gallery dark mrb35">
+    <ul id="html5-videos-videojs" class="list-unstyled row justified-gallery">
+        <li class="video" data-html="#video1" data-poster="{{ asset('media/img/neoland_3.jpg') }}">
+            <a href="">
+                <img class="img-responsive" src="{{ asset('media/img/neoland_3.jpg') }}">
+                <div class="demo-gallery-poster">
+                    <img src="{{ asset('img/play-button.png') }}">
+                </div>
+            </a>
+        </li>
+        <li>
+            <a class="jg-entry" href="{{ asset('media/img/neoland_1.jpg') }}">
+
+                <img class="img-responsive" src="{{ asset('media/img/neoland_1.jpg') }}">
+                <div class="demo-gallery-poster">
+                    <img src="{{ asset('img/zoom.png') }}">
+                </div>
+
+            </a>
+        </li>
+    </ul>
 </div>
+
+
