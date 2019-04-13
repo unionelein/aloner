@@ -55,6 +55,7 @@ EOF
             $event->setAddress('Гомель, ул. Советская, ' . \rand(1, 100));
             $event->setSite('https://carte.by/gomel/bubbles/');
             $event->setPriceText('1 билет стоит ' . \rand(5, 15) . 'p.');
+            $event->setYandexMapSrc('https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A15e27f3cf0991c2962ebe60e38c919125f7b1836a461a76eaa7df9e24f7d4a23&amp;width=650&amp;height=350&amp;lang=ru_RU&amp;scroll=true');
 
             $event->addMedia(new Media('/media/img/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
             $event->addMedia(new Media('/media/img/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));

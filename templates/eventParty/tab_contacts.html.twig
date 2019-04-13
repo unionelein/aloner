@@ -13,11 +13,12 @@
 <div class="row">
     <div class="col-sm-6">
         <b>Время работы сегодня:</b>
-        <p>
+        <p class="mb-1">
             {% for timetable in eventParty.event.timetables.forWeekDay('now'|date('w')) %}
                 {{ func.printTimetable(timetable) }}
             {% endfor %}
         </p>
+        <a href="#fullTimetable" data-toggle="collapse" role="button">Подробнее</a>
     </div>
     <div class="col-sm-6">
         <div><b>Телефон:</b> {{ eventParty.event.phone }}</div>
@@ -26,14 +27,12 @@
 
     <div class="col-sm-12">
         <div class="timetable-wrapper">
-            <a href="#fullTimetable" data-toggle="collapse" role="button">Подробнее</a>
-
             <div class="collapse" id="fullTimetable">
                 <table>
                     {% for day, dayName in constant('App\\Entity\\Timetable::SHORT_WEEK_DAYS') %}
-                        <tr>
-                            <td><b>{{ dayName }}:</b></td>
-                            <td class="pb-3">
+                        <tr class="pb-3">
+                            <td class="pr-1"><b>{{ dayName }}:</b></td>
+                            <td>
                                 {% for timetable in eventParty.event.timetables.forWeekDay(day) %}
                                     {{ func.printTimetable(timetable) }}
                                 {% endfor %}
@@ -45,5 +44,12 @@
         </div>
     </div>
 </div>
-<p><b>Адрес:</b> <i>{{ eventParty.event.address }}</i></p>
-<img src="http://dontforget.pro/wp-content/uploads/2014/03/map20.png" alt="" width="100%">
+
+<div class="row col-sm-12 mt-1">
+    <p><b>Адрес:</b> <i>{{ eventParty.event.address }}</i></p>
+    {% if eventParty.event.yandexMapSrc %}
+        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.yandexMapSrc }}"></script>
+    {% endif %}
+</div>
+
+

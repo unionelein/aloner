@@ -77,6 +77,11 @@ class Event
      */
     private $priceText;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $yandexMapSrc;
+
     public function __construct(string $title, City $city)
     {
         $this->timetables = new ArrayCollection();
@@ -217,6 +222,18 @@ class Event
     public function setPriceText(?string $priceText): self
     {
         $this->priceText = $priceText;
+
+        return $this;
+    }
+
+    public function getYandexMapSrc(): ?string
+    {
+        return $this->yandexMapSrc;
+    }
+
+    public function setYandexMapSrc(?string $yandexMapSrc): self
+    {
+        $this->yandexMapSrc = $yandexMapSrc;
 
         return $this;
     }
