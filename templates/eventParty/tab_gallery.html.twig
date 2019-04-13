@@ -1,3 +1,12 @@
+{% for media in eventParty.event.media|slice(0, 9) if media.type == constant('App\\Entity\\Media::TYPE_VIDEO')  %}
+    <div class="d-none" id="video-{{ media.id }}">
+        <video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="true">
+            <source src="{{ media.src }}" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+{% endfor %}
+
 <div class="row media-wrapper gallery" id="event-gallery">
     {% for media in eventParty.event.media|slice(0, 9)  %}
         {% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}
@@ -14,13 +23,6 @@
                     <img src="{{ asset('img/play-button.png') }}" alt="{{ media.alt }}">
                 </div>
             </a>
-
-            <div class="d-none" id="video-{{ media.id }}">
-                <video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="true">
-                    <source src="{{ media.src }}" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
-            </div>
         {% endif %}
     {% else %}
         <div class="col-sm-12 text-center">В галерее пусто</div>

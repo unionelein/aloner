@@ -3,8 +3,7 @@ $(document).ready(() => {
     new Announcement();
 
     $('#event-gallery').lightGallery({
-        videojs: true,
-        thumbnail:false
+        videojs: true
     });
 });
 

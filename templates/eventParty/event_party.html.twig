@@ -4,7 +4,7 @@
     {{ parent() }}
 
     <link rel="stylesheet" href="{{ asset('node_modules/lightgallery/src/css/lightgallery.css') }}">
-    <link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('node_modules/video/video.css') }}">
 
     <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
     <link rel="stylesheet" href="{{ asset('css/event_party.css') }}">
@@ -102,15 +102,11 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/libs/authoban.js') }}"></script>
-    <script src="http://vjs.zencdn.net/4.12/video.js"></script>
 
     <script src="{{ asset('node_modules/lightgallery/src/js/lightgallery.js') }}"></script>
-
     <script src="{{ asset('node_modules/lightgallery/lib/jquery.mousewheel.min.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/modules/lg-zoom.min.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/modules/lg-thumbnail.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/modules/lg-fullscreen.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/modules/lg-video.js') }}"></script>
+    <script src="{{ asset('node_modules/lightgallery/modules/lg-video.min.js') }}"></script>
+    <script src="{{ asset('node_modules/video/video.js') }}"></script>
 
     <script src="{{ asset('js/event_party/Chat.js') }}"></script>
     <script src="{{ asset('js/event_party/Announcement.js') }}"></script>
