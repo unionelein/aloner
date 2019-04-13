@@ -3,37 +3,29 @@
 namespace App\Form;
 
 use App\Entity\SearchCriteria;
-use App\Entity\Timetable;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class SearchCriteriaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var SearchCriteria $criteria */
-        $criteria = $options['data'] ?? null;
-
         $builder
             ->add('timeFrom', TimeType::class, [
                 'label' => false,
-                'required' => false,
+                'required' => true,
                 'widget' => 'single_text',
-                'data' => ($criteria && $criteria->isInitialised())
-                    ? $criteria->getTimeFrom()
-                    : new \DateTime(SearchCriteria::DEFAULT_TIME_FROM),
+                'constraints' => [new NotNull()],
             ])
             ->add('timeTo', TimeType::class, [
                 'label' => false,
-                'required' => false,
+                'required' => true,
                 'widget' => 'single_text',
-                'data' => ($criteria && $criteria->isInitialised())
-                    ? $criteria->getTimeTo()
-                    : new \DateTime(SearchCriteria::DEFAULT_TIME_TO),
+                'constraints' => [new NotNull()],
             ])
             ->add('day', ChoiceType::class, [
                 'label' => false,

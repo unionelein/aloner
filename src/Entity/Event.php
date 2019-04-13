@@ -82,13 +82,25 @@ class Event
      */
     private $yandexMapSrc;
 
-    public function __construct(string $title, City $city)
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $minNumberOfPeople;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $maxNumberOfPeople;
+
+    public function __construct(string $title, City $city, int $minNumberOfPeople, int $maxNumberOfPeople)
     {
         $this->timetables = new ArrayCollection();
         $this->media = new ArrayCollection();
 
         $this->title = $title;
         $this->city  = $city;
+        $this->minNumberOfPeople = $minNumberOfPeople;
+        $this->maxNumberOfPeople = $maxNumberOfPeople;
     }
 
     public function getId(): ?int
@@ -236,5 +248,15 @@ class Event
         $this->yandexMapSrc = $yandexMapSrc;
 
         return $this;
+    }
+
+    public function getMinNumberOfPeople(): int
+    {
+        return $this->minNumberOfPeople;
+    }
+
+    public function getMaxNumberOfPeople(): int
+    {
+        return $this->maxNumberOfPeople;
     }
 }

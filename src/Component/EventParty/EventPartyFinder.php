@@ -2,12 +2,15 @@
 
 namespace App\Component\EventParty;
 
+use App\Component\Model\VO\DateTimeInterval;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventPartyRepository;
 
 class EventPartyFinder
 {
+    private const ALLOWED_MINS_OFFSET = 30;
+
     /**
      * @var EventPartyRepository
      */
@@ -22,13 +25,18 @@ class EventPartyFinder
     {
         $criteria = $user->getSearchCriteria();
 
-        // TODO: чтобы в 1 день не повторялись евенты, в которые закидывает юзера
+        $criteriaDay      = (int) $criteria->getDay()->format('w');
+        $criteriaInterval = new DateTimeInterval($criteria->getTimeFrom(), $criteria->getTimeTo());
+
         $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
         $this->sortByRelevance($eventParties);
 
-        $resultEventParties = [];
         foreach ($eventParties as $eventParty) {
             if ($user->getSkippedEventParties()->contains($eventParty)) {
+                continue;
+            }
+
+            if ($user->getSkippedTodayEvents()->contains($eventParty->getEvent())) {
                 continue;
             }
 
@@ -36,10 +44,16 @@ class EventPartyFinder
                 continue;
             }
 
-            $resultEventParties[] = $eventParty;
+            $timetables = $eventParty->getEvent()->getTimetables()->getForWeekDay($criteriaDay);
+
+            if (!EventTimeChecker::check($timetables, $criteriaInterval, self::ALLOWED_MINS_OFFSET)) {
+                continue;
+            }
+
+            return $eventParty;
         }
 
-        return $resultEventParties[0] ?? null;
+        return null;
     }
 
     private function sortByRelevance(array &$eventParties)

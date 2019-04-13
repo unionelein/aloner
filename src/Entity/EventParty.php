@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\EventParty\AgeChecker;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,6 +33,8 @@ class EventParty
     private $id;
 
     /**
+     * @var ArrayCollection|User[]
+     *
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="eventParties")
      */
     private $users;
@@ -192,6 +195,27 @@ class EventParty
     {
         if (!$this->hasSlotForUser($user)) {
             return false;
+        }
+
+        $usersAge = \array_map(static function (User $user) {
+            // if girl add 1 year for checker compare (boys must be slightly older)
+            return $user->getSex()->isFemale() ? $user->getAge() + 1 : $user->getAge();
+        }, $this->users->toArray());
+
+        if (!AgeChecker::check($usersAge, $user->getAge())) {
+            return false;
+        }
+
+        if ($this->users->count()) {
+            /** @var User $firstUser */
+            $firstUser = $this->users->first();
+
+            $searchDay  = $user->getSearchCriteria()->getDay()->format('d');
+            $selectedDay = $firstUser->getSearchCriteria()->getDay()->format('d');
+
+            if ($searchDay !== $selectedDay) {
+                return false;
+            }
         }
 
         return true;

@@ -24,12 +24,12 @@ class SearchCriteria
     private $id;
 
     /**
-     * @ORM\Column(type="time", nullable=true)
+     * @ORM\Column(type="time", nullable=false)
      */
     private $timeFrom;
 
     /**
-     * @ORM\Column(type="time", nullable=true)
+     * @ORM\Column(type="time", nullable=false)
      */
     private $timeTo;
 
@@ -47,6 +47,9 @@ class SearchCriteria
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->timeFrom = new \DateTime(self::DEFAULT_TIME_FROM);
+        $this->timeTo = new \DateTime(self::DEFAULT_TIME_TO);
+        $this->day = new \DateTime();
     }
 
     public function getId(): ?int
@@ -54,24 +57,24 @@ class SearchCriteria
         return $this->id;
     }
 
-    public function getTimeFrom(): ?\DateTimeInterface
+    public function getTimeFrom(): \DateTime
     {
         return $this->timeFrom;
     }
 
-    public function setTimeFrom(?\DateTimeInterface $timeFrom): self
+    public function setTimeFrom(\DateTime $timeFrom): self
     {
         $this->timeFrom = $timeFrom;
 
         return $this;
     }
 
-    public function getTimeTo(): ?\DateTimeInterface
+    public function getTimeTo(): \DateTime
     {
         return $this->timeTo;
     }
 
-    public function setTimeTo(?\DateTimeInterface $timeTo): self
+    public function setTimeTo(\DateTime $timeTo): self
     {
         $this->timeTo = $timeTo;
 
@@ -95,12 +98,12 @@ class SearchCriteria
         return $this->getUpdatedAt() > $this->getCreatedAt();
     }
 
-    public function getDay(): ?\DateTimeInterface
+    public function getDay(): \DateTime
     {
         return $this->day;
     }
 
-    public function setDay(\DateTimeInterface $day): self
+    public function setDay(\DateTime $day): self
     {
         $this->day = $day;
 

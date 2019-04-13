@@ -265,6 +265,11 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getAge(): int
+    {
+        return (int) $this->getBirthday()->diff(new \DateTime())->format('Y');
+    }
+
     /**
      * @return Collection|EventParty[]
      */
@@ -321,6 +326,20 @@ class User implements UserInterface
         }
 
         return $skipped;
+    }
+
+    public function getSkippedTodayEvents(): Collection
+    {
+        $events = new ArrayCollection();
+        $today  = new \DateTime('00:00:00');
+
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->isActionSkip() && $history->getCreatedAt() > $today) {
+                $events[] = $history->getEventParty()->getEvent();
+            }
+        }
+
+        return $events;
     }
 
     public function skipEventParty(EventParty $eventParty): self

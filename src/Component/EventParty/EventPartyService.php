@@ -37,10 +37,13 @@ class EventPartyService
         \shuffle($events);
         $event = \reset($events);
 
-        $girlsNum = \rand(1, 3);
-        $guysNum  = \rand(1, 3);
+        $numOfPeople = \random_int($event->getMinNumberOfPeople(), $event->getMaxNumberOfPeople());
 
-        return new EventParty($event, $girlsNum, $guysNum);
+        if (($numOfPeople % 2) !== 0) {
+            $numOfPeople > $event->getMinNumberOfPeople() ? $numOfPeople-- : $numOfPeople++;
+        }
+
+        return new EventParty($event, $numOfPeople/2, $numOfPeople/2);
     }
 
     public function join(User $user, EventParty $eventParty)

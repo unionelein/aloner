@@ -34,7 +34,7 @@ class EventFixture extends BaseFixture
             $city  = $this->getReference('city_1');
             $title = $this->faker->randomElement(self::EVENT_TITLES);
 
-            $event = new Event($title, $city);
+            $event = new Event($title, $city, \rand(2, 4), \rand(4, 6));
             $event->setDescription(<<<EOF
 %tab% **Батутная арена** - это отличное место повеселиться и познакомиться, а так же получить заряд позитива!
 
