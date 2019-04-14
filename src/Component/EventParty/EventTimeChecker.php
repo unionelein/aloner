@@ -8,8 +8,9 @@ use App\Entity\Timetable;
 class EventTimeChecker
 {
     /**
-     * @param Timetable[] $timetables
+     * @param Timetable[] $timetables $timetables
      * @param DateTimeInterval $searchInterval
+     * @param DateTimeInterval $usersInterval
      * @param int $allowedMinsOffset
      *
      * @return bool
@@ -17,15 +18,18 @@ class EventTimeChecker
     public static function check(
         array $timetables,
         DateTimeInterval $searchInterval,
+        DateTimeInterval $usersInterval,
         int $allowedMinsOffset = 0
     ): bool{
+        // TODO: add check time correct (check ep total users time and event time for acceptable)
+
         foreach ($timetables as $timetable) {
             if ($timetable->getType() === Timetable::TYPE_DAY) {
-                $searchTimeFrom = self::time($searchInterval->getTimeFrom()->modify("+{$allowedMinsOffset} min"));
-                $searchTimeTo   = self::time($searchInterval->getTimeTo()->modify("-{$allowedMinsOffset} min"));
+                $searchTimeFrom = DateTimeInterval::time($searchInterval->getTimeFrom()->modify("+{$allowedMinsOffset} min"));
+                $searchTimeTo   = DateTimeInterval::time($searchInterval->getTimeTo()->modify("-{$allowedMinsOffset} min"));
 
-                $timeFrom = self::time($timetable->getTimeFrom());
-                $timeTo   = self::time($timetable->getTimeTo());
+                $timeFrom = DateTimeInterval::time($timetable->getTimeFrom());
+                $timeTo   = DateTimeInterval::time($timetable->getTimeTo());
 
                 if ($searchTimeFrom >= $timeFrom && $searchTimeTo <= $timeTo) {
                     return true;
@@ -33,11 +37,11 @@ class EventTimeChecker
             }
 
             if ($timetable->getType() === Timetable::TYPE_VISIT) {
-                $searchTimeFrom = self::time($searchInterval->getTimeFrom()->modify("-{$allowedMinsOffset} min"));
-                $searchTimeTo   = self::time($searchInterval->getTimeTo()->modify("+{$allowedMinsOffset} min"));
+                $searchTimeFrom = DateTimeInterval::time($searchInterval->getTimeFrom()->modify("-{$allowedMinsOffset} min"));
+                $searchTimeTo   = DateTimeInterval::time($searchInterval->getTimeTo()->modify("+{$allowedMinsOffset} min"));
 
-                $timeFrom = self::time($timetable->getTimeFrom());
-                $timeTo   = self::time($timetable->getTimeTo());
+                $timeFrom = DateTimeInterval::time($timetable->getTimeFrom());
+                $timeTo   = DateTimeInterval::time($timetable->getTimeTo());
 
                 if ($searchTimeFrom <= $timeFrom && $searchTimeTo >= $timeTo) {
                     return true;
@@ -46,10 +50,5 @@ class EventTimeChecker
         }
 
         return false;
-    }
-
-    private static function time(\DateTime $dateTime): \DateTime
-    {
-        return new \DateTime('0000-00-00 ' . $dateTime->format('H:i:s'));
     }
 }

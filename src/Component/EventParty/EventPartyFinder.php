@@ -45,8 +45,14 @@ class EventPartyFinder
             }
 
             $timetables = $eventParty->getEvent()->getTimetables()->getForWeekDay($criteriaDay);
+            $timeCheck  = EventTimeChecker::check(
+                $timetables,
+                $criteriaInterval,
+                $eventParty->getUsersTimeInterval(),
+                self::ALLOWED_MINS_OFFSET
+            );
 
-            if (!EventTimeChecker::check($timetables, $criteriaInterval, self::ALLOWED_MINS_OFFSET)) {
+            if (!$timeCheck) {
                 continue;
             }
 

@@ -267,7 +267,7 @@ class User implements UserInterface
 
     public function getAge(): int
     {
-        return (int) $this->getBirthday()->diff(new \DateTime())->format('Y');
+        return (int) $this->getBirthday()->diff(new \DateTime())->format('%y');
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Component\EventParty\AgeChecker;
+use App\Component\EventParty\EventTimeChecker;
+use App\Component\Model\VO\DateTimeInterval;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -252,6 +254,27 @@ class EventParty
         } while (\in_array(\strtolower($nickname), $existingNames, true));
 
         return $nickname;
+    }
+
+    public function getUsersTimeInterval()
+    {
+        $timeFrom = DateTimeInterval::time(new \DateTime('00:00:00'));
+        $timeTo   = DateTimeInterval::time(new \DateTime('00:00:00'));
+
+        foreach ($this->users as $user) {
+            $userTimeFrom = DateTimeInterval::time($user->getSearchCriteria()->getTimeFrom());
+            $userTimeTo   = DateTimeInterval::time($user->getSearchCriteria()->getTimeTo());
+
+            if ($userTimeFrom > $timeFrom) {
+                $timeFrom = $userTimeFrom;
+            }
+
+            if ($userTimeTo < $timeTo) {
+                $timeTo = $userTimeTo;
+            }
+        }
+
+        return new DateTimeInterval($timeFrom, $timeTo);
     }
 
     public function getNumberOfPeople(): int

@@ -30,7 +30,7 @@ class Timetable
 
     public const SATURDAY = 6;
 
-    public const SUNDAY = 7;
+    public const SUNDAY = 0;
 
     public const WEEK_DAYS = [
         self::MONDAY    => 'Понедельник',

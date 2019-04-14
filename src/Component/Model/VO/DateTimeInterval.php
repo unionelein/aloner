@@ -31,4 +31,9 @@ class DateTimeInterval
     {
         return $this->timeTo;
     }
+
+    public static function time(\DateTime $dateTime): \DateTime
+    {
+        return new \DateTime('0000-00-00 ' . $dateTime->format('H:i:s'));
+    }
 }
