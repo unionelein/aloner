@@ -19,7 +19,7 @@ class DateTimeInterval
     /**
      * @return \DateTime
      */
-    public function getTimeFrom(): \DateTime
+    public function getFrom(): \DateTime
     {
         return $this->timeFrom;
     }
@@ -27,13 +27,13 @@ class DateTimeInterval
     /**
      * @return \DateTime
      */
-    public function getTimeTo(): \DateTime
+    public function getTo(): \DateTime
     {
         return $this->timeTo;
     }
 
     public static function time(\DateTime $dateTime): \DateTime
     {
-        return new \DateTime('0000-00-00 ' . $dateTime->format('H:i:s'));
+        return new \DateTime('0000-01-01 ' . $dateTime->format('H:i:s'));
     }
 }

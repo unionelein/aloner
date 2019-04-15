@@ -120,12 +120,12 @@ class EventParty
         return $this->histories;
     }
 
-    public function getMeetingAt(): ?\DateTimeInterface
+    public function getMeetingAt(): ?\DateTime
     {
         return $this->meetingAt;
     }
 
-    public function setMeetingAt(?\DateTimeInterface $meetingAt): self
+    public function setMeetingAt(?\DateTime $meetingAt): self
     {
         $this->meetingAt = $meetingAt;
 
@@ -259,7 +259,7 @@ class EventParty
     public function getUsersTimeInterval()
     {
         $timeFrom = DateTimeInterval::time(new \DateTime('00:00:00'));
-        $timeTo   = DateTimeInterval::time(new \DateTime('00:00:00'));
+        $timeTo   = DateTimeInterval::time(new \DateTime('23:59:59'));
 
         foreach ($this->users as $user) {
             $userTimeFrom = DateTimeInterval::time($user->getSearchCriteria()->getTimeFrom());

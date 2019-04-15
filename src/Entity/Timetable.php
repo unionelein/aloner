@@ -55,8 +55,8 @@ class Timetable
     public function __construct(
         Event $event,
         int $weekDay,
-        \DateTimeInterface $timeFrom,
-        \DateTimeInterface $timeTo,
+        \DateTime $timeFrom,
+        \DateTime $timeTo,
         int $type
     ) {
         $this->setType($type);
@@ -112,12 +112,12 @@ class Timetable
         return $this->event;
     }
 
-    public function getTimeFrom(): \DateTimeInterface
+    public function getTimeFrom(): \DateTime
     {
         return $this->timeFrom;
     }
 
-    public function getTimeTo(): \DateTimeInterface
+    public function getTimeTo(): \DateTime
     {
         return $this->timeTo;
     }

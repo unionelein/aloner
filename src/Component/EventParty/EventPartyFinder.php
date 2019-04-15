@@ -11,6 +11,8 @@ class EventPartyFinder
 {
     private const ALLOWED_MINS_OFFSET = 30;
 
+    private const MIN_MINS_FOR_DAY_EVENT = 90;
+
     /**
      * @var EventPartyRepository
      */
@@ -49,6 +51,7 @@ class EventPartyFinder
                 $timetables,
                 $criteriaInterval,
                 $eventParty->getUsersTimeInterval(),
+                self::MIN_MINS_FOR_DAY_EVENT,
                 self::ALLOWED_MINS_OFFSET
             );
 

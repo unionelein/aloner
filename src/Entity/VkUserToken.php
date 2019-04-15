@@ -57,7 +57,7 @@ class VkUserToken
         return $this->token;
     }
 
-    public function getExpiresAt(): ?\DateTimeInterface
+    public function getExpiresAt(): ?\DateTime
     {
         return $this->expiresAt;
     }
