@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Component\Model\VO\Sex;
 use App\Entity\City;
 use App\Entity\User;
+use App\Validator\UserAgeRange;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -26,7 +27,7 @@ class UserType extends AbstractType
             ->add('city', EntityType::class, [
                 'label' => false,
                 'class' => City::class,
-                'placeholder' => 'Ваш город'
+                'placeholder' => 'Ваш город',
             ])
             ->add('sex', ChoiceType::class, [
                 'label' => false,
@@ -37,7 +38,8 @@ class UserType extends AbstractType
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
                 'label' => false,
-                'help' => 'Дата рождения'
+                'help' => 'Дата рождения',
+                'constraints' => [new UserAgeRange()],
             ])
             ->add('phone', TextType::class, [
                 'label' => false,

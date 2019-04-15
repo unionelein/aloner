@@ -200,8 +200,7 @@ class EventParty
         }
 
         $usersAge = \array_map(static function (User $user) {
-            // if girl add 1 year for checker compare (boys must be slightly older)
-            return $user->getSex()->isFemale() ? $user->getAge() + 1 : $user->getAge();
+            return $user->getAge();
         }, $this->users->toArray());
 
         if (!AgeChecker::check($usersAge, $user->getAge())) {

@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyService;
+use App\Component\Events;
+use App\Component\Events\EventPartyActionEvent;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventPartyMessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -44,8 +47,11 @@ class EventPartyController extends BaseController
     /**
      * @Route("/join", name="app_join_to_event_party")
      */
-    public function join(EventPartyFinder $eventPartyFinder, EventPartyService $eventPartyService)
-    {
+    public function join(
+        EventPartyFinder $eventPartyFinder,
+        EventPartyService $eventPartyService,
+        EventDispatcher $dispatcher
+    ) {
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
@@ -60,15 +66,28 @@ class EventPartyController extends BaseController
 
         $eventPartyService->join($user, $eventParty);
 
+        $dispatcher->dispatch(
+            Events::JOIN_TO_EVENT_PARTY,
+            new EventPartyActionEvent($user, $eventParty)
+        );
+
         return $this->redirectToRoute('app_current_event_party');
     }
 
     /**
      * @Route("/skip/{id}", name="app_skip_event_party")
      */
-    public function skip(EventParty $eventParty, EventPartyService $eventPartyService)
-    {
+    public function skip(
+        EventParty $eventParty,
+        EventPartyService $eventPartyService,
+        EventDispatcher $dispatcher
+    ) {
         $eventPartyService->skip($this->getUser(), $eventParty);
+
+        $dispatcher->dispatch(
+            Events::SKIP_EVENT_PARTY,
+            new EventPartyActionEvent($this->getUser(), $eventParty)
+        );
 
         return $this->redirectToRoute('app_join_to_event_party');
     }
@@ -76,9 +95,17 @@ class EventPartyController extends BaseController
     /**
      * @Route("/leave/{id}", name="app_leave_event_party")
      */
-    public function leave(EventParty $eventParty, EventPartyService $eventPartyService)
-    {
+    public function leave(
+        EventParty $eventParty,
+        EventPartyService $eventPartyService,
+        EventDispatcher $dispatcher
+    ) {
         $eventPartyService->skip($this->getUser(), $eventParty);
+
+        $dispatcher->dispatch(
+            Events::SKIP_EVENT_PARTY,
+            new EventPartyActionEvent($this->getUser(), $eventParty)
+        );
 
         return $this->redirectToRoute('app_main');
     }

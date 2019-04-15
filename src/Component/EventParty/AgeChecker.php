@@ -5,12 +5,12 @@ namespace App\Component\EventParty;
 class AgeChecker
 {
     private const AGE_INTERVALS = [
-        // allowed years different, ages
-        1 => [0, 15],
-        2 => [16, 25],
-        3 => [26, 35],
-        4 => [36, 50],
-        5 => [51, 100],
+        [15, 17],
+        [18, 22],
+        [23, 28],
+        [29, 36],
+        [37, 45],
+        [46, 55],
     ];
 
     public static function check(array $usersAge, int $age): bool
@@ -22,7 +22,7 @@ class AgeChecker
         $avgAge = (int) (\array_sum($usersAge) / \count($usersAge));
         $range  = self::getAgeRange($avgAge);
 
-        if ($age >= $range[0] && $age <= $range[1]) {
+        if ($range && $age >= $range[0] && $age <= $range[1]) {
             return true;
         }
 
@@ -31,12 +31,20 @@ class AgeChecker
 
     public static function getAgeRange(int $age): array
     {
-        foreach (self::AGE_INTERVALS as $interval => $ageRange) {
+        foreach (self::AGE_INTERVALS as $ageRange) {
             if ($age >= $ageRange[0] && $age <= $ageRange[1]) {
-                return [$age - $interval, $age + $interval];
+                return $ageRange;
             }
         }
 
-        return [0, 0];
+        return [];
+    }
+
+    public static function getTotalRange(): array
+    {
+        $fromAges = array_column(self::AGE_INTERVALS, 0);
+        $toAges   = array_column(self::AGE_INTERVALS, 1);
+
+        return [\min($fromAges), \max($toAges)];
     }
 }
