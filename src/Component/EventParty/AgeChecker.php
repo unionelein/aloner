@@ -7,9 +7,9 @@ class AgeChecker
     private const AGE_INTERVALS = [
         // allowed years different, ages
         1 => [0, 15],
-        2 => [16, 20],
-        3 => [21, 30],
-        4 => [31, 50],
+        2 => [16, 25],
+        3 => [26, 35],
+        4 => [36, 50],
         5 => [51, 100],
     ];
 
