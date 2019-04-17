@@ -23,7 +23,7 @@ class EventPartyController extends BaseController
     /**
      * @Route("/", name="app_current_event_party")
      */
-    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EntityManagerInterface $em)
+    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EventDispatcher $dispatcher)
     {
         $user       = $this->getUser();
         $eventParty = $user->getActiveEventParty();
@@ -32,11 +32,10 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_main');
         }
 
-        // update hash on each load of page for better security
-        $user->updateTempHash();
-
-        $em->persist($user);
-        $em->flush();
+        $dispatcher->dispatch(
+            Events::LOAD_EVENT_PARTY,
+            new EventPartyActionEvent($user, $eventParty)
+        );
 
         return $this->render('eventParty/event_party.html.twig', [
             'eventParty'      => $eventParty,
@@ -92,23 +91,5 @@ class EventPartyController extends BaseController
     public function noEventsFound()
     {
         return $this->render('eventParty/no_events_found.html.twig');
-    }
-
-    /**
-     * @Route("/test_pusher", name="app_test_pusher")
-     */
-    public function testPusher()
-    {
-        // This is our new stuff
-        $context = new \ZMQContext();
-        $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my pusher');
-        $socket->connect("tcp://localhost:5555");
-
-        $socket->send(json_encode([
-            'id' => 'pusher_test',
-            'topic' => 'pusher',
-        ]));
-
-        return $this->json(['status' => 'da']);
     }
 }

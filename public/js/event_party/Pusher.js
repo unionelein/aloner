@@ -1,11 +1,13 @@
-class Announcement {
+class Pusher {
     constructor() {
         this.setUpConnection();
     }
 
     setUpConnection() {
         const onConnect = () => {
-            this.connection.subscribe('pusher', function(topic, data) {
+            const eventPartyHash = $('#event-party-data').data('hash');
+
+            this.connection.subscribe(eventPartyHash, (topic, data) => {
                 // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
                 console.log('New article published to category "' + topic + '" : ' + data.title);
             });

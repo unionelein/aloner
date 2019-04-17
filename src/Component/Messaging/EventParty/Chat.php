@@ -2,8 +2,7 @@
 
 namespace App\Component\Messaging\EventParty;
 
-use App\Component\Messaging\EventParty\Model\ClientData;
-use App\Component\Messaging\EventParty\Model\MessageData;
+use App\Component\Messaging\EventParty\Model\Chat\ClientData;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;

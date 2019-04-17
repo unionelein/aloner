@@ -5,48 +5,103 @@ namespace App\Component\Messaging\EventParty;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
-class Pusher implements WampServerInterface {
-    /**
-     * A lookup of all the topics clients have subscribed to
-     */
-    protected $subscribedTopics = array();
+class Pusher implements WampServerInterface
+{
+    public const TYPE_JOIN = 1;
 
-    public function onSubscribe(ConnectionInterface $conn, $topic) {
+    public const TYPE_SKIP = 2;
+
+
+    public const TYPE_TIME_OFFER = 3;
+
+    public const TYPE_PLACE_OFFER = 4;
+
+    public const TYPE_CAFE_OFFER = 5;
+
+
+    public const TYPE_TIME_OFFER_ANSWER = 6;
+
+    public const TYPE_PLACE_OFFER_ANSWER = 7;
+
+    public const TYPE_CAFE_OFFER_ANSWER = 8;
+
+    public const TYPES = [
+        self::TYPE_JOIN,
+        self::TYPE_SKIP,
+        self::TYPE_TIME_OFFER,
+        self::TYPE_PLACE_OFFER,
+        self::TYPE_CAFE_OFFER,
+        self::TYPE_TIME_OFFER_ANSWER,
+        self::TYPE_PLACE_OFFER_ANSWER,
+        self::TYPE_CAFE_OFFER_ANSWER,
+    ];
+
+    private $eventPartyTopics = [];
+
+    public function onSubscribe(ConnectionInterface $conn, $topic)
+    {
         echo 'new subscribe :' . $topic->getId();
-        $this->subscribedTopics[$topic->getId()] = $topic;
+        $this->eventPartyTopics[$topic->getId()] = $topic;
     }
 
     /**
      * @param string JSON'ified string we'll receive from ZeroMQ
      */
-    public function onBlogEntry($entry) {
-        $entryData = json_decode($entry, true);
-        echo $entryData['topic'] .' given as topic';
-        // If the lookup topic object isn't set there is no one to publish to
-        if (!array_key_exists($entryData['topic'], $this->subscribedTopics)) {
-            echo $entryData['topic'] .' key does not exists';
+    public function onMessage(string $json): void
+    {
+        $data     = \json_decode($json, true);
+
+        $topicKey   = $data['topic'] ?? null;
+        $type       = $data['type'] ?? null;
+        $pusherData = $data['data'] ?? null;
+
+        echo $topicKey .' given as topic';
+
+        if (!$topicKey || !$type || !$pusherData) {
             return;
         }
 
-        $topic = $this->subscribedTopics[$entryData['topic']];
+        if (!\in_array($type, self::TYPES, true)) {
+            return;
+        }
 
-        // re-send the data to all the clients subscribed to that category
-        $topic->broadcast($entryData);
+        if (!\array_key_exists($topicKey, $this->eventPartyTopics)) {
+            return;
+        }
+
+        $topic = $this->eventPartyTopics[$topicKey];
+
+        $topic->broadcast(\json_encode([
+            'type' => $type,
+            'data' => $pusherData,
+        ]));
     }
-    public function onUnSubscribe(ConnectionInterface $conn, $topic) {
+
+    public function onUnSubscribe(ConnectionInterface $conn, $topic)
+    {
     }
-    public function onOpen(ConnectionInterface $conn) {
+
+    public function onOpen(ConnectionInterface $conn)
+    {
     }
-    public function onClose(ConnectionInterface $conn) {
+
+    public function onClose(ConnectionInterface $conn)
+    {
     }
-    public function onCall(ConnectionInterface $conn, $id, $topic, array $params) {
+
+    public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
+    {
         // In this application if clients send data it's because the user hacked around in console
         $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
     }
-    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) {
+
+    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
+    {
         // In this application if clients send data it's because the user hacked around in console
         $conn->close();
     }
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
     }
 }

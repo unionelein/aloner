@@ -340,4 +340,9 @@ class EventParty
                 return 'Текущий статус не распознан';
         }
     }
+
+    public function getHash(): string
+    {
+        return \crypt($this->id . $this->event->getTitle(), 'ep');
+    }
 }

@@ -29,20 +29,12 @@ class PusherRunCommand extends Command
         $context = new Context($loop);
         $pull = $context->getSocket(\ZMQ::SOCKET_PULL);
         $pull->bind('tcp://127.0.0.1:5555'); // Binding to 127.0.0.1 means the only client that can connect is itself
-        $pull->on('message', array($pusher, 'onBlogEntry'));
+        $pull->on('message', [$pusher, 'onMessage']);
 
         // Set up our WebSocket server for clients wanting real-time updates
         $webSock = new Server('0.0.0.0:8888/pusher', $loop); // Binding to 0.0.0.0 means remotes can connect
-        $webServer = new IoServer(
-            new HttpServer(
-                new WsServer(
-                    new WampServer(
-                        $pusher
-                    )
-                )
-            ),
-            $webSock
-        );
+
+        new IoServer(new HttpServer(new WsServer(new WampServer($pusher))), $webSock);
 
         $loop->run();
     }

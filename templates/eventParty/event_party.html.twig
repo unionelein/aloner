@@ -94,7 +94,8 @@
         </div>
 
         <div class="d-none js-data">
-            <div id="current-user" data-temp-hash="{{ app.user.tempHash }}"></div>
+            <div id="current-user-data" data-temp-hash="{{ app.user.tempHash }}"></div>
+            <div id="event-party-data" data-hash="{{ eventParty.hash }}"></div>
         </div>
     </div>
 {% endblock %}
@@ -109,6 +110,6 @@
     <script src="{{ asset('node_modules/video/video.js') }}"></script>
 
     <script src="{{ asset('js/event_party/Chat.js') }}"></script>
-    <script src="{{ asset('js/event_party/Announcement.js') }}"></script>
+    <script src="{{ asset('js/event_party/Pusher.js') }}"></script>
     <script src="{{ asset('js/event_party/event_party.js') }}"></script>
 {% endblock %}
