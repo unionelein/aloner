@@ -2,7 +2,9 @@
 
 namespace App\Component\Messaging\EventParty\Model\Chat;
 
+use App\Entity\EventParty;
 use App\Entity\User;
+use Ratchet\ConnectionInterface;
 
 class ClientData
 {
@@ -15,20 +17,15 @@ class ClientData
     /** @var int */
     private $eventPartyId;
 
-    public function __construct(int $userId, string $username, int $eventPartyId)
-    {
-        $this->userId = $userId;
-        $this->username = $username;
-        $this->eventPartyId = $eventPartyId;
-    }
+    /** @var ConnectionInterface */
+    private $connection;
 
-    public static function extract(User $user): self
+    public function __construct(ConnectionInterface $connection, User $user, EventParty $eventParty)
     {
-        return new self(
-            $user->getId(),
-            $user->getNicknameFor($user->getActiveEventParty()),
-            $user->getActiveEventParty()->getId()
-        );
+        $this->connection   = $connection;
+        $this->userId       = $user->getId();
+        $this->username     = $user->getNicknameIn($eventParty);
+        $this->eventPartyId = $eventParty->getId();
     }
 
     public function getUserId(): int
@@ -44,5 +41,10 @@ class ClientData
     public function getEventPartyId(): int
     {
         return $this->eventPartyId;
+    }
+
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
     }
 }

@@ -65,10 +65,10 @@ class EventPartyFinder
         return null;
     }
 
-    private function sortByRelevance(array &$eventParties)
+    private function sortByRelevance(array &$eventParties): void
     {
-        \usort($eventParties, function (EventParty $eventParty1, EventParty $eventParty2) {
-            return $eventParty1->getPeopleRemaining() <=> $eventParty2->getPeopleRemaining();
+        \usort($eventParties, function (EventParty $ep1, EventParty $ep2) {
+            return $ep1->getPeopleRemaining() <=> $ep2->getPeopleRemaining();
         });
     }
 }

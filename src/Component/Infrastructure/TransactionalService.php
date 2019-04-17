@@ -21,7 +21,6 @@ class TransactionalService
         try {
             $operation($this->em);
 
-            $this->em->flush();
             $this->em->commit();
         } catch (\Exception $e) {
             $this->em->rollback();

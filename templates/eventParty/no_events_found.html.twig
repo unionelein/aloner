@@ -1,6 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h3 class="text-center">К сожалению, для города {{ app.user.city }} у нас нет пока активных мероприятий :(</h3>
-    <p class="text-center">Попробуйте воспользоваться сервисом через некоторое время, мы обязательно что-нибудь добавим</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <p class="text-center font-size-20px">К сожалению, для города {{ app.user.city }} у нас пока нет активных мероприятий :(</p>
+                <p class="text-center">Попробуйте воспользоваться сервисом через некоторое время, мы обязательно что-нибудь добавим</p>
+
+                {# добавить 2 кнопки синяя красная с переходом на видео выбора #}
+
+                <p class="mt-5 text-center">
+                    <a href="{{ path('app_main') }}" class="btn btn-primary">На главную</a>
+                </p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

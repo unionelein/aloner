@@ -16,7 +16,7 @@ class UserAgeRangeValidator extends ConstraintValidator
     {
         $age = (int) $birthday->diff(new \DateTime())->format('%y');
 
-        [$minAge, $maxAge] = AgeChecker::getTotalRange();
+        [$minAge, $maxAge] = AgeChecker::getFullRange();
 
         if ($age < $minAge) {
             $this->context->buildViolation($constraint->tooYoung)

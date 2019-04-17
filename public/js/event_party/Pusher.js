@@ -9,7 +9,8 @@ class Pusher {
 
             this.connection.subscribe(eventPartyHash, (topic, data) => {
                 // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
-                console.log('New article published to category "' + topic + '" : ' + data.title);
+                console.log('topic id: ' + topic);
+                console.log('data: ' + data);
             });
         };
 

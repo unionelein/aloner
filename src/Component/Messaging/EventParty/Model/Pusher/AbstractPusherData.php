@@ -18,6 +18,8 @@ abstract class AbstractPusherData implements PusherDataInterface, \JsonSerializa
     }
     
     abstract public function getTopicId(): string;
+
+    abstract public function toArray(): array;
     
     public function getType(): int
     {
@@ -26,6 +28,6 @@ abstract class AbstractPusherData implements PusherDataInterface, \JsonSerializa
 
     public function jsonSerialize(): array
     {
-        return \get_object_vars($this);
+        return $this->toArray();
     }
 }

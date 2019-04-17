@@ -30,20 +30,16 @@ class EventPartyMessageRepository extends ServiceEntityRepository
      */
     public function getMessageHistoryFor(EventParty $eventParty, User $user = null): array
     {
-        $qb = $this->createQueryBuilder('chat_msg');
+        $historyJoin = $user->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN);
 
-        if ($user) {
-            $historyJoin = $user->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN);
-
-            if (!$historyJoin) {
-                return [];
-            }
-
-            $qb->andWhere('chat_msg.createdAt > :joinedAt')
-                ->setParameter('joinedAt', $historyJoin->getCreatedAt());
+        if (!$historyJoin) {
+            return [];
         }
 
-        return $qb->getQuery()
+        return $this->createQueryBuilder('chat_msg')
+            ->andWhere('chat_msg.createdAt > :joinedAt')
+            ->setParameter('joinedAt', $historyJoin->getCreatedAt())
+            ->getQuery()
             ->getResult();
     }
 }

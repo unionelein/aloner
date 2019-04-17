@@ -23,7 +23,7 @@ class EventTimeChecker
         int $minsForDayEvent,
         int $allowedMinsOffset = 0
     ): bool{
-        // пользователи могут прийти немного раньше, и уйти немного позже, чем указали
+        // Actually, users can go little bit earlier
         $searchTimeFrom = DateTimeInterval::time($searchInterval->getFrom())->modify("-{$allowedMinsOffset} min");
         $searchTimeTo   = DateTimeInterval::time($searchInterval->getTo())->modify("+{$allowedMinsOffset} min");
 

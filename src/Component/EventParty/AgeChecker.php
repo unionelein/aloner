@@ -13,14 +13,14 @@ class AgeChecker
         [46, 55],
     ];
 
-    public static function check(array $usersAge, int $age): bool
+    public static function isAgeAcceptableFor(int $age, array $usersAge): bool
     {
         if (\count($usersAge) === 0) {
             return true;
         }
 
         $avgAge = (int) (\array_sum($usersAge) / \count($usersAge));
-        $range  = self::getAgeRange($avgAge);
+        $range  = self::getAgeRangeFor($avgAge);
 
         if ($range && $age >= $range[0] && $age <= $range[1]) {
             return true;
@@ -29,7 +29,7 @@ class AgeChecker
         return false;
     }
 
-    public static function getAgeRange(int $age): array
+    public static function getAgeRangeFor(int $age): array
     {
         foreach (self::AGE_INTERVALS as $ageRange) {
             if ($age >= $ageRange[0] && $age <= $ageRange[1]) {
@@ -40,7 +40,7 @@ class AgeChecker
         return [];
     }
 
-    public static function getTotalRange(): array
+    public static function getFullRange(): array
     {
         $fromAges = array_column(self::AGE_INTERVALS, 0);
         $toAges   = array_column(self::AGE_INTERVALS, 1);

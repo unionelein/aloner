@@ -7,7 +7,7 @@ use App\Component\Events\EventPartyActionEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\JoinData;
 use App\Component\Messaging\EventParty\Model\Pusher\SkipData;
 use App\Component\Messaging\EventParty\PusherFacade;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Component\User\UserManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EventPartyActionSubscriber implements EventSubscriberInterface
@@ -15,13 +15,13 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
     /** @var PusherFacade */
     private $pusherFacade;
 
-    /** @var EntityManagerInterface */
-    private $em;
+    /** @var UserManager */
+    private $userManager;
 
-    public function __construct(PusherFacade $pusherFacade, EntityManagerInterface $em)
+    public function __construct(PusherFacade $pusherFacade, UserManager $userManager)
     {
         $this->pusherFacade = $pusherFacade;
-        $this->em = $em;
+        $this->userManager  = $userManager;
     }
 
     public static function getSubscribedEvents()
@@ -35,13 +35,7 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
 
     public function onLoadEventParty(EventPartyActionEvent $event): void
     {
-        $user = $event->getUser();
-
-        // update hash on each load of page for better security
-        $user->updateTempHash();
-
-        $this->em->persist($user);
-        $this->em->flush();
+        $this->userManager->updateTempHash($event->getUser());
     }
     
     public function onEventPartyJoin(EventPartyActionEvent $event): void

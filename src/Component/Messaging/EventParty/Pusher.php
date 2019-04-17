@@ -49,7 +49,7 @@ class Pusher implements WampServerInterface
      */
     public function onMessage(string $json): void
     {
-        $data     = \json_decode($json, true);
+        $data = \json_decode($json, true);
 
         $topicKey   = $data['topic'] ?? null;
         $type       = $data['type'] ?? null;

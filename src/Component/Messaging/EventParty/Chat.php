@@ -2,8 +2,12 @@
 
 namespace App\Component\Messaging\EventParty;
 
+use App\Component\Messaging\EventParty\Model\Chat\ClientDataCollection;
 use App\Component\Messaging\EventParty\Model\Chat\ClientData;
+use App\Entity\EventParty;
+use App\Entity\EventPartyMessage;
 use App\Entity\User;
+use App\Repository\EventPartyRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Ratchet\MessageComponentInterface;
@@ -15,13 +19,8 @@ class Chat implements MessageComponentInterface
 
     private const TYPE_MESSAGE = 'message';
 
-    private const MAX_MESSAGE_LENGTH = 500;
-
-    /** @var \SplObjectStorage */
-    protected $clients;
-
-    /** @var ClientData[] */
-    protected $clientsData = [];
+    /** @var ClientDataCollection */
+    protected $clientCollection;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -29,17 +28,20 @@ class Chat implements MessageComponentInterface
     /** @var UserRepository  */
     private $userRepo;
 
+    /** @var EventPartyRepository */
+    private $epRepo;
+
     public function __construct(EntityManagerInterface $em)
     {
-        $this->clients = new \SplObjectStorage;
-        $this->em = $em;
+        $this->clientCollection  = new ClientDataCollection();
+
+        $this->em       = $em;
         $this->userRepo = $em->getRepository(User::class);
+        $this->epRepo   = $em->getRepository(EventParty::class);
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
-
         echo "New connection! ({$conn->resourceId})\n";
     }
 
@@ -47,19 +49,19 @@ class Chat implements MessageComponentInterface
     {
         $data = \json_decode($json, true);
 
-        switch ($data['type'] ?? 0) {
+        switch ($data['type'] ?? null) {
             case self::TYPE_IDENTIFY:
                 $this->identify($from, $data);
                 break;
             case self::TYPE_MESSAGE:
                 $this->message($from, $data);
+                break;
         }
     }
 
     public function onClose(ConnectionInterface $conn)
     {
-        $this->clients->detach($conn);
-        unset($this->clientsData[$conn->resourceId]);
+        $this->clientCollection->removeByConnection($conn);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
@@ -73,14 +75,20 @@ class Chat implements MessageComponentInterface
 
     private function identify(ConnectionInterface $from, array $data)
     {
-        $this->checkDBConnection();
-        $user = $this->userRepo->findByTempHash($data['userTempHash'] ?? '');
-
-        if (!$user instanceof User) {
+        if (empty($data['userTempHash']) || empty($data['eventPartyId'])) {
             return;
         }
 
-        $this->clientsData[$from->resourceId] = ClientData::extract($user);
+        $this->checkDBConnection();
+
+        $eventParty = $this->epRepo->find((int) $data['eventPartyId']);
+        $user       = $this->userRepo->findByTempHash($data['userTempHash']);
+
+        if (!$user || !$eventParty || !$eventParty->getUsers()->contains($user)) {
+            return;
+        }
+
+        $this->clientCollection->add(new ClientData($from, $user, $eventParty));
 
         echo "Identified user: '{$user->getName()}' ({$from->resourceId})\n";
     }
@@ -95,9 +103,9 @@ class Chat implements MessageComponentInterface
 
     private function message(ConnectionInterface $from, array $data)
     {
-        $clientData = $this->clientsData[$from->resourceId] ?? null;
+        $clientData = $this->clientCollection->findByConnection($from);
 
-        if (!$clientData || empty($data['message']) || \strlen($data['message']) > self::MAX_MESSAGE_LENGTH) {
+        if (!$clientData || empty($data['message']) || \strlen($data['message']) > EventPartyMessage::MAX_MESSAGE_LENGTH) {
             return;
         }
 
@@ -106,8 +114,10 @@ class Chat implements MessageComponentInterface
             'message'  => $data['message'],
         ];
 
-        foreach ($this->clients as $client) {
-            $client->send(\json_encode($msg));
+        $connections = $this->clientCollection->getConnectionsForEventPartyId($clientData->getEventPartyId());
+
+        foreach ($connections as $connection) {
+            $connection->send(\json_encode($msg));
         }
 
         $this->storeMessage($clientData, $data['message']);

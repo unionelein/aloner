@@ -10,6 +10,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class EventPartyMessage
 {
+    public const MAX_MESSAGE_LENGTH = 500;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

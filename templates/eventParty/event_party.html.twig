@@ -53,8 +53,8 @@
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
                         <div class="user-icon-block {% if user == app.user %} current-user{% endif %}">
-                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameFor(eventParty) }}">
-                            <div class="user-icon-name">{{ user.nicknameFor(eventParty) }}</div>
+                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
+                            <div class="user-icon-name">{{ user.nicknameIn(eventParty) }}</div>
                         </div>
                     {% endfor %}
                     <div class="clearfix"></div>
@@ -73,7 +73,10 @@
 
                         <div class="delimiter"></div>
 
-                        <textarea class="chat-message-input" maxlength="500" placeholder="Напишите что-нибудь..."></textarea>
+                        <textarea class="chat-message-input"
+                                  maxlength="{{ constant('App\\Entity\\EventPartyMessage::MAX_MESSAGE_LENGTH') }}"
+                                  placeholder="Напишите что-нибудь..."
+                        ></textarea>
 
                         <div class="text-right">
                             <a href="#" class="chat-send-message-btn">Отправить</a>
@@ -95,7 +98,7 @@
 
         <div class="d-none js-data">
             <div id="current-user-data" data-temp-hash="{{ app.user.tempHash }}"></div>
-            <div id="event-party-data" data-hash="{{ eventParty.hash }}"></div>
+            <div id="event-party-data" data-id="{{ eventParty.id }}"></div>
         </div>
     </div>
 {% endblock %}

@@ -199,24 +199,12 @@ class EventParty
             return false;
         }
 
-        $usersAge = \array_map(static function (User $user) {
-            return $user->getAge();
-        }, $this->users->toArray());
-
-        if (!AgeChecker::check($usersAge, $user->getAge())) {
+        if (!AgeChecker::isAgeAcceptableFor($user->getAge(), $this->getUsersAge())) {
             return false;
         }
 
-        if ($this->users->count()) {
-            /** @var User $firstUser */
-            $firstUser = $this->users->first();
-
-            $searchDay  = $user->getSearchCriteria()->getDay()->format('d');
-            $selectedDay = $firstUser->getSearchCriteria()->getDay()->format('d');
-
-            if ($searchDay !== $selectedDay) {
-                return false;
-            }
+        if (!$this->isAppropriateDay($user->getSearchCriteria()->getDay())) {
+            return false;
         }
 
         return true;
@@ -228,6 +216,28 @@ class EventParty
         $currentNumber = $user->getSex()->isFemale() ? $this->getCurrentNumberOfGirls() : $this->getCurrentNumberOfGuys();
 
         return $maxNumber > $currentNumber;
+    }
+
+    public function getUsersAge(): array
+    {
+        return \array_map(static function (User $user) {
+            return $user->getAge();
+        }, $this->users->toArray());
+    }
+
+    public function isAppropriateDay(\DateTime $date): bool
+    {
+        if ($this->users->count() === 0) {
+            return true;
+        }
+
+        /** @var User $firstUser */
+        $firstUser = $this->users->first();
+
+        $searchDay   = $date->format('d');
+        $selectedDay = $firstUser->getSearchCriteria()->getDay()->format('d');
+
+        return $searchDay === $selectedDay;
     }
 
     /**
@@ -337,12 +347,7 @@ class EventParty
                 return self::STATUSES[self::STATUS_PLANING];
 
             default:
-                return 'Текущий статус не распознан';
+                return 'Event status not found';
         }
-    }
-
-    public function getHash(): string
-    {
-        return \crypt($this->id . $this->event->getTitle(), 'ep');
     }
 }

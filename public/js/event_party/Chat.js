@@ -9,14 +9,16 @@ class Chat {
     }
 
     constructor() {
-        this.$currentUser = $('#current-user');
+        this.$currentUserData = $('#current-user-data');
+        this.$eventPartyData  = $('#event-party-data');
+
         this.$sendMessageBtn = $('.chat-send-message-btn');
         this.$messageInput = $('.chat-message-input');
         this.$messagesBlock = $('.chat-messages-block');
-        this.userTempHash = this.$currentUser.data('temp-hash');
 
         this.scrollMessagesBlockToBottom();
         this.$messagesBlock.removeClass('invisible');
+
         this.setUpConnection();
 
         this.$sendMessageBtn.on('click', this.handleClickSendMessageBtn.bind(this));
@@ -29,7 +31,8 @@ class Chat {
         this.connection.onopen = () => {
             this.sendData({
                 type: Chat.TYPE_IDENTIFY,
-                userTempHash: this.userTempHash
+                eventPartyId: this.$eventPartyData.data('id'),
+                userTempHash: this.$currentUserData.data('temp-hash')
             });
         };
 

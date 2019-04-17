@@ -26,4 +26,11 @@ class SkipData extends AbstractPusherData
     {
         return $this->epHash;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'skip' => 2,
+        ];
+    }
 }

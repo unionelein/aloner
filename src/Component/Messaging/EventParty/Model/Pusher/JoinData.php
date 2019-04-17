@@ -22,5 +22,10 @@ class JoinData extends AbstractPusherData
         return $this->epHash;
     }
 
-
+    public function toArray(): array
+    {
+        return [
+            'join' => 1,
+        ];
+    }
 }
