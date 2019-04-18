@@ -111,7 +111,7 @@ class Chat implements MessageComponentInterface
 
         $msg = [
             'username' => $clientData->getUsername(),
-            'message'  => $data['message'],
+            'message'  => \htmlspecialchars($data['message']),
         ];
 
         $connections = $this->clientCollection->getConnectionsForEventPartyId($clientData->getEventPartyId());
@@ -122,7 +122,7 @@ class Chat implements MessageComponentInterface
 
         $this->storeMessage($clientData, $data['message']);
 
-        echo "New message from {$msg['username']}: {$msg['message']}\n";
+        echo "New message from {$msg['username']}: {$data['message']}\n";
     }
 
     private function storeMessage(ClientData $clientData, string $message)

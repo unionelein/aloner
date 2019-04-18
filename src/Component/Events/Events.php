@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Component;
+namespace App\Component\Events;
 
 class Events
 {

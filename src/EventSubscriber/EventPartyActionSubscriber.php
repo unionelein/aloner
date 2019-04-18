@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Component\Events;
+use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\JoinData;
 use App\Component\Messaging\EventParty\Model\Pusher\SkipData;

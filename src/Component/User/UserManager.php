@@ -2,23 +2,23 @@
 
 namespace App\Component\User;
 
-use App\Component\Events;
+use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\Infrastructure\TransactionalService;
 use App\Entity\EventParty;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UserManager
 {
     /** @var TransactionalService */
     private $transactional;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     private $dispatcher;
 
-    public function __construct(TransactionalService $transactional, EventDispatcher $dispatcher)
+    public function __construct(TransactionalService $transactional, EventDispatcherInterface $dispatcher)
     {
         $this->transactional = $transactional;
         $this->dispatcher    = $dispatcher;

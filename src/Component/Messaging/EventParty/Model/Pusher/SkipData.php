@@ -13,18 +13,18 @@ use App\Entity\User;
 
 class SkipData extends AbstractPusherData
 {
-    private $epHash;
+    private $epId;
 
     public function __construct(User $user, EventParty $eventParty)
     {
         parent::__construct(Pusher::TYPE_SKIP);
 
-        $this->epHash = $eventParty->getHash();
+        $this->epId = $eventParty->getId();
     }
 
     public function getTopicId(): string
     {
-        return $this->epHash;
+        return (string) $this->epId;
     }
 
     public function toArray(): array

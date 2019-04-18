@@ -4,14 +4,14 @@ namespace App\Controller;
 
 use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyManager;
-use App\Component\Events;
+use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\User\UserManager;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -23,7 +23,7 @@ class EventPartyController extends BaseController
     /**
      * @Route("/", name="app_current_event_party")
      */
-    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EventDispatcher $dispatcher)
+    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EventDispatcherInterface $dispatcher)
     {
         $user       = $this->getUser();
         $eventParty = $user->getActiveEventParty();
