@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Timetable
 {
+    public const MIN_MINS_FOR_DAY_EVENT = 90;
+
     public const TYPE_VISIT = 1;
 
     public const TYPE_DAY = 2;

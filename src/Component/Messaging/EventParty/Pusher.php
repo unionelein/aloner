@@ -61,33 +61,49 @@ class Pusher implements WampServerInterface
         $this->epRepo   = $em->getRepository(EventParty::class);
     }
 
-    public function onSubscribe(ConnectionInterface $conn, $topic)
+    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
         echo 'new subscribe: ' . $topic->getId() . "\n";
 
-        $topic->remove($conn);
-
-        $data = \explode('|', $topic->getId());
-
-        if (!isset($data[0], $data[1])) {
+        if (!\is_array($event)) {
+            $conn->close();
             return;
         }
 
-        [$epId, $userHash] = $data;
+        $epId = $event['eventPartyId'] ?? null;
+        $hash = $event['userTempHash'] ?? null;
+
+        if (!$epId || !$hash) {
+            $conn->close();
+            return;
+        }
 
         $this->checkDBConnection();
 
         $eventParty = $this->epRepo->find((int) $epId);
-        $user       = $this->userRepo->findByTempHash($userHash);
+        $user       = $this->userRepo->findByTempHash((string) $hash);
 
-        if (!$user || !$eventParty || !$eventParty->getUsers()->contains($user)) {
+        if (!$user || !$eventParty) {
+            $conn->close();
             return;
         }
 
-        $this->eventPartyTopics[$epId] = $this->eventPartyTopics[$epId] ?? new Topic((string) $epId);
-        $this->eventPartyTopics[$epId]->add($conn);
+        $this->em->refresh($eventParty);
+        $this->em->refresh($user);
 
-        echo 'now subs: ' . $this->eventPartyTopics[$epId]->count() . "\n";
+        if (!$eventParty->getUsers()->contains($user)) {
+            $conn->close();
+            return;
+        }
+
+        $this->eventPartyTopics[$topic->getId()] = $this->eventPartyTopics[$topic->getId()] ?? $topic;
+        $this->eventPartyTopics[$topic->getId()]->add($conn);
+
+        echo 'now subs: ' . $this->eventPartyTopics[$topic->getId()]->count() . "\n";
+    }
+
+    public function onSubscribe(ConnectionInterface $conn, $topic)
+    {
     }
 
     /**
@@ -129,7 +145,6 @@ class Pusher implements WampServerInterface
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
-        echo 'unsubscribe: ' . $topic->getId() ."\n";
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -138,7 +153,7 @@ class Pusher implements WampServerInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-        foreach ($this->eventPartyTopics as $epId => $topic) {
+        foreach ($this->eventPartyTopics as $topicId => $topic) {
             if (!$topic->has($conn)) {
                 continue;
             }
@@ -146,20 +161,13 @@ class Pusher implements WampServerInterface
             $topic->remove($conn);
 
             if ($topic->count() === 0) {
-                unset($this->eventPartyTopics[$epId]);
+                unset($this->eventPartyTopics[$topicId]);
             }
         }
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
     {
-        // In this application if clients send data it's because the user hacked around in console
-        $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
-    }
-
-    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
-    {
-        // In this application if clients send data it's because the user hacked around in console
         $conn->close();
     }
 

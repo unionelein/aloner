@@ -4,15 +4,13 @@ namespace App\Component\EventParty;
 
 use App\Component\Model\VO\DateTimeInterval;
 use App\Entity\EventParty;
+use App\Entity\SearchCriteria;
+use App\Entity\Timetable;
 use App\Entity\User;
 use App\Repository\EventPartyRepository;
 
 class EventPartyFinder
 {
-    private const ALLOWED_MINS_OFFSET = 30;
-
-    private const MIN_MINS_FOR_DAY_EVENT = 90;
-
     /**
      * @var EventPartyRepository
      */
@@ -47,12 +45,12 @@ class EventPartyFinder
             }
 
             $timetables = $eventParty->getEvent()->getTimetables()->getForWeekDay($criteriaDay);
-            $timeCheck  = EventTimeChecker::check(
+            $timeCheck  = EventTimeChecker::isUserTimeFitForEventParty(
                 $timetables,
                 $criteriaInterval,
                 $eventParty->getUsersTimeInterval(),
-                self::MIN_MINS_FOR_DAY_EVENT,
-                self::ALLOWED_MINS_OFFSET
+                Timetable::MIN_MINS_FOR_DAY_EVENT,
+                SearchCriteria::ALLOWED_MINS_OFFSET
             );
 
             if (!$timeCheck) {
@@ -68,6 +66,10 @@ class EventPartyFinder
     private function sortByRelevance(array &$eventParties): void
     {
         \usort($eventParties, function (EventParty $ep1, EventParty $ep2) {
+            if ($ep1->getPeopleRemaining() === $ep2->getPeopleRemaining()) {
+                return $ep2->getUsers()->count() <=> $ep1->getUsers()->count();
+            }
+
             return $ep1->getPeopleRemaining() <=> $ep2->getPeopleRemaining();
         });
     }

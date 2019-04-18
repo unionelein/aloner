@@ -25,7 +25,18 @@ class EventPartyManager
         }
 
         \shuffle($events);
-        $event = \reset($events);
+
+        $event = null;
+        foreach ($events as $availableEvent) {
+            if (EventTimeChecker::isUserTimeFitForEvent($user, $availableEvent)) {
+                $event = $availableEvent;
+                break;
+            }
+        }
+
+        if (!$event) {
+            return null;
+        }
 
         $numOfPeople = \random_int($event->getMinNumberOfPeople(), $event->getMaxNumberOfPeople());
 

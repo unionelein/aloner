@@ -1,6 +1,6 @@
 $(document).ready(() => {
     new Chat();
-    new Pusher();
+    new Receiver();
 
     $('#event-gallery').lightGallery({
         videojs: true

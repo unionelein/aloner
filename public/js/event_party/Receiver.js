@@ -1,15 +1,19 @@
-class Pusher {
+class Receiver {
     constructor() {
         this.setUpConnection();
     }
 
     setUpConnection() {
         const onConnect = () => {
-            const hash = $('#current-user-data').data('temp-hash');
             const epId = $('#event-party-data').data('id');
+            const hash = $('#current-user-data').data('temp-hash');
 
-            this.connection.subscribe(`${epId}|${hash}`, (topic, data) => {
-                // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
+            this.connection.publish(`${epId}`, {
+                eventPartyId: epId,
+                userTempHash: hash
+            });
+
+            this.connection.subscribe(`${epId}`, (topic, data) => {
                 console.log('topic id: ' + topic);
                 console.log('data: ' + data);
             });

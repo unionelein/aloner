@@ -76,15 +76,25 @@ class Chat implements MessageComponentInterface
     private function identify(ConnectionInterface $from, array $data)
     {
         if (empty($data['userTempHash']) || empty($data['eventPartyId'])) {
+            $from->close();
             return;
         }
 
         $this->checkDBConnection();
 
         $eventParty = $this->epRepo->find((int) $data['eventPartyId']);
-        $user       = $this->userRepo->findByTempHash($data['userTempHash']);
+        $user       = $this->userRepo->findByTempHash((string) $data['userTempHash']);
 
-        if (!$user || !$eventParty || !$eventParty->getUsers()->contains($user)) {
+        if (!$user || !$eventParty) {
+            $from->close();
+            return;
+        }
+
+        $this->em->refresh($eventParty);
+        $this->em->refresh($user);
+
+        if (!$eventParty->getUsers()->contains($user)) {
+            $from->close();
             return;
         }
 
