@@ -2,7 +2,13 @@
 
 namespace App\Component\Messaging\EventParty;
 
+use App\Entity\EventParty;
+use App\Entity\User;
+use App\Repository\EventPartyRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Ratchet\ConnectionInterface;
+use Ratchet\Wamp\Topic;
 use Ratchet\Wamp\WampServerInterface;
 
 class Pusher implements WampServerInterface
@@ -36,12 +42,52 @@ class Pusher implements WampServerInterface
         self::TYPE_CAFE_OFFER_ANSWER,
     ];
 
+    /** @var Topic[] */
     private $eventPartyTopics = [];
+
+    /** @var EntityManagerInterface */
+    private $em;
+
+    /** @var UserRepository  */
+    private $userRepo;
+
+    /** @var EventPartyRepository */
+    private $epRepo;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em       = $em;
+        $this->userRepo = $em->getRepository(User::class);
+        $this->epRepo   = $em->getRepository(EventParty::class);
+    }
 
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
-        echo 'new subscribe :' . $topic->getId();
-        $this->eventPartyTopics[$topic->getId()] = $topic;
+        echo 'new subscribe: ' . $topic->getId() . "\n";
+
+        $topic->remove($conn);
+
+        $data = \explode('|', $topic->getId());
+
+        if (!isset($data[0], $data[1])) {
+            return;
+        }
+
+        [$epId, $userHash] = $data;
+
+        $this->checkDBConnection();
+
+        $eventParty = $this->epRepo->find((int) $epId);
+        $user       = $this->userRepo->findByTempHash($userHash);
+
+        if (!$user || !$eventParty || !$eventParty->getUsers()->contains($user)) {
+            return;
+        }
+
+        $this->eventPartyTopics[$epId] = $this->eventPartyTopics[$epId] ?? new Topic((string) $epId);
+        $this->eventPartyTopics[$epId]->add($conn);
+
+        echo 'now subs: ' . $this->eventPartyTopics[$epId]->count() . "\n";
     }
 
     /**
@@ -55,7 +101,7 @@ class Pusher implements WampServerInterface
         $type       = $data['type'] ?? null;
         $pusherData = $data['data'] ?? null;
 
-        echo $topicKey .' given as topic';
+        echo $topicKey ." given as topic\n";
 
         if (!$topicKey || !$type || !$pusherData) {
             return;
@@ -69,7 +115,11 @@ class Pusher implements WampServerInterface
             return;
         }
 
-        $topic = $this->eventPartyTopics[$topicKey];
+        $topic = $this->eventPartyTopics[$topicKey] ?? null;
+
+        if (!$topic || $topic->count() === 0) {
+            return;
+        }
 
         $topic->broadcast(\json_encode([
             'type' => $type,
@@ -79,6 +129,7 @@ class Pusher implements WampServerInterface
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
+        echo 'unsubscribe: ' . $topic->getId() ."\n";
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -87,6 +138,17 @@ class Pusher implements WampServerInterface
 
     public function onClose(ConnectionInterface $conn)
     {
+        foreach ($this->eventPartyTopics as $epId => $topic) {
+            if (!$topic->has($conn)) {
+                continue;
+            }
+
+            $topic->remove($conn);
+
+            if ($topic->count() === 0) {
+                unset($this->eventPartyTopics[$epId]);
+            }
+        }
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
@@ -103,5 +165,13 @@ class Pusher implements WampServerInterface
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
+    }
+
+    private function checkDBConnection(): void
+    {
+        if ($this->em->getConnection()->ping() === false) {
+            $this->em->getConnection()->close();
+            $this->em->getConnection()->connect();
+        }
     }
 }

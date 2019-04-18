@@ -5,9 +5,10 @@ class Pusher {
 
     setUpConnection() {
         const onConnect = () => {
-            const eventPartyHash = $('#event-party-data').data('hash');
+            const hash = $('#current-user-data').data('temp-hash');
+            const epId = $('#event-party-data').data('id');
 
-            this.connection.subscribe(eventPartyHash, (topic, data) => {
+            this.connection.subscribe(`${epId}|${hash}`, (topic, data) => {
                 // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
                 console.log('topic id: ' + topic);
                 console.log('data: ' + data);

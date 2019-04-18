@@ -58,6 +58,10 @@ b, strong {
     color: #212529;
 }
 
+.font-size-18px {
+    font-size: 18px;
+}
+
 .font-size-20px {
     font-size: 20px;
 }

@@ -86,12 +86,51 @@
 
                 <div class="row event-party-actions">
                     <div class="col-sm-6">
-                        <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary w-100">Дальше</a>
+                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#skipModal">
+                            Дальше
+                        </button>
                     </div>
 
                     <div class="col-sm-6">
-                        <a href="{{ path('app_leave_event_party', {id: eventParty.id}) }}" class="btn btn-danger w-100">Выход</a>
+                        <button type="button" class="btn btn-danger w-100" data-toggle="modal" data-target="#leaveModal">
+                            Выход
+                        </button>
                     </div>
+
+                    <div class="modal fade" id="skipModal" tabindex="-1" role="dialog" aria-labelledby="skipModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-sm mt-25vh" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <p class="modal-title font-size-18px" id="skipModalTitle">Точно дальше?</p>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="{{ path('app_skip_event_party', {id: eventParty.id}) }}" class="btn btn-primary">Дальше</a>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="leaveModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-sm mt-25vh" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <p class="modal-title font-size-18px" id="leaveModalTitle">Точно выйти?</p>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="{{ path('app_leave_event_party', {id: eventParty.id}) }}" class="btn btn-danger">Выйти</a>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

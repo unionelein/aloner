@@ -3,6 +3,7 @@
 namespace App\Command\EventParty;
 
 use App\Component\Messaging\EventParty\Pusher;
+use Doctrine\ORM\EntityManagerInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
@@ -18,12 +19,22 @@ class PusherRunCommand extends Command
 {
     protected static $defaultName = 'event_party:pusher:run';
 
+    /** @var EntityManagerInterface */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct();
+
+        $this->em = $em;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('push start');
 
         $loop   = Factory::create();
-        $pusher = new Pusher();
+        $pusher = new Pusher($this->em);
 
         // Listen for the web server to make a ZeroMQ push after an ajax request
         $context = new Context($loop);
