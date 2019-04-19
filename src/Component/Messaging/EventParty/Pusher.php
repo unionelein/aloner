@@ -13,23 +13,23 @@ use Ratchet\Wamp\WampServerInterface;
 
 class Pusher implements WampServerInterface
 {
-    public const TYPE_JOIN = 1;
+    public const TYPE_JOIN = 'join';
 
-    public const TYPE_SKIP = 2;
-
-
-    public const TYPE_TIME_OFFER = 3;
-
-    public const TYPE_PLACE_OFFER = 4;
-
-    public const TYPE_CAFE_OFFER = 5;
+    public const TYPE_SKIP = 'skip';
 
 
-    public const TYPE_TIME_OFFER_ANSWER = 6;
+    public const TYPE_TIME_OFFER = 'time_offer';
 
-    public const TYPE_PLACE_OFFER_ANSWER = 7;
+    public const TYPE_PLACE_OFFER = 'place_offer';
 
-    public const TYPE_CAFE_OFFER_ANSWER = 8;
+    public const TYPE_CAFE_OFFER = 'cafe_offer';
+
+
+    public const TYPE_TIME_OFFER_ANSWER = 'time_offer_answer';
+
+    public const TYPE_PLACE_OFFER_ANSWER = 'place_offer_answer';
+
+    public const TYPE_CAFE_OFFER_ANSWER = 'cafe_offer_answer';
 
     public const TYPES = [
         self::TYPE_JOIN,

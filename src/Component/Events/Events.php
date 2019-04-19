@@ -9,4 +9,6 @@ class Events
     public const JOIN_TO_EVENT_PARTY = 'event_party.join';
 
     public const SKIP_EVENT_PARTY = 'event_party.skip';
+
+    public const EVENT_PARTY_FILLED = 'event_party.filled';
 }

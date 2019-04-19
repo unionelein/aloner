@@ -8,6 +8,7 @@ use App\Component\Messaging\EventParty\Model\Pusher\JoinData;
 use App\Component\Messaging\EventParty\Model\Pusher\SkipData;
 use App\Component\Messaging\EventParty\PusherFacade;
 use App\Component\User\UserManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EventPartyActionSubscriber implements EventSubscriberInterface
@@ -15,27 +16,21 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
     /** @var PusherFacade */
     private $pusherFacade;
 
-    /** @var UserManager */
-    private $userManager;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
-    public function __construct(PusherFacade $pusherFacade, UserManager $userManager)
+    public function __construct(PusherFacade $pusherFacade, EventDispatcherInterface $dispatcher)
     {
         $this->pusherFacade = $pusherFacade;
-        $this->userManager  = $userManager;
+        $this->dispatcher   = $dispatcher;
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            Events::LOAD_EVENT_PARTY    => 'onLoadEventParty',
             Events::JOIN_TO_EVENT_PARTY => 'onEventPartyJoin',
             Events::SKIP_EVENT_PARTY    => 'onEventPartySkip',
         ];
-    }
-
-    public function onLoadEventParty(EventPartyActionEvent $event): void
-    {
-        $this->userManager->updateTempHash($event->getUser());
     }
     
     public function onEventPartyJoin(EventPartyActionEvent $event): void
@@ -43,6 +38,10 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
         $this->pusherFacade->send(
             new JoinData($event->getUser(), $event->getEventParty())
         );
+
+        if ($event->getEventParty()->isFilled()) {
+            $this->dispatcher->dispatch(Events::EVENT_PARTY_FILLED, $event);
+        }
     }
 
     public function onEventPartySkip(EventPartyActionEvent $event): void

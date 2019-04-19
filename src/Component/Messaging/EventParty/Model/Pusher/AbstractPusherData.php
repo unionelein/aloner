@@ -8,7 +8,7 @@ abstract class AbstractPusherData implements PusherDataInterface, \JsonSerializa
 {
     protected $type;
 
-    public function __construct(int $type)
+    public function __construct(string $type)
     {
         if (!\in_array($type, Pusher::TYPES, true)) {
             throw new \InvalidArgumentException('Invalid type given');
@@ -21,7 +21,7 @@ abstract class AbstractPusherData implements PusherDataInterface, \JsonSerializa
 
     abstract public function toArray(): array;
     
-    public function getType(): int
+    public function getType(): string
     {
         return $this->type;
     }

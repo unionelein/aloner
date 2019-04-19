@@ -13,24 +13,30 @@ use App\Entity\User;
 
 class SkipData extends AbstractPusherData
 {
-    private $epId;
+    /** @var User */
+    private $user;
+
+    /** @var EventParty */
+    private $eventParty;
 
     public function __construct(User $user, EventParty $eventParty)
     {
         parent::__construct(Pusher::TYPE_SKIP);
 
-        $this->epId = $eventParty->getId();
+        $this->user = $user;
+        $this->eventParty = $eventParty;
     }
 
     public function getTopicId(): string
     {
-        return (string) $this->epId;
+        return (string) $this->eventParty->getId();
     }
 
     public function toArray(): array
     {
         return [
-            'skip' => 2,
+            'userId'           => $this->user->getId(),
+            'eventPartyStatus' => $this->eventParty->getCurrentStatusTitle(),
         ];
     }
 }
