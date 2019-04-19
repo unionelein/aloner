@@ -2,7 +2,7 @@
 
 namespace App\Component\Model\VO;
 
-class DateTimeInterval
+class TimeInterval
 {
     /** @var \DateTime */
     private $timeFrom;
@@ -12,8 +12,8 @@ class DateTimeInterval
 
     public function __construct(\DateTime $timeFrom, \DateTime $timeTo)
     {
-        $this->timeFrom = $timeFrom;
-        $this->timeTo = $timeTo;
+        $this->timeFrom = self::time($timeFrom);
+        $this->timeTo   = self::time($timeTo);
     }
 
     /**
@@ -30,6 +30,24 @@ class DateTimeInterval
     public function getTo(): \DateTime
     {
         return $this->timeTo;
+    }
+
+    public static function timeDayStart(): \DateTime
+    {
+        return self::time(new \DateTime('00:00:00'));
+    }
+
+    public static function timeDayEnd(): \DateTime
+    {
+        return self::time(new \DateTime('23:59:59'));
+    }
+
+    public static function fullDayTimeInterval(): self
+    {
+        return new self(
+            self::timeDayStart(),
+            self::timeDayEnd()
+        );
     }
 
     public static function time(\DateTime $dateTime): \DateTime

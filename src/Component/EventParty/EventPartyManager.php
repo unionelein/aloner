@@ -2,6 +2,7 @@
 
 namespace App\Component\EventParty;
 
+use App\Entity\Event;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventRepository;
@@ -18,6 +19,21 @@ class EventPartyManager
 
     public function createForUser(User $user): ?EventParty
     {
+        $event = $this->findEventForUser($user);
+
+        if (!$event) {
+            return null;
+        }
+
+        $minNumOfEachSex = (int) \ceil($event->getMinNumberOfPeople() / 2);
+        $maxNumOfEachSex = (int) \floor($event->getMaxNumberOfPeople() / 2);
+        $numOfEachSex    = \random_int($minNumOfEachSex, $maxNumOfEachSex);
+
+        return new EventParty($event, $numOfEachSex, $numOfEachSex);
+    }
+
+    private function findEventForUser($user): ?Event
+    {
         $events = $this->eventRepo->findAppropriateEventsForUser($user);
 
         if (\count($events) === 0) {
@@ -26,26 +42,12 @@ class EventPartyManager
 
         \shuffle($events);
 
-        $event = null;
-        foreach ($events as $availableEvent) {
-            if (EventTimeChecker::isUserTimeFitForEvent($user, $availableEvent)) {
-                $event = $availableEvent;
-                break;
+        foreach ($events as $event) {
+            if (EventTimeChecker::isEventTimeAppropriateForUser($user, $event)) {
+                return $event;
             }
         }
 
-        if (!$event) {
-            return null;
-        }
-
-        $numOfPeople = \random_int($event->getMinNumberOfPeople(), $event->getMaxNumberOfPeople());
-
-        if (($numOfPeople % 2) !== 0) {
-            $numOfPeople > $event->getMinNumberOfPeople() ? $numOfPeople-- : $numOfPeople++;
-        }
-
-        return new EventParty($event, $numOfPeople/2, $numOfPeople/2);
+        return null;
     }
-
-
 }

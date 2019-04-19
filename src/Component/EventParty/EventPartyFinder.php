@@ -2,10 +2,7 @@
 
 namespace App\Component\EventParty;
 
-use App\Component\Model\VO\DateTimeInterval;
 use App\Entity\EventParty;
-use App\Entity\SearchCriteria;
-use App\Entity\Timetable;
 use App\Entity\User;
 use App\Repository\EventPartyRepository;
 
@@ -23,11 +20,6 @@ class EventPartyFinder
 
     public function findForUser(User $user): ?EventParty
     {
-        $criteria = $user->getSearchCriteria();
-
-        $criteriaDay      = (int) $criteria->getDay()->format('w');
-        $criteriaInterval = new DateTimeInterval($criteria->getTimeFrom(), $criteria->getTimeTo());
-
         $eventParties = $this->eventPartyRepo->findAvailableEventPartiesForUser($user);
         $this->sortByRelevance($eventParties);
 
@@ -41,19 +33,6 @@ class EventPartyFinder
             }
 
             if (!$eventParty->canUserJoin($user)) {
-                continue;
-            }
-
-            $timetables = $eventParty->getEvent()->getTimetables()->getForWeekDay($criteriaDay);
-            $timeCheck  = EventTimeChecker::isUserTimeFitForEventParty(
-                $timetables,
-                $criteriaInterval,
-                $eventParty->getUsersTimeInterval(),
-                Timetable::MIN_MINS_FOR_DAY_EVENT,
-                SearchCriteria::ALLOWED_MINS_OFFSET
-            );
-
-            if (!$timeCheck) {
                 continue;
             }
 

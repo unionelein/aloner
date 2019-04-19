@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\Model\VO\TimeInterval;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
@@ -49,9 +50,11 @@ class SearchCriteria
     public function __construct(User $user)
     {
         $this->user = $user;
-        $this->timeFrom = new \DateTime(self::DEFAULT_TIME_FROM);
-        $this->timeTo = new \DateTime(self::DEFAULT_TIME_TO);
+
         $this->day = new \DateTime();
+
+        $this->timeFrom = TimeInterval::time(new \DateTime(self::DEFAULT_TIME_FROM));
+        $this->timeTo   = TimeInterval::time(new \DateTime(self::DEFAULT_TIME_TO));
     }
 
     public function getId(): ?int
@@ -61,24 +64,24 @@ class SearchCriteria
 
     public function getTimeFrom(): \DateTime
     {
-        return $this->timeFrom;
+        return TimeInterval::time($this->timeFrom);
     }
 
     public function setTimeFrom(\DateTime $timeFrom): self
     {
-        $this->timeFrom = $timeFrom;
+        $this->timeFrom = TimeInterval::time($timeFrom);
 
         return $this;
     }
 
     public function getTimeTo(): \DateTime
     {
-        return $this->timeTo;
+        return TimeInterval::time($this->timeTo);
     }
 
     public function setTimeTo(\DateTime $timeTo): self
     {
-        $this->timeTo = $timeTo;
+        $this->timeTo = TimeInterval::time($timeTo);
 
         return $this;
     }
@@ -95,11 +98,6 @@ class SearchCriteria
         return $this;
     }
 
-    public function isInitialised(): bool
-    {
-        return $this->getUpdatedAt() > $this->getCreatedAt();
-    }
-
     public function getDay(): \DateTime
     {
         return $this->day;
@@ -110,5 +108,10 @@ class SearchCriteria
         $this->day = $day;
 
         return $this;
+    }
+
+    public function getTimeInterval(): TimeInterval
+    {
+        return new TimeInterval($this->timeFrom, $this->timeTo);
     }
 }

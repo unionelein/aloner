@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Component\EventParty\AgeChecker;
 use App\Component\EventParty\EventTimeChecker;
-use App\Component\Model\VO\DateTimeInterval;
+use App\Component\Model\VO\TimeInterval;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -207,6 +207,10 @@ class EventParty
             return false;
         }
 
+        if (!$this->isAppropriateTimeForUser($user)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -240,6 +244,15 @@ class EventParty
         return $searchDay === $selectedDay;
     }
 
+    public function isAppropriateTimeForUser(User $user): bool
+    {
+        return EventTimeChecker::isEventTimeAppropriateForUser(
+            $user,
+            $this->getEvent(),
+            $this->getUsersTimeInterval()
+        );
+    }
+
     /**
      * If in party already exists user with same name we need to add sequence to user name
      */
@@ -265,14 +278,14 @@ class EventParty
         return $nickname;
     }
 
-    public function getUsersTimeInterval()
+    public function getUsersTimeInterval(): TimeInterval
     {
-        $timeFrom = DateTimeInterval::time(new \DateTime('00:00:00'));
-        $timeTo   = DateTimeInterval::time(new \DateTime('23:59:59'));
+        $timeFrom = TimeInterval::timeDayStart();
+        $timeTo   = TimeInterval::timeDayEnd();
 
         foreach ($this->users as $user) {
-            $userTimeFrom = DateTimeInterval::time($user->getSearchCriteria()->getTimeFrom());
-            $userTimeTo   = DateTimeInterval::time($user->getSearchCriteria()->getTimeTo());
+            $userTimeFrom = TimeInterval::time($user->getSearchCriteria()->getTimeFrom());
+            $userTimeTo   = TimeInterval::time($user->getSearchCriteria()->getTimeTo());
 
             if ($userTimeFrom > $timeFrom) {
                 $timeFrom = $userTimeFrom;
@@ -283,7 +296,7 @@ class EventParty
             }
         }
 
-        return new DateTimeInterval($timeFrom, $timeTo);
+        return new TimeInterval($timeFrom, $timeTo);
     }
 
     public function getNumberOfPeople(): int

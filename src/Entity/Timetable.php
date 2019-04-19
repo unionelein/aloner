@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\Model\VO\TimeInterval;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -54,23 +55,6 @@ class Timetable
         self::SUNDAY    => 'Вс',
     ];
 
-    public function __construct(
-        Event $event,
-        int $weekDay,
-        \DateTime $timeFrom,
-        \DateTime $timeTo,
-        int $type
-    ) {
-        $this->setType($type);
-        $this->setWeekDay($weekDay);
-
-        $this->event    = $event;
-        $this->timeFrom = $timeFrom;
-        $this->timeTo   = $timeTo;
-
-        $event->addTimetable($this);
-    }
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -104,6 +88,23 @@ class Timetable
      */
     private $type;
 
+    public function __construct(
+        Event $event,
+        int $weekDay,
+        \DateTime $timeFrom,
+        \DateTime $timeTo,
+        int $type
+    ) {
+        $this->setType($type);
+        $this->setWeekDay($weekDay);
+
+        $this->event    = $event;
+        $this->timeFrom = TimeInterval::time($timeFrom);
+        $this->timeTo   = TimeInterval::time($timeTo);
+
+        $event->addTimetable($this);
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -116,12 +117,12 @@ class Timetable
 
     public function getTimeFrom(): \DateTime
     {
-        return $this->timeFrom;
+        return TimeInterval::time($this->timeFrom);
     }
 
     public function getTimeTo(): \DateTime
     {
-        return $this->timeTo;
+        return TimeInterval::time($this->timeTo);
     }
 
     public function getType(): int

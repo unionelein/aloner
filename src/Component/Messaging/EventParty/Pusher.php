@@ -43,7 +43,7 @@ class Pusher implements WampServerInterface
     ];
 
     /** @var Topic[] */
-    private $eventPartyTopics = [];
+    private $topics = [];
 
     /** @var EntityManagerInterface */
     private $em;
@@ -61,27 +61,22 @@ class Pusher implements WampServerInterface
         $this->epRepo   = $em->getRepository(EventParty::class);
     }
 
+    /**
+     * @param array $event
+     */
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
-        echo 'new subscribe: ' . $topic->getId() . "\n";
+        echo "new subscribe: {$topic->getId()}\n";
 
-        if (!\is_array($event)) {
-            $conn->close();
-            return;
-        }
-
-        $epId = $event['eventPartyId'] ?? null;
-        $hash = $event['userTempHash'] ?? null;
-
-        if (!$epId || !$hash) {
+        if (empty($event['eventPartyId']) || empty($event['userTempHash'])) {
             $conn->close();
             return;
         }
 
         $this->checkDBConnection();
 
-        $eventParty = $this->epRepo->find((int) $epId);
-        $user       = $this->userRepo->findByTempHash((string) $hash);
+        $eventParty = $this->epRepo->find((int) $event['eventPartyId']);
+        $user       = $this->userRepo->findByTempHash((string) $event['userTempHash']);
 
         if (!$user || !$eventParty) {
             $conn->close();
@@ -96,10 +91,10 @@ class Pusher implements WampServerInterface
             return;
         }
 
-        $this->eventPartyTopics[$topic->getId()] = $this->eventPartyTopics[$topic->getId()] ?? $topic;
-        $this->eventPartyTopics[$topic->getId()]->add($conn);
+        $this->topics[$topic->getId()] = $this->topics[$topic->getId()] ?? $topic;
+        $this->topics[$topic->getId()]->add($conn);
 
-        echo 'now subs: ' . $this->eventPartyTopics[$topic->getId()]->count() . "\n";
+        echo "current count for topic {$topic->getId()}: {$this->topics[$topic->getId()]->count()}\n";
     }
 
     public function onSubscribe(ConnectionInterface $conn, $topic)
@@ -117,8 +112,6 @@ class Pusher implements WampServerInterface
         $type       = $data['type'] ?? null;
         $pusherData = $data['data'] ?? null;
 
-        echo $topicKey ." given as topic\n";
-
         if (!$topicKey || !$type || !$pusherData) {
             return;
         }
@@ -127,15 +120,17 @@ class Pusher implements WampServerInterface
             return;
         }
 
-        if (!\array_key_exists($topicKey, $this->eventPartyTopics)) {
+        if (!\array_key_exists($topicKey, $this->topics)) {
             return;
         }
 
-        $topic = $this->eventPartyTopics[$topicKey] ?? null;
+        $topic = $this->topics[$topicKey] ?? null;
 
         if (!$topic || $topic->count() === 0) {
             return;
         }
+
+        echo "Send data {$json}\n";
 
         $topic->broadcast(\json_encode([
             'type' => $type,
@@ -153,7 +148,7 @@ class Pusher implements WampServerInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-        foreach ($this->eventPartyTopics as $topicId => $topic) {
+        foreach ($this->topics as $topicId => $topic) {
             if (!$topic->has($conn)) {
                 continue;
             }
@@ -161,8 +156,10 @@ class Pusher implements WampServerInterface
             $topic->remove($conn);
 
             if ($topic->count() === 0) {
-                unset($this->eventPartyTopics[$topicId]);
+                unset($this->topics[$topicId]);
             }
+
+            echo "close conn, count in topic {$topic->getId()}: {$topic->count()}, topics count: " . \count($this->topics) . "\n";
         }
     }
 
