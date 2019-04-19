@@ -17,6 +17,7 @@ class Pusher implements WampServerInterface
 
     public const TYPE_SKIP = 'skip';
 
+    public const TYPE_FILLED = 'filled';
 
     public const TYPE_TIME_OFFER = 'time_offer';
 

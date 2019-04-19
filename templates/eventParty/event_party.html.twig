@@ -27,6 +27,9 @@
                         <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">
                             <i class="fas fa-address-book"></i> Контакты
                         </a>
+                        <a class="nav-item nav-link" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
+                            <i class="fas fa-address-book"></i> Контакты
+                        </a>
                     </div>
                 </nav>
 
@@ -46,13 +49,18 @@
                             {% include 'eventParty/tab_contacts.html.twig' %}
                         </div>
                     </div>
+                    <div class="tab-pane fade block nav-block" id="nav-plan" role="tabpanel" aria-labelledby="nav-plan-tab">
+                        <div class="block-body">
+                            {% include 'eventParty/tab_plan.html.twig' %}
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-sm-4">
                 <div class="js-user-icon-block-prototype d-none">
                     <div class="user-icon-block __additionalClasses__">
-                        <img src="__avatarPath__" alt="Аватар пользователя __nickName__">
+                        <img __avatar_path_src_attr__ alt="Аватар пользователя __nickName__">
                         <div class="user-icon-name">__nickName__</div>
                     </div>
                 </div>
@@ -143,7 +151,10 @@
         </div>
 
         <div class="d-none js-data">
-            <div id="current-user-data" data-temp-hash="{{ app.user.tempHash }}"></div>
+            <div id="current-user-data"
+                 data-temp-hash="{{ app.user.tempHash }}"
+                 data-id="{{ app.user.id }}"
+            ></div>
             <div id="event-party-data" data-id="{{ eventParty.id }}"></div>
         </div>
     </div>

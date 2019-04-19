@@ -32,7 +32,7 @@ class EventPartyManager
         return new EventParty($event, $numOfEachSex, $numOfEachSex);
     }
 
-    private function findEventForUser($user): ?Event
+    private function findEventForUser(User $user): ?Event
     {
         $events = $this->eventRepo->findAppropriateEventsForUser($user);
 
@@ -43,9 +43,15 @@ class EventPartyManager
         \shuffle($events);
 
         foreach ($events as $event) {
-            if (EventTimeChecker::isEventTimeAppropriateForUser($user, $event)) {
-                return $event;
+            if ($user->getSkippedTodayEvents()->contains($event)) {
+                continue;
             }
+
+            if (!EventTimeChecker::isEventTimeAppropriateForUser($user, $event)) {
+                continue;
+            }
+
+            return $event;
         }
 
         return null;

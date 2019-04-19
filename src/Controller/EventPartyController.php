@@ -57,7 +57,7 @@ class EventPartyController extends BaseController
         $eventParty = $eventPartyFinder->findForUser($user) ?? $epManager->createForUser($user);
 
         if (!$eventParty) {
-            $this->redirectToRoute('app_no_events_found');
+            return $this->redirectToRoute('app_no_events_found');
         }
 
         $userManager->join($user, $eventParty);
