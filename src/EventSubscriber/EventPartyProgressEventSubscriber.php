@@ -9,6 +9,7 @@ namespace App\EventSubscriber;
 
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\Events\Events;
+use App\Component\Messaging\EventParty\Model\Pusher\FilledData;
 use App\Component\Messaging\EventParty\PusherFacade;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,6 +32,6 @@ class EventPartyProgressEventSubscriber implements EventSubscriberInterface
 
     public function onEventPartyFilled(EventPartyActionEvent $event): void
     {
-        //$this->pusherFacade->send();
+        $this->pusherFacade->send(new FilledData($event->getEventParty()));
     }
 }

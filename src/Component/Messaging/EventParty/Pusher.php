@@ -35,6 +35,7 @@ class Pusher implements WampServerInterface
     public const TYPES = [
         self::TYPE_JOIN,
         self::TYPE_SKIP,
+        self::TYPE_FILLED,
         self::TYPE_TIME_OFFER,
         self::TYPE_PLACE_OFFER,
         self::TYPE_CAFE_OFFER,

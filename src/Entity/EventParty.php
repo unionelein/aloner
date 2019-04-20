@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class EventParty
 {
+    public const DEFAULT_MEETING_PLACE = 'Около входа за 10 минут до начала';
+
     public const STATUS_PENDING = 1;
 
     public const STATUS_PLANING = 2;

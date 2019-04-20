@@ -19,6 +19,7 @@ class Receiver {
         this.$planTab     = $('#nav-plan-tab');
         this.$planBlock   = $('#nav-plan');
         this.$tabsWrapper = $('.event-party-tabs-wrapper');
+        this.$tabsBlocks  = $('.nav-block-content-wrapper');
 
         this.setUpConnection();
     }
@@ -79,25 +80,29 @@ class Receiver {
             return
         }
 
+        this.$planTab.addClass('d-none');
+        this.$planBlock.addClass('d-none');
+        this.openTab('info');
+
         $(`.js-user-icon-block-${data.userId}`).remove();
         this.$epStatus.html(data.eventPartyStatus);
     }
 
     onFilled(data) {
-        this.showPlanTab();
+        this.$planTab.removeClass('d-none');
+        this.$planBlock.removeClass('d-none');
+        this.openTab('plan');
     }
 
-    showPlanTab() {
+    openTab(name) {
         this.$tabsWrapper.find('.nav-item').removeClass('active show')
+            .attr('aria-selected', 'false');
+
+        this.$tabsBlocks.find('.tab-pane').removeClass('active show');
+
+        this.$tabsWrapper.find(`#nav-${name}-tab`).addClass('active show')
             .attr('aria-selected', 'true');
 
-        this.$tabsWrapper.find('.tab-pane').removeClass('active show');
-
-        this.$planTab.addClass('active show')
-            .attr('aria-selected', 'true')
-            .show();
-
-        this.$planBlock.addClass('active show')
-            .show();
+        this.$tabsBlocks.find(`#nav-${name}`).addClass('active show');
     }
 }

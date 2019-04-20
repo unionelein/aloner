@@ -27,8 +27,8 @@
                         <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">
                             <i class="fas fa-address-book"></i> Контакты
                         </a>
-                        <a class="nav-item nav-link" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
-                            <i class="fas fa-address-book"></i> Контакты
+                        <a class="nav-item nav-link {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
+                            <i class="fas fa-tasks"></i> План
                         </a>
                     </div>
                 </nav>
@@ -49,7 +49,7 @@
                             {% include 'eventParty/tab_contacts.html.twig' %}
                         </div>
                     </div>
-                    <div class="tab-pane fade block nav-block" id="nav-plan" role="tabpanel" aria-labelledby="nav-plan-tab">
+                    <div class="tab-pane fade block nav-block {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan" role="tabpanel" aria-labelledby="nav-plan-tab">
                         <div class="block-body">
                             {% include 'eventParty/tab_plan.html.twig' %}
                         </div>
