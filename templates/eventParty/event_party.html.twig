@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="{{ asset('node_modules/lightgallery/src/css/lightgallery.css') }}">
     <link rel="stylesheet" href="http://vjs.zencdn.net/4.12/video-js.css">
 
-    <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
     <link rel="stylesheet" href="{{ asset('css/event_party.css') }}">
 {% endblock %}
 
@@ -156,6 +155,12 @@
                  data-id="{{ app.user.id }}"
             ></div>
             <div id="event-party-data" data-id="{{ eventParty.id }}"></div>
+
+            <div class="load-spinner">
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -171,5 +176,6 @@
 
     <script src="{{ asset('js/event_party/Chat.js') }}"></script>
     <script src="{{ asset('js/event_party/Receiver.js') }}"></script>
+    <script src="{{ asset('js/event_party/Plan.js') }}"></script>
     <script src="{{ asset('js/event_party/event_party.js') }}"></script>
 {% endblock %}

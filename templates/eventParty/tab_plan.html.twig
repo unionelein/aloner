@@ -7,16 +7,74 @@
                         <b>Время мероприятия:</b>
                         <span class="ml-1">Не выбрано</span>
                     </td>
-                    <td><button type="button" class="btn btn-sm btn-primary js-time-offer">Предложить</button></td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-primary js-time-offer"
+                                data-url="{{ path('app_event_party_time_offer', {id: eventParty.id}) }}"
+                                data-toggle="modal"
+                                data-target="#timeOfferModal"
+                        >
+                            Предложить
+                        </button>
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         <b>Место встречи:</b>
                         <span class="ml-1">{{ constant('App\\Entity\\EventParty::DEFAULT_MEETING_PLACE') }}</span>
                     </td>
-                    <td><button type="button" class="btn btn-sm btn-primary js-place-offer">Предложить</button></td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-primary js-place-offer"
+                                data-url="{{ path('app_event_party_place_offer', {id: eventParty.id}) }}"
+                                data-toggle="modal"
+                                data-target="#placeOfferModal"
+                        >
+                            Предложить
+                        </button>
+                    </td>
                 </tr>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="timeOfferModal" tabindex="-1" role="dialog" aria-labelledby="timeOfferModalTitle" aria-hidden="true">
+    <div class="modal-dialog mt-25vh" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title font-size-18px" id="timeOfferModalTitle">Предложить другое время</p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body text-center time-offer-body"></div>
+
+            <div class="modal-footer time-offer-footer">
+                <button type="button" class="btn btn-primary">Предложить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="placeOfferModal" tabindex="-1" role="dialog" aria-labelledby="placeOfferModalTitle" aria-hidden="true">
+    <div class="modal-dialog mt-25vh" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title font-size-18px" id="placeOfferModalTitle">Предложить другое место</p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body text-center place-offer-body"></div>
+
+            <div class="modal-footer place-offer-footer">
+                <button type="button" class="btn btn-primary">Предложить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+            </div>
         </div>
     </div>
 </div>

@@ -3,7 +3,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -72,4 +71,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/main/main.js') }}"></script>
 {% endblock %}

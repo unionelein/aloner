@@ -13,6 +13,7 @@ use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Security\Voter\EventPartyVoter;
 
 /**
  * @IsGranted(User::ROLE_FULL_REG)
@@ -91,5 +92,23 @@ class EventPartyController extends BaseController
     public function noEventsFound()
     {
         return $this->render('eventParty/no_events_found.html.twig');
+    }
+
+    /**
+     * @Route("/time_offer/{id}", name="app_event_party_time_offer")
+     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     */
+    public function timeOffer(EventParty $eventParty)
+    {
+        return $this->render('eventParty/time_offer.html.twig');
+    }
+
+    /**
+     * @Route("/place_offer/{id}", name="app_event_party_place_offer")
+     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     */
+    public function placeOffer(EventParty $eventParty)
+    {
+        return $this->render('eventParty/place_offer.html.twig');
     }
 }
