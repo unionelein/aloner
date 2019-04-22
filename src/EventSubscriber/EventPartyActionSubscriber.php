@@ -4,7 +4,9 @@ namespace App\EventSubscriber;
 
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
+use App\Component\Events\PlaceOfferedEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\JoinData;
+use App\Component\Messaging\EventParty\Model\Pusher\PlaceOfferData;
 use App\Component\Messaging\EventParty\Model\Pusher\SkipData;
 use App\Component\Messaging\EventParty\PusherFacade;
 use App\Component\User\UserManager;
@@ -30,6 +32,7 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
         return [
             Events::JOIN_TO_EVENT_PARTY => 'onEventPartyJoin',
             Events::SKIP_EVENT_PARTY    => 'onEventPartySkip',
+            Events::PLACE_OFFERED       => 'onPlaceOffered',
         ];
     }
     
@@ -48,6 +51,13 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
     {
         $this->pusherFacade->send(
             new SkipData($event->getUser(), $event->getEventParty())
+        );
+    }
+
+    public function onPlaceOffered(PlaceOfferedEvent $event)
+    {
+        $this->pusherFacade->send(
+            new PlaceOfferData($event->getUser(), $event->getEventParty(), $event->getPlace())
         );
     }
 }

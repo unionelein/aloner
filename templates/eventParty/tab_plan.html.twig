@@ -5,7 +5,7 @@
                 <tr>
                     <td>
                         <b>Время мероприятия:</b>
-                        <span class="ml-1">Не выбрано</span>
+                        <span class="ml-1">{{ eventParty.meetingAt ?? 'Не выбрано' }}</span>
                     </td>
                     <td>
                         <button type="button"
@@ -21,7 +21,7 @@
                 <tr>
                     <td>
                         <b>Место встречи:</b>
-                        <span class="ml-1">{{ constant('App\\Entity\\EventParty::DEFAULT_MEETING_PLACE') }}</span>
+                        <span class="ml-1">{{ eventParty.meetingPlace ?? constant('App\\Entity\\EventParty::DEFAULT_MEETING_PLACE') }}</span>
                     </td>
                     <td>
                         <button type="button"

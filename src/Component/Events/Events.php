@@ -11,4 +11,6 @@ class Events
     public const SKIP_EVENT_PARTY = 'event_party.skip';
 
     public const EVENT_PARTY_FILLED = 'event_party.filled';
+
+    public const PLACE_OFFERED = '';
 }

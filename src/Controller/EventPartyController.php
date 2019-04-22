@@ -6,12 +6,16 @@ use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyManager;
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
+use App\Component\Events\PlaceOfferedEvent;
 use App\Component\User\UserManager;
 use App\Entity\EventParty;
 use App\Entity\User;
+use App\Form\PlaceOfferType;
 use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Security\Voter\EventPartyVoter;
 
@@ -107,8 +111,25 @@ class EventPartyController extends BaseController
      * @Route("/place_offer/{id}", name="app_event_party_place_offer")
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
      */
-    public function placeOffer(EventParty $eventParty)
+    public function placeOffer(EventParty $eventParty, Request $request, EventDispatcher $dispatcher)
     {
-        return $this->render('eventParty/place_offer.html.twig');
+        $form = $this->createForm(PlaceOfferType::class)
+            ->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $place   = $form->get('place')->getData();
+            $preTime = $form->get('preTime')->getData();
+
+            $meetingPlace = EventParty::createMeetingPlaceFromOffer($place, $preTime);
+
+            $dispatcher->dispatch(
+                Events::PLACE_OFFERED,
+                new PlaceOfferedEvent($this->getUser(), $eventParty, $meetingPlace)
+            );
+        }
+
+        return $this->render('eventParty/place_offer.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

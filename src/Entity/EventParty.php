@@ -62,7 +62,7 @@ class EventParty
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $meetingPoint;
+    private $meetingPlace;
 
     /**
      * @ORM\Column(type="integer")
@@ -85,7 +85,8 @@ class EventParty
         $this->numberOfGuys  = $numberOfGuys;
         $this->numberOfGirls = $numberOfGirls;
 
-        $this->status = self::STATUS_PENDING;
+        $this->status       = self::STATUS_PENDING;
+        $this->meetingPlace = self::DEFAULT_MEETING_PLACE;
 
         $this->users     = new ArrayCollection();
         $this->histories = new ArrayCollection();
@@ -134,16 +135,21 @@ class EventParty
         return $this;
     }
 
-    public function getMeetingPoint(): ?string
+    public function getMeetingPlace(): ?string
     {
-        return $this->meetingPoint;
+        return $this->meetingPlace;
     }
 
-    public function setMeetingPoint(?string $meetingPoint): self
+    public function setMeetingPlace(?string $meetingPlace): self
     {
-        $this->meetingPoint = $meetingPoint;
+        $this->meetingPlace = $meetingPlace;
 
         return $this;
+    }
+
+    public static function createMeetingPlaceFromOffer(string $place, int $preTime): string
+    {
+        return \sprintf('%s за %d мин', $place, $preTime);
     }
 
     public function getNumberOfGirls(): ?int
