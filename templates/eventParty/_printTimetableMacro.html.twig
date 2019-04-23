@@ -1,0 +1,9 @@
+{% macro print(timetable) %}
+    {% if timetable.type == constant('App\\Entity\\Timetable::TYPE_DAY') %}
+        {{ timetable.timeFrom|date('H:i') }} - {{ timetable.timeTo|date('H:i') }}<br>
+    {% elseif timetable.type == constant('App\\Entity\\Timetable::TYPE_VISIT') %}
+        <span class="badge badge-light">
+            {{ timetable.timeFrom|date('H:i') }} - {{ timetable.timeTo|date('H:i') }}
+        </span>
+    {% endif %}
+{% endmacro %}

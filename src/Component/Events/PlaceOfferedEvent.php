@@ -17,11 +17,15 @@ class PlaceOfferedEvent extends Event
     /** @var string */
     private $place;
 
-    public function __construct(User $user, EventParty $eventParty, string $place)
+    /** @var \DateTime */
+    private $meetingDateTime;
+
+    public function __construct(User $user, EventParty $eventParty, string $place, \DateTime $meetingDateTime)
     {
         $this->user = $user;
         $this->eventParty = $eventParty;
         $this->place = $place;
+        $this->meetingDateTime = $meetingDateTime;
     }
 
     public function getUser(): User
@@ -37,5 +41,13 @@ class PlaceOfferedEvent extends Event
     public function getPlace(): string
     {
         return $this->place;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getMeetingDateTime(): \DateTime
+    {
+        return $this->meetingDateTime;
     }
 }

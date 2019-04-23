@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Component\EventParty\AgeChecker;
 use App\Component\EventParty\EventTimeChecker;
 use App\Component\Model\VO\TimeInterval;
+use App\Component\Util\Date;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class EventParty
 {
-    public const DEFAULT_MEETING_PLACE = 'Около входа за 10 минут до начала';
-
     public const STATUS_PENDING = 1;
 
     public const STATUS_PLANING = 2;
@@ -55,6 +54,8 @@ class EventParty
     private $status;
 
     /**
+     * @var \DateTime
+     *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $meetingAt;
@@ -86,7 +87,7 @@ class EventParty
         $this->numberOfGirls = $numberOfGirls;
 
         $this->status       = self::STATUS_PENDING;
-        $this->meetingPlace = self::DEFAULT_MEETING_PLACE;
+        $this->meetingPlace = $event->getAddress();
 
         $this->users     = new ArrayCollection();
         $this->histories = new ArrayCollection();
@@ -145,11 +146,6 @@ class EventParty
         $this->meetingPlace = $meetingPlace;
 
         return $this;
-    }
-
-    public static function createMeetingPlaceFromOffer(string $place, int $preTime): string
-    {
-        return \sprintf('%s за %d мин', $place, $preTime);
     }
 
     public function getNumberOfGirls(): ?int
@@ -237,17 +233,33 @@ class EventParty
         }, $this->users->toArray());
     }
 
+    public function getUsersSearchCriteriaDate(): ?\DateTime
+    {
+        if ($this->users->count() === 0) {
+            return null;
+        }
+
+        /** @var User $firstUser */
+        $firstUser = $this->users->first();
+
+        return $firstUser->getSearchCriteria()->getDay();
+    }
+
+    public function getUsersSearchCriteriaDateString(): ?string
+    {
+        return $this->getUsersSearchCriteriaDate()
+            ? Date::convertDateToString($this->getUsersSearchCriteriaDate())
+            : null;
+    }
+    
     public function isAppropriateDay(\DateTime $date): bool
     {
         if ($this->users->count() === 0) {
             return true;
         }
 
-        /** @var User $firstUser */
-        $firstUser = $this->users->first();
-
-        $searchDay   = $date->format('d');
-        $selectedDay = $firstUser->getSearchCriteria()->getDay()->format('d');
+        $searchDay   = Date::date($date);
+        $selectedDay = $this->getUsersSearchCriteriaDate();
 
         return $searchDay === $selectedDay;
     }
@@ -370,5 +382,12 @@ class EventParty
             default:
                 return 'Event status not found';
         }
+    }
+
+    public function getMeetingAtString(): ?string
+    {
+        return $this->meetingAt ?
+            Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i:s')
+            : null;
     }
 }

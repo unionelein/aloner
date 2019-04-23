@@ -88,12 +88,18 @@ class Timetable
      */
     private $type;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $length;
+
     public function __construct(
         Event $event,
         int $weekDay,
         \DateTime $timeFrom,
         \DateTime $timeTo,
-        int $type
+        int $type,
+        int $length
     ) {
         $this->setType($type);
         $this->setWeekDay($weekDay);
@@ -103,6 +109,7 @@ class Timetable
         $this->timeTo   = TimeInterval::time($timeTo);
 
         $event->addTimetable($this);
+        $this->length = $length;
     }
 
     public function getId(): ?int
@@ -155,5 +162,10 @@ class Timetable
         $this->weekDay = $weekDay;
 
         return $this;
+    }
+
+    public function getTimeLength(): int
+    {
+        return $this->length;
     }
 }

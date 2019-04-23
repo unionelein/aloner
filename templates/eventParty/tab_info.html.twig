@@ -5,8 +5,11 @@
 <div class="row">
     <div class="col-sm-6">
         {% if eventParty.event.priceText %}
-            <div class="event-price"><b>Цена</b>: {{ eventParty.event.priceText }}</div>
+            <p><b>Цена</b>: {{ eventParty.event.priceText }}</p>
         {% endif %}
+
+        <p><b>Длительность:</b> {{ eventParty.event.eventTimeLengths|join('/') }} мин</p>
+
     </div>
     <div class="col-sm-6 text-right">
         Сайт: <a href="{{ eventParty.event.site }}">{{ eventParty.event.site }}</a>

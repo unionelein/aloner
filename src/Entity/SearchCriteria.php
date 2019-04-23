@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Component\Model\VO\TimeInterval;
+use App\Component\Util\Date;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
@@ -100,12 +101,12 @@ class SearchCriteria
 
     public function getDay(): \DateTime
     {
-        return $this->day;
+        return Date::date($this->day);
     }
 
     public function setDay(\DateTime $day): self
     {
-        $this->day = $day;
+        $this->day = Date::date($day);
 
         return $this;
     }

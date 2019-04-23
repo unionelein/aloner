@@ -1,0 +1,25 @@
+<div class="container-fluid">
+    {{ form_start(form) }}
+
+    <div class="row">
+        <div class="col-sm-4">Место встречи:</div>
+        <div class="col-sm-8">{{ form_row(form.place) }}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4">Время встречи:</div>
+        <div class="col-sm-4">{{ form_row(form.day) }}</div>
+        <div class="col-sm-4">{{ form_row(form.time) }}</div>
+        <div class="col-sm-12">
+            {% set usersDay = eventParty.usersSearchCriteriaDateString %}
+            {% set usersTime = eventParty.usersTimeInterval %}
+
+            <div class="help">*Нужно позвонить и узнать, свободно ли это время</div>
+            <div class="help">
+                *Подходящее всем время - {{ usersDay }}, {{ usersTime.from|date('H:i')}}-{{ usersTime.to|date('H:i')}}
+            </div>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+</div>

@@ -79,7 +79,8 @@ EOF
                     $day,
                     new \DateTime(\sprintf('%d:%d0:00', \rand(8, 11), $this->faker->randomElement([0, 3]))),
                     new \DateTime(\sprintf('%d:%d0:00', \rand(15, 23), $this->faker->randomElement([0, 3]))),
-                    $type
+                    $type,
+                    $this->faker->randomElement([60, 90, 120])
                 );
                 $event->addTimetable($timetable);
             }
@@ -88,13 +89,15 @@ EOF
                 $interval  = $this->faker->randomElement([45, 60, 120]);
                 $total     = 600 / $interval + \rand(-3, +3);
                 $workStart = \rand(7, 12);
+
                 for ($i = 0; $i < $total; $i++) {
                     $timetable = new Timetable(
                         $event,
                         $day,
                         (new \DateTime("{$workStart}:00:00"))->modify('+' . $i * $interval . ' min'),
                         (new \DateTime("{$workStart}:00:00"))->modify('+' . ($i + 1) * $interval . ' min'),
-                        $type
+                        $type,
+                        $interval
                     );
                     $event->addTimetable($timetable);
                 }

@@ -188,6 +188,15 @@ class Event
         return $this;
     }
 
+    public function getEventTimeLengths(): array
+    {
+        $lengths = \array_map(static function (Timetable $timetable) {
+            return $timetable->getTimeLength();
+        }, $this->timetables->toArray());
+
+        return \array_unique($lengths);
+    }
+
     public function getPhone(): ?string
     {
         return $this->phone;

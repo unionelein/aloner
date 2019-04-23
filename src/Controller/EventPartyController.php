@@ -8,9 +8,10 @@ use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\Events\PlaceOfferedEvent;
 use App\Component\User\UserManager;
+use App\Component\Util\Date;
 use App\Entity\EventParty;
 use App\Entity\User;
-use App\Form\PlaceOfferType;
+use App\Form\MeetingPointOfferType;
 use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -99,37 +100,30 @@ class EventPartyController extends BaseController
     }
 
     /**
-     * @Route("/time_offer/{id}", name="app_event_party_time_offer")
+     * @Route("/meeting_point_offer/{id}", name="app_meeting_point_offer")
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
      */
-    public function timeOffer(EventParty $eventParty)
+    public function meetingPointOffer(EventParty $eventParty, Request $request, EventDispatcher $dispatcher)
     {
-        return $this->render('eventParty/time_offer.html.twig');
-    }
-
-    /**
-     * @Route("/place_offer/{id}", name="app_event_party_place_offer")
-     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
-     */
-    public function placeOffer(EventParty $eventParty, Request $request, EventDispatcher $dispatcher)
-    {
-        $form = $this->createForm(PlaceOfferType::class)
+        $form = $this->createForm(MeetingPointOfferType::class, null, ['eventParty' => $eventParty])
             ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $place   = $form->get('place')->getData();
-            $preTime = $form->get('preTime')->getData();
+            $place = $form->get('place')->getData();
+            $day   = $form->get('day')->getData();
+            $time  = $form->get('time')->getData();
 
-            $meetingPlace = EventParty::createMeetingPlaceFromOffer($place, $preTime);
+            $meetingDateTime = $day->modify($time->format('H:i:s'));
 
             $dispatcher->dispatch(
                 Events::PLACE_OFFERED,
-                new PlaceOfferedEvent($this->getUser(), $eventParty, $meetingPlace)
+                new PlaceOfferedEvent($this->getUser(), $eventParty, $place, $meetingDateTime)
             );
         }
 
-        return $this->render('eventParty/place_offer.html.twig', [
-            'form' => $form->createView(),
+        return $this->render('eventParty/meeting_point_offer.html.twig', [
+            'eventParty'        => $eventParty,
+            'form'              => $form->createView(),
         ]);
     }
 }
