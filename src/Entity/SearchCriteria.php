@@ -12,7 +12,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class SearchCriteria
 {
-    public const ALLOWED_MINS_OFFSET = 30;
+    public const ALLOWED_MINS_OFFSET = 10;
 
     public const DEFAULT_TIME_FROM = '18:00';
 

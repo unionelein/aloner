@@ -1,11 +1,27 @@
 <div class="container">
     <div class="row">
-        <div class="col-sm-12">
-            <p><b>Место мероприятия:</b> {{ eventParty.meetingPlace }}</p>
-            <p><b>Время мероприятия:</b> {{ eventParty.meetingAtString ?? 'Не выбрано' }}</p>
-            <p class="text-right">
-                <button class="btn btn-sm btn-primary">Предложить другое</button>
+        <div class="col-sm-12 tab-plan-body">
+            <p class="mb-1"><b>Место встречи:</b> {{ eventParty.meetingPlace }}</p>
+            <p><b>Время встречи:</b> {{ eventParty.meetingAtString ?? 'Не выбрано' }}</p>
+            <p>
+                <button class="btn btn-sm btn-primary open-meeting-point-offer"
+                        data-toggle="modal"
+                        data-target="#meetingPointOfferModal"
+                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                >Предложить</button>
             </p>
+        </div>
+    </div>
+</div>
+
+<div class="d-none offers-wrapper">
+    <div class="alert alert-info meeting-point-alert">
+        <div>Предложено новое время и место встречи:</div>
+        <p class="meeting-point-text font-weight-bold mb-2"></p>
+
+        <div class="text-center">
+            <button type="button" class="btn btn-sm btn-primary">Подходит</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Не подходит</button>
         </div>
     </div>
 </div>
@@ -22,8 +38,11 @@
 
             <div class="modal-body text-center meeting-point-offer-body"></div>
 
-            <div class="modal-footer time-offer-footer">
-                <button type="button" class="btn btn-primary">Предложить</button>
+            <div class="modal-footer meeting-point-offer-footer">
+                <button type="button"
+                        class="btn btn-primary send-meeting-point-offer"
+                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                >Предложить</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
             </div>
         </div>

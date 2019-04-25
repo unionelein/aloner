@@ -10,13 +10,12 @@ use App\Entity\User;
 
 class EventTimeChecker
 {
-    public static function isEventTimeAppropriateForUser(
+    public static function findAvailableEventTimetableForUser(
         User $user,
         Event $event,
         TimeInterval $usersTimeInterval = null,
-        int $minsForDayEvent = Timetable::MIN_MINS_FOR_DAY_EVENT,
         int $allowedMinsOffset = SearchCriteria::ALLOWED_MINS_OFFSET
-    ): bool {
+    ): ?Timetable {
         $usersTimeInterval = $usersTimeInterval ?? TimeInterval::fullDayTimeInterval();
 
         $searchTimeFrom = $user->getSearchCriteria()->getTimeFrom()->modify("-{$allowedMinsOffset} min");
@@ -35,8 +34,8 @@ class EventTimeChecker
 
                 $availableMins = ($minTimeTo->getTimestamp() - $maxTimeFrom->getTimestamp()) / 60;
 
-                if ($availableMins >= $minsForDayEvent) {
-                    return true;
+                if ($availableMins >= $timetable->getTimeLength()) {
+                    return $timetable;
                 }
             }
 
@@ -45,11 +44,11 @@ class EventTimeChecker
                 $availableForNewUser = $searchTimeFrom <= $timeFrom && $searchTimeTo >= $timeTo;
 
                 if ($availableForUsers && $availableForNewUser) {
-                    return true;
+                    return $timetable;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 }

@@ -4,9 +4,9 @@ namespace App\EventSubscriber;
 
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
-use App\Component\Events\PlaceOfferedEvent;
+use App\Component\Events\MeetingPointOfferedEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\JoinData;
-use App\Component\Messaging\EventParty\Model\Pusher\PlaceOfferData;
+use App\Component\Messaging\EventParty\Model\Pusher\MeetingPointOfferData;
 use App\Component\Messaging\EventParty\Model\Pusher\SkipData;
 use App\Component\Messaging\EventParty\PusherFacade;
 use App\Component\User\UserManager;
@@ -30,9 +30,9 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::JOIN_TO_EVENT_PARTY => 'onEventPartyJoin',
-            Events::SKIP_EVENT_PARTY    => 'onEventPartySkip',
-            Events::PLACE_OFFERED       => 'onPlaceOffered',
+            Events::JOIN_TO_EVENT_PARTY   => 'onEventPartyJoin',
+            Events::SKIP_EVENT_PARTY      => 'onEventPartySkip',
+            Events::MEETING_POINT_OFFERED => 'onMeetingPointOffered',
         ];
     }
     
@@ -54,10 +54,15 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onPlaceOffered(PlaceOfferedEvent $event)
+    public function onMeetingPointOffered(MeetingPointOfferedEvent $event)
     {
         $this->pusherFacade->send(
-            new PlaceOfferData($event->getUser(), $event->getEventParty(), $event->getPlace())
+            new MeetingPointOfferData(
+                $event->getUser(),
+                $event->getEventParty(),
+                $event->getPlace(),
+                $event->getMeetingDateTime()
+            )
         );
     }
 }

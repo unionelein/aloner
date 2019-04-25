@@ -6,7 +6,7 @@ use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyManager;
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
-use App\Component\Events\PlaceOfferedEvent;
+use App\Component\Events\MeetingPointOfferedEvent;
 use App\Component\User\UserManager;
 use App\Component\Util\Date;
 use App\Entity\EventParty;
@@ -16,6 +16,7 @@ use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Security\Voter\EventPartyVoter;
@@ -103,7 +104,7 @@ class EventPartyController extends BaseController
      * @Route("/meeting_point_offer/{id}", name="app_meeting_point_offer")
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
      */
-    public function meetingPointOffer(EventParty $eventParty, Request $request, EventDispatcher $dispatcher)
+    public function meetingPointOffer(EventParty $eventParty, Request $request, EventDispatcherInterface $dispatcher)
     {
         $form = $this->createForm(MeetingPointOfferType::class, null, ['eventParty' => $eventParty])
             ->handleRequest($request);
@@ -116,9 +117,11 @@ class EventPartyController extends BaseController
             $meetingDateTime = $day->modify($time->format('H:i:s'));
 
             $dispatcher->dispatch(
-                Events::PLACE_OFFERED,
-                new PlaceOfferedEvent($this->getUser(), $eventParty, $place, $meetingDateTime)
+                Events::MEETING_POINT_OFFERED,
+                new MeetingPointOfferedEvent($this->getUser(), $eventParty, $place, $meetingDateTime)
             );
+
+            return new JsonResponse(['status' => 'success']);
         }
 
         return $this->render('eventParty/meeting_point_offer.html.twig', [

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Component\Util\Date;
 use App\Entity\EventParty;
+use App\Entity\Timetable;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -35,7 +36,7 @@ class MeetingPointOfferType extends AbstractType
                 'required' => true,
                 'widget' => 'single_text',
                 'constraints' => [new NotNull()],
-                'data' => $eventParty->getMeetingAt(),
+                'data' => $this->findMeetingTime($eventParty),
             ])
             ->add('place', TextType::class, [
                 'label' => false,
@@ -54,5 +55,26 @@ class MeetingPointOfferType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['eventParty']);
+    }
+
+    private function findMeetingTime(EventParty $eventParty): ?\DateTime
+    {
+        if ($eventParty->getMeetingAt()) {
+            return $eventParty->getMeetingAt();
+        }
+
+        $availableTimetable = $eventParty->findAvailableTimetable();
+
+        if (!$availableTimetable) {
+            return null;
+        }
+
+        $offset = EventParty::MEETING_TIME_OFFSET_BEFORE_EVENT;
+
+        if ($availableTimetable->getType() === Timetable::TYPE_DAY) {
+            return $eventParty->getUsersTimeInterval()->getFrom()->modify("-{$offset} min");
+        }
+
+        return $availableTimetable->getTimeFrom()->modify("-{$offset} min");
     }
 }

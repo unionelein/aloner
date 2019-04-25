@@ -57,17 +57,10 @@
             </div>
 
             <div class="col-sm-4">
-                <div class="js-user-icon-block-prototype d-none">
-                    <div class="user-icon-block __additionalClasses__">
-                        <img __avatar_path_src_attr__ alt="Аватар пользователя __nickName__">
-                        <div class="user-icon-name">__nickName__</div>
-                    </div>
-                </div>
-
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
                         <div class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %} current-user{% endif %}">
-                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
+                            <img class="user-icon-img" src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
                             <div class="user-icon-name">{{ user.nicknameIn(eventParty) }}</div>
                         </div>
                     {% endfor %}

@@ -188,11 +188,15 @@ class Event
         return $this;
     }
 
-    public function getEventTimeLengths(): array
+    public function getEventTimeLengths(\DateTime $day = null): array
     {
+        $timetables = $day
+            ? $this->getTimetables()->getForWeekDay((int) $day->format('w'))
+            : $this->timetables->toArray();
+
         $lengths = \array_map(static function (Timetable $timetable) {
             return $timetable->getTimeLength();
-        }, $this->timetables->toArray());
+        }, $timetables);
 
         return \array_unique($lengths);
     }

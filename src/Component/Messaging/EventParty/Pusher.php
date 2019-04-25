@@ -19,16 +19,11 @@ class Pusher implements WampServerInterface
 
     public const TYPE_FILLED = 'filled';
 
-    public const TYPE_TIME_OFFER = 'time_offer';
+    public const TYPE_MEETING_POINT_OFFER = 'meeting_point_offer';
 
-    public const TYPE_PLACE_OFFER = 'place_offer';
+    public const TYPE_MEETING_POINT_OFFER_ANSWER = 'meeting_point_offer_answer';
 
     public const TYPE_CAFE_OFFER = 'cafe_offer';
-
-
-    public const TYPE_TIME_OFFER_ANSWER = 'time_offer_answer';
-
-    public const TYPE_PLACE_OFFER_ANSWER = 'place_offer_answer';
 
     public const TYPE_CAFE_OFFER_ANSWER = 'cafe_offer_answer';
 
@@ -36,11 +31,9 @@ class Pusher implements WampServerInterface
         self::TYPE_JOIN,
         self::TYPE_SKIP,
         self::TYPE_FILLED,
-        self::TYPE_TIME_OFFER,
-        self::TYPE_PLACE_OFFER,
+        self::TYPE_MEETING_POINT_OFFER,
+        self::TYPE_MEETING_POINT_OFFER_ANSWER,
         self::TYPE_CAFE_OFFER,
-        self::TYPE_TIME_OFFER_ANSWER,
-        self::TYPE_PLACE_OFFER_ANSWER,
         self::TYPE_CAFE_OFFER_ANSWER,
     ];
 

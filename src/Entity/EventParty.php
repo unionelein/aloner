@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class EventParty
 {
+    public const STATUS_DELETED = 0;
+
     public const STATUS_PENDING = 1;
 
     public const STATUS_PLANING = 2;
@@ -27,6 +29,8 @@ class EventParty
         self::STATUS_PENDING => 'Ожидаем еще {{ N }} человек',
         self::STATUS_PLANING => 'Заполнение плана',
     ];
+
+    public const MEETING_TIME_OFFSET_BEFORE_EVENT = 10;
 
     /**
      * @ORM\Id()
@@ -191,7 +195,7 @@ class EventParty
             $this->users->removeElement($user);
             $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE));
 
-            $this->status = self::STATUS_PENDING;
+            $this->status = $this->users->count() !== 0 ? self::STATUS_PENDING : self::STATUS_DELETED;
         }
 
         return $this;
@@ -211,7 +215,7 @@ class EventParty
             return false;
         }
 
-        if (!$this->isAppropriateTimeForUser($user)) {
+        if (!$this->findAvailableTimetable($user)) {
             return false;
         }
 
@@ -261,12 +265,18 @@ class EventParty
         $searchDay   = Date::date($date);
         $selectedDay = $this->getUsersSearchCriteriaDate();
 
-        return $searchDay === $selectedDay;
+        return $searchDay == $selectedDay;
     }
 
-    public function isAppropriateTimeForUser(User $user): bool
+    public function findAvailableTimetable(User $user = null): ?Timetable
     {
-        return EventTimeChecker::isEventTimeAppropriateForUser(
+        $user = $user ?? $this->users->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        return EventTimeChecker::findAvailableEventTimetableForUser(
             $user,
             $this->getEvent(),
             $this->getUsersTimeInterval()

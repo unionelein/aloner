@@ -82,3 +82,7 @@ b, strong {
     animation: spinner-border .75s linear infinite;
 }
 
+.help {
+    font-style: italic;
+    font-size: 13px;
+}

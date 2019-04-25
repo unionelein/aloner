@@ -47,7 +47,7 @@ class EventPartyManager
                 continue;
             }
 
-            if (!EventTimeChecker::isEventTimeAppropriateForUser($user, $event)) {
+            if (!EventTimeChecker::findAvailableEventTimetableForUser($user, $event)) {
                 continue;
             }
 

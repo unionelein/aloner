@@ -11,15 +11,18 @@ class Receiver {
         return 'filled';
     }
 
+    static get TYPE_MEETING_POINT_OFFER() {
+        return 'meeting_point_offer';
+    }
+
     constructor() {
         this.$userData = $('#current-user-data');
         this.$epData   = $('#event-party-data');
 
-        this.$epStatus    = $('.event-party-status');
-        this.$planTab     = $('#nav-plan-tab');
-        this.$planBlock   = $('#nav-plan');
-        this.$tabsWrapper = $('.event-party-tabs-wrapper');
-        this.$tabsBlocks  = $('.nav-block-content-wrapper');
+        this.$epStatus      = $('.event-party-status');
+        this.$planBody      = $('.tab-plan-body');
+        this.$planTabNav    = $('#nav-plan-tab');
+        this.$offersWrapper = $('.offers-wrapper');
 
         this.setUpConnection();
     }
@@ -45,6 +48,7 @@ class Receiver {
                     case Receiver.TYPE_JOIN: return this.onJoin(data.data);
                     case Receiver.TYPE_SKIP: return this.onSkip(data.data);
                     case Receiver.TYPE_FILLED: return this.onFilled(data.data);
+                    case Receiver.TYPE_MEETING_POINT_OFFER: return this.onMeetingPointOffer(data.data);
                 }
             });
         };
@@ -63,15 +67,15 @@ class Receiver {
             return
         }
 
-        const userIconBlockPrototype = $('.js-user-icon-block-prototype').html();
+        const $participantsWrapper = $('.participants-wrapper');
+        const $userIconBlock       = $participantsWrapper.find('.user-icon-block').first().clone();
 
-        let userIconBlock = userIconBlockPrototype
-            .replace(/__userId__/g, data.userId)
-            .replace(/__additionalClasses__/g, `js-user-icon-block-${data.userId}`)
-            .replace(/__avatar_path_src_attr__/g, `src="/${data.avatarPath}"`)
-            .replace(/__nickName__/g, data.nickName);
+        $userIconBlock.removeClass('current-user').addClass(`js-user-icon-block-${data.userId}`);
+        $userIconBlock.find('.user-icon-img').attr('src', `/${data.avatarPath}`);
+        $userIconBlock.find('.user-icon-name').html(data.nickName);
 
-        $('.participants-wrapper').append(userIconBlock);
+        $participantsWrapper.append($userIconBlock);
+
         this.$epStatus.html(data.eventPartyStatus);
     }
 
@@ -80,8 +84,8 @@ class Receiver {
             return
         }
 
-        this.$planTab.addClass('d-none');
-        this.$planBlock.addClass('d-none');
+        $('#nav-plan-tab').addClass('d-none');
+        $('#nav-plan').addClass('d-none');
         this.openTab('info');
 
         $(`.js-user-icon-block-${data.userId}`).remove();
@@ -89,20 +93,37 @@ class Receiver {
     }
 
     onFilled(data) {
-        this.$planTab.removeClass('d-none');
-        this.$planBlock.removeClass('d-none');
+        $('#nav-plan-tab').removeClass('d-none');
+        $('#nav-plan').removeClass('d-none');
         this.openTab('plan');
     }
 
     openTab(name) {
-        this.$tabsWrapper.find('.nav-item').removeClass('active show')
+        $('.event-party-tabs-wrapper').find('.nav-item').removeClass('active show')
             .attr('aria-selected', 'false');
 
-        this.$tabsBlocks.find('.tab-pane').removeClass('active show');
+        $('.nav-block-content-wrapper').find('.tab-pane').removeClass('active show');
 
-        this.$tabsWrapper.find(`#nav-${name}-tab`).addClass('active show')
+        $(`#nav-${name}-tab`).addClass('active show')
             .attr('aria-selected', 'true');
 
-        this.$tabsBlocks.find(`#nav-${name}`).addClass('active show');
+        $(`#nav-${name}`).addClass('active show');
+    }
+
+    onMeetingPointOffer(data) {
+        let $meetingPointAlert = this.$offersWrapper.find('.meeting-point-alert').clone();
+
+        $meetingPointAlert.find('.meeting-point-text').html(`${data.place} - ${data.meetingDateTimeString}`);
+        this.$planBody.prepend($meetingPointAlert);
+
+        let $badge = this.$planTabNav.find('.badge');
+
+        if (!$badge.length) {
+            $badge = $('<span>').addClass('badge badge-info').html('0');
+            this.$planTabNav.append($badge);
+        }
+
+        let count = +$badge.html();
+        $badge.html(count + 1);
     }
 }

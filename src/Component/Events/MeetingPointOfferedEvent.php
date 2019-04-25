@@ -6,7 +6,7 @@ use App\Entity\EventParty;
 use App\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 
-class PlaceOfferedEvent extends Event
+class MeetingPointOfferedEvent extends Event
 {
     /** @var User */
     private $user;

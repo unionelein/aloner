@@ -47,11 +47,11 @@ class Date
     {
         $today = new \DateTime();
 
-        if (self::date($dateTime) === self::date($today)) {
+        if (self::date($dateTime) == self::date($today)) {
             return 'Сегодня';
         }
 
-        if (self::date($dateTime) === self::date($today)->modify('+1 day')) {
+        if (self::date($dateTime) == self::date($today)->modify('+1 day')) {
             return 'Завтра';
         }
 
@@ -64,6 +64,8 @@ class Date
 
     public static function date(\DateTime $dateTime): \DateTime
     {
-        return $dateTime->modify('00:00:00');
+        $clone = clone $dateTime;
+
+        return $clone->modify('00:00:00');
     }
 }

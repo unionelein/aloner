@@ -12,5 +12,5 @@ class Events
 
     public const EVENT_PARTY_FILLED = 'event_party.filled';
 
-    public const PLACE_OFFERED = '';
+    public const MEETING_POINT_OFFERED = 'event_party.meeting_point_offered';
 }
