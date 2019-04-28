@@ -30,10 +30,10 @@ class JoinData extends AbstractPusherData
     public function toArray(): array
     {
         return [
-            'userId'           => $this->user->getId(),
-            'avatarPath'       => $this->user->getAvatarPath(),
-            'nickName'         => $this->user->getNicknameIn($this->eventParty),
-            'eventPartyStatus' => $this->eventParty->getCurrentStatusTitle(),
+            'userId'     => $this->user->getId(),
+            'avatarPath' => $this->user->getAvatarPath(),
+            'nickname'   => $this->user->getNicknameIn($this->eventParty),
+            'epStatus'   => $this->eventParty->getCurrentStatusTitle(),
         ];
     }
 }

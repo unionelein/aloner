@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Component\EventParty\AgeChecker;
 use App\Component\EventParty\EventTimeChecker;
+use App\Component\Model\DTO\EventPartyHistory\JoinHistory;
+use App\Component\Model\DTO\EventPartyHistory\LeaveHistory;
 use App\Component\Model\VO\TimeInterval;
 use App\Component\Util\Date;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,6 +30,7 @@ class EventParty
     private const STATUSES = [
         self::STATUS_PENDING => 'Ожидаем еще {{ N }} человек',
         self::STATUS_PLANING => 'Заполнение плана',
+        self::STATUS_READY   => 'Встреча {{ DATE_TIME }}, {{ PLACE }}. Приятно провести время!',
     ];
 
     public const MEETING_TIME_OFFSET_BEFORE_EVENT = 10;
@@ -80,6 +83,7 @@ class EventParty
     private $numberOfGuys;
 
     /**
+     * @var EventPartyHistory[]|ArrayCollection
      * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", cascade={"persist","remove"}, mappedBy="eventParty")
      */
     private $histories;
@@ -167,6 +171,11 @@ class EventParty
         return self::STATUS_DONE === $this->status;
     }
 
+    public function markAsReady(): void
+    {
+        $this->status = self::STATUS_READY;
+    }
+
     public function addUser(User $user): self
     {
         if ($this->users->contains($user)) {
@@ -179,8 +188,9 @@ class EventParty
 
         $this->users[] = $user;
 
-        $nickname = $this->createNicknameForUser($user);
-        $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $nickname));
+
+        $historyData = new JoinHistory($this->createNicknameForUser($user));
+        $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $historyData));
 
         if ($this->isFilled()) {
             $this->status = self::STATUS_PLANING;
@@ -193,12 +203,28 @@ class EventParty
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
-            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE));
+            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE, new LeaveHistory()));
+
+            $this->revertToPending();
 
             $this->status = $this->users->count() !== 0 ? self::STATUS_PENDING : self::STATUS_DELETED;
         }
 
         return $this;
+    }
+
+    private function revertToPending(): void
+    {
+        foreach ($this->histories as $history) {
+            if (\in_array($history->getAction(), EventPartyHistory::PLAN_ACTIONS, true)) {
+                $history->markAsDeleted();
+            }
+        }
+
+        $this->meetingPlace = $this->event->getAddress();
+        $this->meetingAt    = null;
+
+        $this->status = self::STATUS_PENDING;
     }
 
     public function canUserJoin(User $user): bool
@@ -389,6 +415,12 @@ class EventParty
             case self::STATUS_PLANING:
                 return self::STATUSES[self::STATUS_PLANING];
 
+            case self::STATUS_READY:
+                $title = \str_replace('{{ PLACE }}', $this->meetingPlace, self::STATUSES[self::STATUS_READY]);
+                $title = \str_replace('{{ DATE_TIME }}', $this->getMeetingAtString(), $title);
+
+                return $title;
+
             default:
                 return 'Event status not found';
         }
@@ -399,5 +431,114 @@ class EventParty
         return $this->meetingAt ?
             Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i:s')
             : null;
+    }
+
+    /**
+     * @param User $user
+     * @return EventPartyHistory[]
+     */
+    public function getActiveOffersFor(User $user): array
+    {
+        $answerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER_ANSWER];
+
+        $answeredIds = [];
+        foreach ($this->histories as $history) {
+            $isAnswer = \in_array($history->getAction(), $answerActions, true);
+
+            if ($isAnswer && $history->getUser() === $user) {
+                $answeredIds[] = $history->getData()->getOfferId();
+            }
+        }
+
+        $offerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER];
+
+        $offers = [];
+        foreach ($this->histories as $history) {
+            $isOffer    = \in_array($history->getAction(), $offerActions, true);
+            $isAnswered = \in_array($history->getId(), $answeredIds, true);
+
+            if ($isOffer && !$isAnswered) {
+                $offers[] = $history;
+            }
+        }
+
+        return $offers;
+    }
+
+    /**
+     * @return EventPartyHistory[]
+     */
+    public function getOffers(): array
+    {
+        $offerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER];
+
+        $offers = [];
+        foreach ($this->histories as $history) {
+            if (\in_array($history->getAction(), $offerActions, true)) {
+                $offers[] = $history;
+            }
+        }
+
+        return $offers;
+    }
+
+    /**
+     * @return EventPartyHistory[]
+     */
+    public function getAnswersForOffer(EventPartyHistory $offer)
+    {
+        $answerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER_ANSWER];
+
+        $answers = [];
+        foreach ($this->histories as $history) {
+            if (\in_array($history->getAction(), $answerActions, true)
+                && $history->getData()->getOfferId() === $offer->getId()
+            ) {
+                $answers[] = $history;
+            }
+        }
+
+        return $answers;
+    }
+
+    public function getAcceptedAnswersCountFor(EventPartyHistory $offer): int
+    {
+        $answers = $this->getAnswersForOffer($offer);
+
+        $count = 1;
+        foreach ($answers as $answer) {
+            if ($answer->getData()->getAnswer() === true) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    public function isOfferAccepted(EventPartyHistory $offer): bool
+    {
+        $answers = $this->getAnswersForOffer($offer);
+
+        foreach ($answers as $answer) {
+            if ($answer->getData()->getAnswer() === false) {
+                return false;
+            }
+        }
+
+        // is all users answer to this offer positive
+        return ($this->users->count() - 1) === \count($answers);
+    }
+
+    public function isOfferRejected(EventPartyHistory $offer): bool
+    {
+        $answers = $this->getAnswersForOffer($offer);
+
+        foreach ($answers as $answer) {
+            if ($answer->getData()->getAnswer() === false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

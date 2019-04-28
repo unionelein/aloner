@@ -23,6 +23,8 @@ class Pusher implements WampServerInterface
 
     public const TYPE_MEETING_POINT_OFFER_ANSWER = 'meeting_point_offer_answer';
 
+    public const TYPE_MEETING_POINT_OFFER_ACCEPTED = 'meeting_point_offer_accepted';
+
     public const TYPE_CAFE_OFFER = 'cafe_offer';
 
     public const TYPE_CAFE_OFFER_ANSWER = 'cafe_offer_answer';

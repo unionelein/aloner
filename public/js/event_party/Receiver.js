@@ -15,14 +15,20 @@ class Receiver {
         return 'meeting_point_offer';
     }
 
+    static get TYPE_MEETING_POINT_OFFER_ANSWER() {
+        return 'meeting_point_offer_answer';
+    }
+
+    static get TYPE_MEETING_POINT_OFFER_ACCEPTED() {
+        return 'meeting_point_offer_accepted';
+    }
+
     constructor() {
+        this.helper = new Helper();
+        this.plan   = new Plan();
+
         this.$userData = $('#current-user-data');
         this.$epData   = $('#event-party-data');
-
-        this.$epStatus      = $('.event-party-status');
-        this.$planBody      = $('.tab-plan-body');
-        this.$planTabNav    = $('#nav-plan-tab');
-        this.$offersWrapper = $('.offers-wrapper');
 
         this.setUpConnection();
     }
@@ -49,6 +55,8 @@ class Receiver {
                     case Receiver.TYPE_SKIP: return this.onSkip(data.data);
                     case Receiver.TYPE_FILLED: return this.onFilled(data.data);
                     case Receiver.TYPE_MEETING_POINT_OFFER: return this.onMeetingPointOffer(data.data);
+                    case Receiver.TYPE_MEETING_POINT_OFFER_ANSWER: return this.onMeetingPointOfferAnswer(data.data);
+                    case Receiver.TYPE_MEETING_POINT_OFFER_ACCEPTED: return this.onMeetingPointOfferAccepted(data.data);
                 }
             });
         };
@@ -67,16 +75,8 @@ class Receiver {
             return
         }
 
-        const $participantsWrapper = $('.participants-wrapper');
-        const $userIconBlock       = $participantsWrapper.find('.user-icon-block').first().clone();
-
-        $userIconBlock.removeClass('current-user').addClass(`js-user-icon-block-${data.userId}`);
-        $userIconBlock.find('.user-icon-img').attr('src', `/${data.avatarPath}`);
-        $userIconBlock.find('.user-icon-name').html(data.nickName);
-
-        $participantsWrapper.append($userIconBlock);
-
-        this.$epStatus.html(data.eventPartyStatus);
+        this.helper.addUserIconBlock(data.userId, data.avatarPath, data.nickname);
+        this.helper.updateEpStatus(data.epStatus);
     }
 
     onSkip(data) {
@@ -84,46 +84,41 @@ class Receiver {
             return
         }
 
-        $('#nav-plan-tab').addClass('d-none');
-        $('#nav-plan').addClass('d-none');
-        this.openTab('info');
+        this.helper.removeUserIconBlock(data.userId);
+        this.helper.updateEpStatus(data.epStatus);
 
-        $(`.js-user-icon-block-${data.userId}`).remove();
-        this.$epStatus.html(data.eventPartyStatus);
+        this.helper.hideTab('plan');
+        this.helper.openTab('info');
+
+        this.helper.resetPlanTab();
     }
 
     onFilled(data) {
-        $('#nav-plan-tab').removeClass('d-none');
-        $('#nav-plan').removeClass('d-none');
-        this.openTab('plan');
-    }
-
-    openTab(name) {
-        $('.event-party-tabs-wrapper').find('.nav-item').removeClass('active show')
-            .attr('aria-selected', 'false');
-
-        $('.nav-block-content-wrapper').find('.tab-pane').removeClass('active show');
-
-        $(`#nav-${name}-tab`).addClass('active show')
-            .attr('aria-selected', 'true');
-
-        $(`#nav-${name}`).addClass('active show');
+        this.helper.openTab('plan');
     }
 
     onMeetingPointOffer(data) {
-        let $meetingPointAlert = this.$offersWrapper.find('.meeting-point-alert').clone();
-
-        $meetingPointAlert.find('.meeting-point-text').html(`${data.place} - ${data.meetingDateTimeString}`);
-        this.$planBody.prepend($meetingPointAlert);
-
-        let $badge = this.$planTabNav.find('.badge');
-
-        if (!$badge.length) {
-            $badge = $('<span>').addClass('badge badge-info').html('0');
-            this.$planTabNav.append($badge);
+        if (this.$userData.data('id') === data.userId) {
+            return
         }
 
-        let count = +$badge.html();
-        $badge.html(count + 1);
+        const meetingPointText = `${data.place} - ${data.meetingDateTimeString}`;
+
+        this.plan.addMeetingPointOfferAlert(data.offerId, meetingPointText);
+        this.helper.addMeetingPointOfferHistoryRow(data.offerId, meetingPointText);
+    }
+
+    onMeetingPointOfferAnswer(data) {
+        console.log(data.answer);
+
+        data.answer
+            ? this.helper.addAcceptedAnswerToMeetingPointHistoryRow(data.offerId)
+            : this.helper.markMeetingPointHistoryRowAsRejected(data.offerId);
+    }
+
+    onMeetingPointOfferAccepted(data) {
+        this.helper.updateEpStatus(data.epStatus);
+        this.helper.updateMeetingPlace(data.place);
+        this.helper.updateMeetingDateTime(data.meetingDateTimeString);
     }
 }

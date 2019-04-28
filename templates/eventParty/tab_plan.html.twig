@@ -1,8 +1,48 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 tab-plan-body">
-            <p class="mb-1"><b>Место встречи:</b> {{ eventParty.meetingPlace }}</p>
-            <p><b>Время встречи:</b> {{ eventParty.meetingAtString ?? 'Не выбрано' }}</p>
+            {% for activeOffer in eventParty.activeOffersFor(app.user) %}
+                {% include 'eventParty/_meeting_point_offer_alert.html.twig' with {
+                    offerId: activeOffer.id,
+                    epId: eventParty.id,
+                    place: activeOffer.data.place,
+                    meetingDataText: activeOffer.data.meetingDateTimeString
+                } %}
+            {% endfor %}
+
+            <p class="mb-1">
+                <b>Место встречи:</b>
+                <span class="plan-place" data-default="{{ eventParty.event.address }}">{{ eventParty.meetingPlace }}</span>
+            </p>
+            <p>
+                <b>Время встречи:</b>
+                <span class="plan-time" data-default="Не выбрано">{{ eventParty.meetingAtString ?? 'Не выбрано' }}</span>
+            </p>
+
+            {% set offers = eventParty.offers %}
+
+            <div class="meeting-point-offers-history mb-2 {% if offers|length == 0 %}d-none{% endif %}">
+                <a data-toggle="collapse" href="#meeting-point-offers" role="button" aria-expanded="false" aria-controls="meeting-point-offers">
+                    Предложения (<span class="meeting-point-offers-history-count">{{ offers|length }}</span>)
+                </a>
+                <div class="collapse" id="meeting-point-offers">
+                    {% for offer in offers %}
+                        {% set offerAccepted = eventParty.offerAccepted(offer) %}
+                        {% set offerRejected = eventParty.offerRejected(offer) %}
+
+                        {% include 'eventParty/_meeting_point_offer.html.twig' with {
+                            offerId: offer.id,
+                            color: offerAccepted ? 'green' : (offerRejected ? 'red' : 'inherit'),
+                            iconClass: offerAccepted ? 'fa fa-check' : (offerRejected ? 'fa fa-close' : 'fa fa-clock-o'),
+                            place: offer.data.place,
+                            meetingDateTimeString: offer.data.meetingDateTimeString,
+                            usersCount: eventParty.users.count,
+                            acceptedAnswersCount: eventParty.acceptedAnswersCountFor(offer)
+                        } %}
+                    {% endfor %}
+                </div>
+            </div>
+
             <p>
                 <button class="btn btn-sm btn-primary open-meeting-point-offer"
                         data-toggle="modal"
@@ -14,15 +54,26 @@
     </div>
 </div>
 
-<div class="d-none offers-wrapper">
-    <div class="alert alert-info meeting-point-alert">
-        <div>Предложено новое время и место встречи:</div>
-        <p class="meeting-point-text font-weight-bold mb-2"></p>
+<div class="d-none plan-templates">
+    <div class="meeting-point-offer-alert-template">
+        {% include 'eventParty/_meeting_point_offer_alert.html.twig' with {
+            place: '',
+            eventParty: eventParty,
+            meetingDataText: '',
+            offerId: ''
+        } %}
+    </div>
 
-        <div class="text-center">
-            <button type="button" class="btn btn-sm btn-primary">Подходит</button>
-            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Не подходит</button>
-        </div>
+    <div class="meeting-point-offers-history-template">
+        {% include 'eventParty/_meeting_point_offer.html.twig' with {
+            offerId: '',
+            color: 'inherit',
+            iconClass: 'fa fa-clock-o',
+            place: '',
+            meetingDateTimeString: '',
+            usersCount: eventParty.users.count,
+            acceptedAnswersCount: '1'
+        } %}
     </div>
 </div>
 

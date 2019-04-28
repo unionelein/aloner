@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Component\Model\DTO\Form\MeetingPointData;
 use App\Component\Util\Date;
 use App\Entity\EventParty;
 use App\Entity\Timetable;
@@ -54,6 +55,10 @@ class MeetingPointOfferType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefaults([
+            'data_class' => MeetingPointData::class,
+        ]);
+
         $resolver->setRequired(['eventParty']);
     }
 

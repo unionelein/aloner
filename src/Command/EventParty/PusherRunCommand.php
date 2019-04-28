@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PusherRunCommand extends Command
 {
-    protected static $defaultName = 'event_party:pusher:run';
+    protected static $defaultName = 'pusher:run';
 
     /** @var EntityManagerInterface */
     private $em;

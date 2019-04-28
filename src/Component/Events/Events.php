@@ -13,4 +13,8 @@ class Events
     public const EVENT_PARTY_FILLED = 'event_party.filled';
 
     public const MEETING_POINT_OFFERED = 'event_party.meeting_point_offered';
+
+    public const MEETING_POINT_OFFER_ANSWERED = 'event_party.meeting_point_offer_answered';
+
+    public const MEETING_POINT_OFFER_ACCEPTED = 'event_party.meeting_point_offer_accepted';
 }

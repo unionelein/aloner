@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ChatRunCommand extends Command
 {
-    protected static $defaultName = 'event_party:chat:run';
+    protected static $defaultName = 'chat:run';
 
     /** @var EntityManagerInterface */
     private $em;

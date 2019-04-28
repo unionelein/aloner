@@ -5,14 +5,14 @@ namespace App\Component\Messaging\EventParty\Model\Pusher;
 use App\Component\Messaging\EventParty\Pusher;
 use App\Entity\EventParty;
 
-class FilledData extends AbstractPusherData
+class MeetingPointOfferAcceptedData extends AbstractPusherData
 {
     /** @var EventParty */
     private $eventParty;
 
     public function __construct(EventParty $eventParty)
     {
-        parent::__construct(Pusher::TYPE_FILLED);
+        parent::__construct(Pusher::TYPE_MEETING_POINT_OFFER_ACCEPTED);
 
         $this->eventParty = $eventParty;
     }
@@ -26,6 +26,8 @@ class FilledData extends AbstractPusherData
     {
         return [
             'epStatus' => $this->eventParty->getCurrentStatusTitle(),
+            'place' => $this->eventParty->getMeetingPlace(),
+            'meetingDateTimeString' => $this->eventParty->getMeetingAtString(),
         ];
     }
 }

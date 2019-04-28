@@ -28,6 +28,12 @@
                         </a>
                         <a class="nav-item nav-link {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
                             <i class="fas fa-tasks"></i> План
+
+                            {% set offersCount = eventParty.activeOffersFor(app.user)|length %}
+
+                            {% if offersCount > 0 %}
+                                <span class="badge badge-info">{{ offersCount }}</span>
+                            {% endif %}
                         </a>
                     </div>
                 </nav>
@@ -168,6 +174,7 @@
     <script src="{{ asset('node_modules/video/video.js') }}"></script>
 
     <script src="{{ asset('js/event_party/Chat.js') }}"></script>
+    <script src="{{ asset('js/event_party/Helper.js') }}"></script>
     <script src="{{ asset('js/event_party/Receiver.js') }}"></script>
     <script src="{{ asset('js/event_party/Plan.js') }}"></script>
     <script src="{{ asset('js/event_party/event_party.js') }}"></script>

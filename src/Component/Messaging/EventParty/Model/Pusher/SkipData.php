@@ -36,7 +36,7 @@ class SkipData extends AbstractPusherData
     {
         return [
             'userId'           => $this->user->getId(),
-            'eventPartyStatus' => $this->eventParty->getCurrentStatusTitle(),
+            'epStatus' => $this->eventParty->getCurrentStatusTitle(),
         ];
     }
 }

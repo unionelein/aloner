@@ -375,7 +375,7 @@ class User implements UserInterface
     public function getNicknameIn(EventParty $eventParty): string
     {
         if ($history = $this->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN)) {
-            return $history->getNickname();
+            return $history->getData()->getNickname() ?? $this->getName();
         }
 
         return $this->getName();

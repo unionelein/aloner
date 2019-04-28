@@ -28,4 +28,4 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
         filters:
-            deleted_event_party: App\Doctrine\DeletedEventPartyFilter
+            deletion_filter: App\Doctrine\DeletionFilter

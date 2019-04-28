@@ -21,7 +21,10 @@ class MeetingPointOfferData extends AbstractPusherData
     /** @var \DateTime */
     private $meetingDateTime;
 
-    public function __construct(User $user, EventParty $eventParty, string $place, \DateTime $meetingDateTime)
+    /** @var int */
+    private $offerId;
+
+    public function __construct(User $user, EventParty $eventParty, int $offerId, string $place, \DateTime $meetingDateTime)
     {
         parent::__construct(Pusher::TYPE_MEETING_POINT_OFFER);
 
@@ -29,6 +32,7 @@ class MeetingPointOfferData extends AbstractPusherData
         $this->eventParty = $eventParty;
         $this->place = $place;
         $this->meetingDateTime = $meetingDateTime;
+        $this->offerId = $offerId;
     }
 
     public function getTopicId(): string
@@ -40,6 +44,7 @@ class MeetingPointOfferData extends AbstractPusherData
     {
         return [
             'userId'                => $this->user->getId(),
+            'offerId'               => $this->offerId,
             'place'                 => $this->place,
             'meetingDateTimeString' => \sprintf('%s, %s',
                 Date::convertDateToString($this->meetingDateTime),
