@@ -98,19 +98,16 @@ class Receiver {
     }
 
     onMeetingPointOffer(data) {
-        if (this.$userData.data('id') === data.userId) {
-            return
-        }
-
         const meetingPointText = `${data.place} - ${data.meetingDateTimeString}`;
 
-        this.plan.addMeetingPointOfferAlert(data.offerId, meetingPointText);
         this.helper.addMeetingPointOfferHistoryRow(data.offerId, meetingPointText);
+
+        if (this.$userData.data('id') !== data.userId) {
+            this.plan.addMeetingPointOfferAlert(data.offerId, meetingPointText);
+        }
     }
 
     onMeetingPointOfferAnswer(data) {
-        console.log(data.answer);
-
         data.answer
             ? this.helper.addAcceptedAnswerToMeetingPointHistoryRow(data.offerId)
             : this.helper.markMeetingPointHistoryRowAsRejected(data.offerId);

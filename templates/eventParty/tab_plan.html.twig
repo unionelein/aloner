@@ -19,6 +19,14 @@
                 <span class="plan-time" data-default="Не выбрано">{{ eventParty.meetingAtString ?? 'Не выбрано' }}</span>
             </p>
 
+            <p class="mb-1">
+                <button class="btn btn-sm btn-primary open-meeting-point-offer"
+                        data-toggle="modal"
+                        data-target="#meetingPointOfferModal"
+                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                >Предложить</button>
+            </p>
+
             {% set offers = eventParty.offers %}
 
             <div class="meeting-point-offers-history mb-2 {% if offers|length == 0 %}d-none{% endif %}">
@@ -26,7 +34,7 @@
                     Предложения (<span class="meeting-point-offers-history-count">{{ offers|length }}</span>)
                 </a>
                 <div class="collapse" id="meeting-point-offers">
-                    {% for offer in offers %}
+                    {% for offer in offers|reverse %}
                         {% set offerAccepted = eventParty.offerAccepted(offer) %}
                         {% set offerRejected = eventParty.offerRejected(offer) %}
 
@@ -36,20 +44,12 @@
                             iconClass: offerAccepted ? 'fa fa-check' : (offerRejected ? 'fa fa-close' : 'fa fa-clock-o'),
                             place: offer.data.place,
                             meetingDateTimeString: offer.data.meetingDateTimeString,
-                            usersCount: eventParty.users.count,
+                            usersCount: eventParty.numberOfPeople,
                             acceptedAnswersCount: eventParty.acceptedAnswersCountFor(offer)
                         } %}
                     {% endfor %}
                 </div>
             </div>
-
-            <p>
-                <button class="btn btn-sm btn-primary open-meeting-point-offer"
-                        data-toggle="modal"
-                        data-target="#meetingPointOfferModal"
-                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
-                >Предложить</button>
-            </p>
         </div>
     </div>
 </div>
@@ -58,7 +58,7 @@
     <div class="meeting-point-offer-alert-template">
         {% include 'eventParty/_meeting_point_offer_alert.html.twig' with {
             place: '',
-            eventParty: eventParty,
+            epId: eventParty.id,
             meetingDataText: '',
             offerId: ''
         } %}
@@ -71,7 +71,7 @@
             iconClass: 'fa fa-clock-o',
             place: '',
             meetingDateTimeString: '',
-            usersCount: eventParty.users.count,
+            usersCount: eventParty.numberOfPeople,
             acceptedAnswersCount: '1'
         } %}
     </div>

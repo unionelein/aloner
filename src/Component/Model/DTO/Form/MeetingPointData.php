@@ -18,7 +18,7 @@ class MeetingPointData
         return $this->place;
     }
 
-    public function setPlace(string $place): void
+    public function setPlace(?string $place): void
     {
         $this->place = $place;
     }
@@ -28,7 +28,7 @@ class MeetingPointData
         return $this->day;
     }
 
-    public function setDay(\DateTime $day): void
+    public function setDay(?\DateTime $day): void
     {
         $this->day = $day;
     }
@@ -38,7 +38,7 @@ class MeetingPointData
         return $this->time;
     }
 
-    public function setTime(\DateTime $time): void
+    public function setTime(?\DateTime $time): void
     {
         $this->time = $time;
     }

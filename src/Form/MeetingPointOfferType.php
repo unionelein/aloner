@@ -28,7 +28,7 @@ class MeetingPointOfferType extends AbstractType
                 'label' => false,
                 'choices' => [
                     'Cегодня' => $today,
-                    'Завтра'  => $today->modify('+1 day'),
+                    'Завтра'  => (clone $today)->modify('+1 day'),
                 ],
                 'data' => $eventParty->getUsersSearchCriteriaDate(),
             ])
@@ -36,14 +36,14 @@ class MeetingPointOfferType extends AbstractType
                 'label' => false,
                 'required' => true,
                 'widget' => 'single_text',
-                'constraints' => [new NotNull()],
+                'constraints' => [new NotNull(['message' => 'Выберите время'])],
                 'data' => $this->findMeetingTime($eventParty),
             ])
             ->add('place', TextType::class, [
                 'label' => false,
                 'required' => true,
                 'constraints' => [
-                    new NotNull(),
+                    new NotNull(['message' => 'Введите место']),
                     new Length([
                         'max' => 30, 'maxMessage' => 'Сликшом длинное описание',
                         'min' => 4,  'minMessage' => 'Сликшом короткое описание',

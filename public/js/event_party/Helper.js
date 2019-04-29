@@ -90,15 +90,15 @@ class Helper {
         $meetingPointOffer.addClass(`meeting-point-offer-${offerId}`);
         $meetingPointOffer.find('.meeting-point-offer-text').html(meetingPointText);
 
-        this.$meetingOffersHistory.append($meetingPointOffer);
+        $('#meeting-point-offers').prepend($meetingPointOffer);
 
         this.updateMeetingPointHistoryCount(+1);
     }
 
     updateMeetingPointHistoryCount(number) {
-        let newCount = +this.$meetingOffersHistory.find('.meeting-point-offers-count').html() + number;
+        let newCount = +this.$meetingOffersHistory.find('.meeting-point-offers-history-count').html() + number;
 
-        this.$meetingOffersHistory.find('.meeting-point-offers-count').html(newCount);
+        this.$meetingOffersHistory.find('.meeting-point-offers-history-count').html(newCount);
 
         newCount > 0
             ? this.$meetingOffersHistory.removeClass('d-none')
@@ -106,7 +106,7 @@ class Helper {
     }
 
     addAcceptedAnswerToMeetingPointHistoryRow(offerId) {
-        const $offer         = $(`meeting-point-offer-${offerId}`);
+        const $offer         = $(`.meeting-point-offer-${offerId}`);
         const $acceptedCount = $offer.find('.meeting-point-offer-accepted-answers-count');
         const $totalCount    = $offer.find('.meeting-point-offer-total-users-count');
 
@@ -114,17 +114,17 @@ class Helper {
 
         if (+$totalCount.html() === +$acceptedCount.html()) {
             $offer.css('color', 'green');
-            $offer.find('meeting-point-offer-icon')
+            $offer.find('.meeting-point-offer-icon')
                 .removeClass('fa-clock-o')
                 .addClass('fa-check');
         }
     }
 
     markMeetingPointHistoryRowAsRejected(offerId) {
-        const $offer = $(`meeting-point-offer-${offerId}`);
+        const $offer = $(`.meeting-point-offer-${offerId}`);
 
         $offer.css('color', 'red');
-        $offer.find('meeting-point-offer-icon')
+        $offer.find('.meeting-point-offer-icon')
             .removeClass('fa-clock-o')
             .addClass('fa-close');
     }

@@ -35,6 +35,7 @@ class Pusher implements WampServerInterface
         self::TYPE_FILLED,
         self::TYPE_MEETING_POINT_OFFER,
         self::TYPE_MEETING_POINT_OFFER_ANSWER,
+        self::TYPE_MEETING_POINT_OFFER_ACCEPTED,
         self::TYPE_CAFE_OFFER,
         self::TYPE_CAFE_OFFER_ANSWER,
     ];

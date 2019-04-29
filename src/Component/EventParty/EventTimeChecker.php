@@ -24,7 +24,9 @@ class EventTimeChecker
         $usersTimeFrom = $usersTimeInterval->getFrom()->modify("-{$allowedMinsOffset} min");
         $usersTimeTo   = $usersTimeInterval->getTo()->modify("+{$allowedMinsOffset} min");
 
-        foreach ($event->getTimetables()->get() as $timetable) {
+        $weekDay = (int) $user->getSearchCriteria()->getDay()->format('w');
+
+        foreach ($event->getTimetables()->getForWeekDay($weekDay) as $timetable) {
             $timeFrom = $timetable->getTimeFrom();
             $timeTo   = $timetable->getTimeTo();
 

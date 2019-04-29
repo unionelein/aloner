@@ -429,7 +429,7 @@ class EventParty
     public function getMeetingAtString(): ?string
     {
         return $this->meetingAt ?
-            Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i:s')
+            Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i')
             : null;
     }
 
@@ -457,7 +457,7 @@ class EventParty
             $isOffer    = \in_array($history->getAction(), $offerActions, true);
             $isAnswered = \in_array($history->getId(), $answeredIds, true);
 
-            if ($isOffer && !$isAnswered) {
+            if ($isOffer && !$isAnswered && $history->getUser() !== $user) {
                 $offers[] = $history;
             }
         }
