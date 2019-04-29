@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Cafe;
 use App\Entity\City;
 use App\Entity\Event;
 use App\Entity\Media;
@@ -32,6 +33,9 @@ class EventFixture extends BaseFixture
         $this->createMany('event', 20, function (int $index) {
             /** @var City $city */
             $city  = $this->getReference('city_1');
+            /** @var Cafe $cafe */
+            $cafe = $this->getReference('cafe_' . \rand(1, 3));
+
             $title = $this->faker->randomElement(self::EVENT_TITLES);
 
             $event = new Event($title, $city, \rand(2, 4), \rand(4, 6));
@@ -63,6 +67,9 @@ EOF
             $event->addMedia(new Media('/media/video/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', '/media/img/neoland_3.jpg'));
 
             $this->addTimeTables($event);
+
+            $event->setNearCafe($cafe);
+            $event->setPathToCafeYandexMapSrc('https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A4a1dfad00ef8fdc41586b909218377b9146497064c9fd6840c55e3c9b2ee6630&amp;width=600&amp;height=350&amp;lang=ru_RU&amp;scroll=true');
 
             return $event;
         });
@@ -109,6 +116,7 @@ EOF
     {
         return [
             CityFixture::class,
+            CafeFixture::class,
         ];
     }
 }

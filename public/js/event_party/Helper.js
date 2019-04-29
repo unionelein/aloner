@@ -8,6 +8,7 @@ class Helper {
 
         this.$planTime  = $('.plan-time');
         this.$planPlace = $('.plan-place');
+        this.$planCafe  = $('.plan-near-cafe');
 
         this.$loadSpinner = $('.js-data').find('.load-spinner');
     }
@@ -152,5 +153,11 @@ class Helper {
 
         this.$planTime.html(this.$planTime.data('default'));
         this.$planPlace.html(this.$planPlace.data('default'));
+
+        this.$planCafe.addClass('d-none');
+    }
+
+    showNearCafe() {
+        this.$planCafe.removeClass('d-none');
     }
 }

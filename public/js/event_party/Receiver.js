@@ -117,5 +117,6 @@ class Receiver {
         this.helper.updateEpStatus(data.epStatus);
         this.helper.updateMeetingPlace(data.place);
         this.helper.updateMeetingDateTime(data.meetingDateTimeString);
+        this.helper.showNearCafe();
     }
 }

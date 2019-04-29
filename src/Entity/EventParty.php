@@ -166,6 +166,11 @@ class EventParty
         return $this->numberOfGuys;
     }
 
+    public function isReady(): bool
+    {
+        return self::STATUS_READY === $this->status;
+    }
+
     public function isDone(): bool
     {
         return self::STATUS_DONE === $this->status;

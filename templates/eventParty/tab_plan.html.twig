@@ -50,6 +50,19 @@
                     {% endfor %}
                 </div>
             </div>
+
+            {% if eventParty.event.nearCafe %}
+                <div class="plan-near-cafe {% if not (eventParty.ready or eventParty.done) %}d-none{% endif %}">
+                    <p>
+                        Рядом есть {{ eventParty.event.nearCafe.name }} ({{ eventParty.event.nearCafe.address }}).<br>
+                        Вы можете встретится там после развлечений и лучше узнать друг дурга
+                    </p>
+                    {% if eventParty.event.pathToCafeYandexMapSrc %}
+                        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.pathToCafeYandexMapSrc }}"></script>
+                    {% endif %}
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>

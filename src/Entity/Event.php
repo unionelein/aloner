@@ -92,6 +92,16 @@ class Event
      */
     private $maxNumberOfPeople;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Cafe")
+     */
+    private $nearCafe;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pathToCafeYandexMapSrc;
+
     public function __construct(string $title, City $city, int $minNumberOfPeople, int $maxNumberOfPeople)
     {
         $this->timetables = new ArrayCollection();
@@ -271,5 +281,29 @@ class Event
     public function getMaxNumberOfPeople(): int
     {
         return $this->maxNumberOfPeople;
+    }
+
+    public function getNearCafe(): ?Cafe
+    {
+        return $this->nearCafe;
+    }
+
+    public function setNearCafe(?Cafe $nearCafe): self
+    {
+        $this->nearCafe = $nearCafe;
+
+        return $this;
+    }
+
+    public function getPathToCafeYandexMapSrc(): ?string
+    {
+        return $this->pathToCafeYandexMapSrc;
+    }
+
+    public function setPathToCafeYandexMapSrc(?string $pathToCafeYandexMapSrc): self
+    {
+        $this->pathToCafeYandexMapSrc = $pathToCafeYandexMapSrc;
+
+        return $this;
     }
 }
