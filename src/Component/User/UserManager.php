@@ -2,17 +2,21 @@
 
 namespace App\Component\User;
 
+use App\Component\EventParty\EventPartyManager;
+use App\Component\Events\EventPartyEvent;
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
 use App\Component\Events\MeetingPointOfferAnsweredEvent;
 use App\Component\Events\MeetingPointOfferedEvent;
 use App\Component\Infrastructure\TransactionalService;
-use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferAnswerHistory;
+use App\Component\Model\DTO\EventPartyHistory\AnswerToMeetingPointOfferHistory;
 use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferHistory;
 use App\Component\Model\DTO\Form\MeetingPointData;
+use App\Component\Model\VO\TimeInterval;
 use App\Entity\EventParty;
 use App\Entity\EventPartyHistory;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -27,14 +31,19 @@ class UserManager
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var UserRepository */
+    private $userRepo;
+
     public function __construct(
         TransactionalService $transactional,
+        UserRepository $userRepo,
         EventDispatcherInterface $dispatcher,
         EntityManagerInterface $em
     ) {
         $this->transactional = $transactional;
         $this->dispatcher    = $dispatcher;
         $this->em            = $em;
+        $this->userRepo      = $userRepo;
     }
 
     public function join(User $user, EventParty $eventParty): void
@@ -51,6 +60,20 @@ class UserManager
             Events::JOIN_TO_EVENT_PARTY,
             new EventPartyActionEvent($user, $eventParty)
         );
+
+        if ($eventParty->isFilled()) {
+            $this->dispatcher->dispatch(Events::EVENT_PARTY_FILLED, new EventPartyEvent($eventParty));
+
+            // if no reserve required we can just offer supposed datetime
+            if ($eventParty->getEvent()->isReserveRequired() === false) {
+                $webUser   = $this->userRepo->getWebUser();
+                $place     = $eventParty->getEvent()->getAddress();
+                $meetingAt = $eventParty->generateMeetingAt();
+                $interval  = $eventParty->generateEventTimeInterval($meetingAt);
+
+                $this->offerMeetingPoint($webUser, $eventParty, $place, $meetingAt, $interval);
+            }
+        }
     }
 
     public function skip(User $user, EventParty $eventParty): void
@@ -77,27 +100,28 @@ class UserManager
         $this->em->flush();
     }
 
-    public function offerMeetingPoint(User $user, EventParty $eventParty, MeetingPointData $meetingPointData): void
-    {
-        $place = $meetingPointData->getPlace();
-        $day   = clone $meetingPointData->getDay();
-        $time  = clone $meetingPointData->getTime();
+    public function offerMeetingPoint(
+        User $user,
+        EventParty $eventParty,
+        string $meetingPlace,
+        \DateTime $meetingDateTime,
+        TimeInterval $eventTimeInterval = null
+    ): void {
+        $eventTimeInterval = $eventTimeInterval ?? $eventParty->generateEventTimeInterval($meetingDateTime);
 
-        $history = new EventPartyHistory(
+        $offer = new EventPartyHistory(
             $eventParty,
             $user,
             EventPartyHistory::ACTION_MEETING_POINT_OFFER,
-            new MeetingPointOfferHistory($place, $day, $time)
+            new MeetingPointOfferHistory($meetingPlace, $meetingDateTime, $eventTimeInterval)
         );
 
-        $this->em->persist($history);
+        $this->em->persist($offer);
         $this->em->flush();
-
-        $meetingDateTime = $day->modify($time->format('H:i:s'));
 
         $this->dispatcher->dispatch(
             Events::MEETING_POINT_OFFERED,
-            new MeetingPointOfferedEvent($user, $eventParty, $history, $place, $meetingDateTime)
+            new MeetingPointOfferedEvent($user, $eventParty, $offer)
         );
     }
 
@@ -112,8 +136,8 @@ class UserManager
         $history = new EventPartyHistory(
             $offerHistory->getEventParty(),
             $user,
-            EventPartyHistory::ACTION_MEETING_POINT_OFFER_ANSWER,
-            new MeetingPointOfferAnswerHistory($offerId, $answer)
+            EventPartyHistory::ACTION_ANSWER_TO_MEETING_POINT_OFFER,
+            new AnswerToMeetingPointOfferHistory($offerId, $answer)
         );
 
         $this->em->persist($history);

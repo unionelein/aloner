@@ -2,10 +2,10 @@
 
 namespace App\Component\Model\DTO\EventPartyHistory;
 
-class LeaveHistory implements HistoryDataInterface
+class EmptyDataHistory implements HistoryDataInterface
 {
     /**
-     * @return LeaveHistory
+     * @return EmptyDataHistory
      */
     public static function fromArray(array $data): HistoryDataInterface
     {

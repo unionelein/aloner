@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface
 {
+    public const WEB_ID = 1;
+
     public const ROLE_PARTIAL_REG = 'ROLE_PARTIAL_REG';
 
     public const ROLE_FULL_REG = 'ROLE_FULL_REG';
@@ -77,6 +79,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\EventParty", mappedBy="users")
+     * @ORM\OrderBy({"id"="DESC"})
      */
     private $eventParties;
 
@@ -105,18 +108,24 @@ class User implements UserInterface
 
     public function __construct(string $name)
     {
-        $this->name = $name;
-
-        $this->eventParties = new ArrayCollection();
+        $this->eventParties        = new ArrayCollection();
         $this->eventPartyHistories = new ArrayCollection();
 
-        $this->addRole(self::ROLE_PARTIAL_REG);
+        $this->name = $name;
+        $this->updateTempHash();
         $this->setSearchCriteria(new SearchCriteria($this));
+
+        $this->addRole(self::ROLE_PARTIAL_REG);
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isWeb(): bool
+    {
+        return self::WEB_ID === $this->id;
     }
 
     public function getLogin(): ?string
@@ -131,7 +140,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->name;
+        return $this->login ?? $this->name . ' (unsaved)';
     }
 
     /**
@@ -202,7 +211,7 @@ class User implements UserInterface
         return $this->vkToken;
     }
 
-    public function addVkToken(AccessToken $accessToken): self
+    public function setVkToken(AccessToken $accessToken): self
     {
         $this->vkToken = new VkUserToken($accessToken, $this);
 
@@ -271,85 +280,19 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|EventParty[]
+     * @return ArrayCollection|EventParty[]
      */
     public function getEventParties(): Collection
     {
         return $this->eventParties;
     }
 
-    public function joinToEventParty(EventParty $eventParty): self
-    {
-        if (!$this->eventParties->contains($eventParty)) {
-            $this->eventParties[] = $eventParty;
-            $eventParty->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function getActiveEventParty(): ?EventParty
-    {
-        foreach ($this->getEventParties() as $eventParty) {
-            if (!$eventParty->isDone()) {
-                return $eventParty;
-            }
-        }
-
-        return null;
-    }
-
-    public function hasActiveEventParty(): bool
-    {
-        return null !== $this->getActiveEventParty();
-    }
-
     /**
      * @return ArrayCollection|EventPartyHistory[]
      */
-    public function getEventPartyHistories(): ArrayCollection
+    public function getEventPartyHistories(): Collection
     {
         return $this->eventPartyHistories;
-    }
-
-    /**
-     * @return Collection|EventParty[]
-     */
-    public function getSkippedEventParties(): Collection
-    {
-        $skipped = new ArrayCollection();
-
-        foreach ($this->eventPartyHistories as $history) {
-            if ($history->isActionSkip()) {
-                $skipped[] = $history->getEventParty();
-            }
-        }
-
-        return $skipped;
-    }
-
-    public function getSkippedTodayEvents(): Collection
-    {
-        $events = new ArrayCollection();
-        $today  = new \DateTime('00:00:00');
-
-        foreach ($this->eventPartyHistories as $history) {
-            if ($history->isActionSkip() && $history->getCreatedAt() > $today) {
-                $events[] = $history->getEventParty()->getEvent();
-            }
-        }
-
-        return $events;
-    }
-
-    public function skipEventParty(EventParty $eventParty): self
-    {
-        if ($this->eventParties->contains($eventParty)) {
-            $eventParty->removeUser($this);
-            $this->eventParties->removeElement($eventParty);
-        }
-
-        return $this;
     }
 
     public function addEventPartyHistory(EventPartyHistory $history): self
@@ -359,26 +302,6 @@ class User implements UserInterface
         }
 
         return $this;
-    }
-
-    public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EventPartyHistory
-    {
-        foreach ($this->eventPartyHistories as $history) {
-            if ($history->getEventParty() === $eventParty && $history->getAction() === $action) {
-                return $history;
-            }
-        }
-
-        return null;
-    }
-
-    public function getNicknameIn(EventParty $eventParty): string
-    {
-        if ($history = $this->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN)) {
-            return $history->getData()->getNickname() ?? $this->getName();
-        }
-
-        return $this->getName();
     }
 
     public function getAvatar(): ?string
@@ -415,7 +338,6 @@ class User implements UserInterface
     {
         $this->searchCriteria = $searchCriteria;
 
-        // set the owning side of the relation if necessary
         if ($this !== $searchCriteria->getUser()) {
             $searchCriteria->setUser($this);
         }
@@ -423,16 +345,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getTempHash(): ?string
+    public function getTempHash(): string
     {
         return $this->tempHash;
-    }
-
-    public function setTempHash(?string $tempHash): self
-    {
-        $this->tempHash = $tempHash;
-
-        return $this;
     }
 
     public function updateTempHash(): self
@@ -440,5 +355,94 @@ class User implements UserInterface
         $this->tempHash = HashGenerator::createUnique();
 
         return $this;
+    }
+
+    public function joinToEventParty(EventParty $eventParty): self
+    {
+        if (!$this->eventParties->contains($eventParty)) {
+            $this->eventParties[] = $eventParty;
+            $eventParty->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function findLastActiveEventParty(): ?EventParty
+    {
+        foreach ($this->getEventParties() as $eventParty) {
+            if (!$eventParty->isDone()) {
+                return $eventParty;
+            }
+        }
+
+        return null;
+    }
+
+    public function hasActiveEventParty(): bool
+    {
+        return null !== $this->findLastActiveEventParty();
+    }
+
+    /**
+     * @return ArrayCollection|EventParty[]
+     */
+    public function getSkippedEventParties(): Collection
+    {
+        $skipped = new ArrayCollection();
+
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->isActionSkip()) {
+                $skipped[] = $history->getEventParty();
+            }
+        }
+
+        return $skipped;
+    }
+
+    /**
+     * @return ArrayCollection|EventParty[]
+     */
+    public function getSkippedTodayEvents(): Collection
+    {
+        $events = new ArrayCollection();
+        $today  = new \DateTime('00:00:00');
+
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->isActionSkip() && $history->getCreatedAt() > $today) {
+                $events[] = $history->getEventParty()->getEvent();
+            }
+        }
+
+        return $events;
+    }
+
+    public function skipEventParty(EventParty $eventParty): self
+    {
+        if ($this->eventParties->contains($eventParty)) {
+            $this->eventParties->removeElement($eventParty);
+            $eventParty->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EventPartyHistory
+    {
+        foreach ($this->eventPartyHistories as $history) {
+            if ($history->getEventParty() === $eventParty && $history->getAction() === $action) {
+                return $history;
+            }
+        }
+
+        return null;
+    }
+
+    public function getNicknameIn(EventParty $eventParty): string
+    {
+        if ($history = $this->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN)) {
+            return $history->getData()->getNickname() ?? $this->getName();
+        }
+
+        return $this->getName();
     }
 }

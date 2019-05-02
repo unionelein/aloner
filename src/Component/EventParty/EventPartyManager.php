@@ -2,19 +2,50 @@
 
 namespace App\Component\EventParty;
 
+use App\Component\Events\EventPartyActionEvent;
+use App\Component\Events\EventPartyEvent;
+use App\Component\Events\Events;
+use App\Component\Infrastructure\TransactionalService;
+use App\Component\Model\DTO\EventPartyHistory\EmptyDataHistory;
 use App\Entity\Event;
 use App\Entity\EventParty;
+use App\Entity\EventPartyHistory;
 use App\Entity\User;
 use App\Repository\EventRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Security;
 
 class EventPartyManager
 {
     /** @var EventRepository */
     private $eventRepo;
 
-    public function __construct(EventRepository $eventRepo)
-    {
-        $this->eventRepo = $eventRepo;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var TransactionalService
+     */
+    private $transactional;
+    /**
+     * @var UserRepository
+     */
+    private $userRepo;
+
+    public function __construct(
+        TransactionalService $transactional,
+        EventDispatcherInterface $dispatcher,
+        EventRepository $eventRepo,
+        UserRepository $userRepo
+    ) {
+        $this->eventRepo  = $eventRepo;
+        $this->dispatcher = $dispatcher;
+        $this->transactional = $transactional;
+        $this->userRepo = $userRepo;
     }
 
     public function createForUser(User $user): ?EventParty

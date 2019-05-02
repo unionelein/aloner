@@ -15,21 +15,13 @@ class MeetingPointOfferedEvent extends Event
     /** @var EventParty */
     private $eventParty;
 
-    /** @var string */
-    private $place;
-
-    /** @var \DateTime */
-    private $meetingDateTime;
-
     /** @var EventPartyHistory */
     private $offer;
 
-    public function __construct(User $user, EventParty $eventParty, EventPartyHistory $offer, string $place, \DateTime $meetingDateTime)
+    public function __construct(User $user, EventParty $eventParty, EventPartyHistory $offer)
     {
         $this->user = $user;
         $this->eventParty = $eventParty;
-        $this->place = $place;
-        $this->meetingDateTime = $meetingDateTime;
         $this->offer = $offer;
     }
 
@@ -41,16 +33,6 @@ class MeetingPointOfferedEvent extends Event
     public function getEventParty(): EventParty
     {
         return $this->eventParty;
-    }
-
-    public function getPlace(): string
-    {
-        return $this->place;
-    }
-
-    public function getMeetingDateTime(): \DateTime
-    {
-        return $this->meetingDateTime;
     }
 
     public function getOffer(): EventPartyHistory

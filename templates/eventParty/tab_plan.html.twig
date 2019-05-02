@@ -1,25 +1,49 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 tab-plan-body">
-            {% for activeOffer in eventParty.activeOffersFor(app.user) %}
+            {% if eventParty.event.reserveRequired %}
+                <div class="alert alert-info reserve-required-alert {% if eventParty.activeOffers()|length or not eventParty.planing %}d-none{% endif %}">
+                    <p class="font-weight-bold">Здесь нужно будет занять места. Что нужно сделать:</p>
+                    <ul>
+                        <li>
+                            1. Узнать и предложить свободное время
+                            <button class="btn btn-sm btn-primary open-meeting-point-offer"
+                                    data-toggle="modal"
+                                    data-target="#meetingPointOfferModal"
+                                    data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                            >Предложить</button>
+                        </li>
+                        <li>2. После того, как все примут предложение, останется только позвонить и занять места на выбранное время</li>
+                    </ul>
+                </div>
+            {% endif %}
+
+
+            {% for activeOffer in eventParty.activeOffers(app.user) %}
                 {% include 'eventParty/_meeting_point_offer_alert.html.twig' with {
-                    offerId: activeOffer.id,
                     epId: eventParty.id,
-                    place: activeOffer.data.place,
-                    meetingDataText: activeOffer.data.meetingDateTimeString
+                    offerId: activeOffer.id,
+                    lines: activeOffer.generateOfferLines
                 } %}
             {% endfor %}
 
             <p class="mb-1">
                 <b>Место встречи:</b>
-                <span class="plan-place" data-default="{{ eventParty.event.address }}">{{ eventParty.meetingPlace }}</span>
+                <span class="plan-place" data-default="Не выбрано">{{ eventParty.meetingPlace ?? 'Не выбрано' }}</span>
             </p>
             <p>
                 <b>Время встречи:</b>
-                <span class="plan-time" data-default="Не выбрано">{{ eventParty.meetingAtString ?? 'Не выбрано' }}</span>
+                <span class="plan-time" data-default="Не выбрано">
+                    {% if eventParty.meetingAt %}
+                        {{ eventParty.meetingAt|dateToString }} в {{  eventParty.meetingAt|date('H:i') }}
+                    {% else %}
+                        Не выбрано
+                    {% endif %}
+                </span>
             </p>
 
-            <p class="mb-1">
+
+            <p class="mb-1 meeting-point-offer-btn-wrapper {% if not eventParty.ready %}d-none{% endif %}">
                 <button class="btn btn-sm btn-primary open-meeting-point-offer"
                         data-toggle="modal"
                         data-target="#meetingPointOfferModal"
@@ -42,19 +66,18 @@
                             offerId: offer.id,
                             color: offerAccepted ? 'green' : (offerRejected ? 'red' : 'inherit'),
                             iconClass: offerAccepted ? 'fa fa-check' : (offerRejected ? 'fa fa-close' : 'fa fa-clock-o'),
-                            place: offer.data.place,
-                            meetingDateTimeString: offer.data.meetingDateTimeString,
+                            text: offer.generateOfferLines.point,
                             usersCount: eventParty.numberOfPeople,
-                            acceptedAnswersCount: eventParty.acceptedAnswersCountFor(offer)
+                            acceptedAnswersCount: eventParty.acceptedOfferUsers(offer)|length
                         } %}
                     {% endfor %}
                 </div>
             </div>
 
-            {% if eventParty.event.nearCafe %}
+            {% if eventParty.event.cafe %}
                 <div class="plan-near-cafe {% if not (eventParty.ready or eventParty.done) %}d-none{% endif %}">
                     <p>
-                        Рядом есть {{ eventParty.event.nearCafe.name }} ({{ eventParty.event.nearCafe.address }}).<br>
+                        Рядом есть {{ eventParty.event.cafe.name }} ({{ eventParty.event.cafe.address }}).<br>
                         Вы можете встретится там после развлечений и лучше узнать друг дурга
                     </p>
                     {% if eventParty.event.pathToCafeYandexMapSrc %}
@@ -70,10 +93,9 @@
 <div class="d-none plan-templates">
     <div class="meeting-point-offer-alert-template">
         {% include 'eventParty/_meeting_point_offer_alert.html.twig' with {
-            place: '',
             epId: eventParty.id,
-            meetingDataText: '',
-            offerId: ''
+            offerId: '',
+            lines: []
         } %}
     </div>
 
@@ -82,8 +104,7 @@
             offerId: '',
             color: 'inherit',
             iconClass: 'fa fa-clock-o',
-            place: '',
-            meetingDateTimeString: '',
+            text: '',
             usersCount: eventParty.numberOfPeople,
             acceptedAnswersCount: '1'
         } %}

@@ -26,6 +26,6 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->em->getFilters()->enable('deletion_filter');
+        //$this->em->getFilters()->enable('deletion_filter');
     }
 }

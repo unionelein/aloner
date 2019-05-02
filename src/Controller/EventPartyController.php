@@ -6,16 +6,12 @@ use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyManager;
 use App\Component\Events\Events;
 use App\Component\Events\EventPartyActionEvent;
-use App\Component\Events\MeetingPointOfferedEvent;
 use App\Component\Model\DTO\Form\MeetingPointData;
 use App\Component\User\UserManager;
-use App\Component\Util\Date;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Form\MeetingPointOfferType;
-use App\Repository\EventPartyMessageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,26 +26,32 @@ use App\Security\Voter\EventPartyVoter;
 class EventPartyController extends BaseController
 {
     /**
-     * @Route("/", name="app_current_event_party")
+     * @Route("/", name="app_event_party_current")
      */
-    public function currentEventParty(EventPartyMessageRepository $epMsgRepo, EventDispatcherInterface $dispatcher)
+    public function current(EventDispatcherInterface $dispatcher)
     {
         $user       = $this->getUser();
-        $eventParty = $user->getActiveEventParty();
+        $eventParty = $user->findLastActiveEventParty();
 
         if (!$eventParty) {
             return $this->redirectToRoute('app_main');
         }
 
+        return $this->eventParty($eventParty, $dispatcher);
+    }
+
+    /**
+     * @Route("/{id}", name="app_event_party", requirements={"id"="\d+"})
+     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     */
+    public function eventParty(EventParty $eventParty, EventDispatcherInterface $dispatcher)
+    {
         $dispatcher->dispatch(
             Events::LOAD_EVENT_PARTY,
-            new EventPartyActionEvent($user, $eventParty)
+            new EventPartyActionEvent($this->getUser(), $eventParty)
         );
 
-        return $this->render('eventParty/event_party.html.twig', [
-            'eventParty'      => $eventParty,
-            'messagesHistory' => $epMsgRepo->getMessageHistoryFor($eventParty, $user),
-        ]);
+        return $this->render('eventParty/event_party.html.twig', ['eventParty' => $eventParty]);
     }
 
     /**
@@ -60,7 +62,7 @@ class EventPartyController extends BaseController
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->redirectToRoute('app_current_event_party');
+            return $this->redirectToRoute('app_event_party_current');
         }
 
         $eventParty = $eventPartyFinder->findForUser($user) ?? $epManager->createForUser($user);
@@ -71,7 +73,7 @@ class EventPartyController extends BaseController
 
         $userManager->join($user, $eventParty);
 
-        return $this->redirectToRoute('app_current_event_party');
+        return $this->redirectToRoute('app_event_party_current');
     }
 
     /**
@@ -108,14 +110,26 @@ class EventPartyController extends BaseController
      */
     public function meetingPointOffer(EventParty $eventParty, Request $request, UserManager $userManager)
     {
-        $form = $this->createForm(MeetingPointOfferType::class, null, ['eventParty' => $eventParty])
-            ->handleRequest($request);
+        $form = $this->createForm(MeetingPointOfferType::class, null, [
+            'eventParty'      => $eventParty,
+            'rejectedOfferId' => $request->get('rejected_offer_id'),
+        ])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var MeetingPointData $meetingPointData */
             $meetingPointData = $form->getData();
 
-            $userManager->offerMeetingPoint($this->getUser(), $eventParty, $meetingPointData);
+            $place = $meetingPointData->getPlace();
+            $day   = clone $meetingPointData->getDay();
+            $time  = clone $meetingPointData->getTime();
+
+            $meetingDateTime  = $day->modify($time->format('H:i:s'));
+
+            if ($rejectedOfferId = $form->get('rejectedOfferId')->getData()) {
+                $userManager->answerOnMeetingPointOffer($this->getUser(), (int) $rejectedOfferId, false);
+            }
+
+            $userManager->offerMeetingPoint($this->getUser(), $eventParty, $place, $meetingDateTime);
 
             return new JsonResponse(['status' => 'success']);
         }

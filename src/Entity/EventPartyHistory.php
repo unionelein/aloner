@@ -4,25 +4,22 @@ namespace App\Entity;
 
 use App\Component\Model\DTO\EventPartyHistory\HistoryDataInterface;
 use App\Component\Model\DTO\EventPartyHistory\JoinHistory;
-use App\Component\Model\DTO\EventPartyHistory\LeaveHistory;
-use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferAnswerHistory;
+use App\Component\Model\DTO\EventPartyHistory\EmptyDataHistory;
+use App\Component\Model\DTO\EventPartyHistory\AnswerToMeetingPointOfferHistory;
 use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferHistory;
+use App\Component\Util\Date;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventPartyHistoryRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class EventPartyHistory
 {
-    public const STATUS_DELETED = 0;
-
-    public const STATUS_ACTIVE = 1;
-
-    public const STATUSES = [
-        self::STATUS_DELETED,
-        self::STATUS_ACTIVE,
-    ];
+    use SoftDeleteableEntity;
 
     public const ACTION_JOIN = 1;
 
@@ -30,18 +27,25 @@ class EventPartyHistory
 
     public const ACTION_MEETING_POINT_OFFER = 3;
 
-    public const ACTION_MEETING_POINT_OFFER_ANSWER = 4;
+    public const ACTION_ANSWER_TO_MEETING_POINT_OFFER = 4;
 
     public const ACTIONS = [
         self::ACTION_JOIN,
         self::ACTION_LEAVE,
         self::ACTION_MEETING_POINT_OFFER,
-        self::ACTION_MEETING_POINT_OFFER_ANSWER,
+        self::ACTION_ANSWER_TO_MEETING_POINT_OFFER,
     ];
 
     public const PLAN_ACTIONS = [
         self::ACTION_MEETING_POINT_OFFER,
-        self::ACTION_MEETING_POINT_OFFER_ANSWER,
+        self::ACTION_ANSWER_TO_MEETING_POINT_OFFER,
+    ];
+
+    private const ACTION_DATA_CLASSES = [
+        self::ACTION_JOIN                          => JoinHistory::class,
+        self::ACTION_LEAVE                         => EmptyDataHistory::class,
+        self::ACTION_MEETING_POINT_OFFER           => MeetingPointOfferHistory::class,
+        self::ACTION_ANSWER_TO_MEETING_POINT_OFFER => AnswerToMeetingPointOfferHistory::class,
     ];
 
     /**
@@ -53,7 +57,7 @@ class EventPartyHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="eventPartyHistories")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $user;
 
@@ -75,18 +79,12 @@ class EventPartyHistory
     private $action;
 
     /**
-     * @ORM\Column(type="smallint")
-     */
-    private $status;
-
-    /**
      * @ORM\Column(type="json")
      */
     private $data;
 
     public function __construct(EventParty $eventParty, User $user, int $action, HistoryDataInterface $data)
     {
-        $this->status = self::STATUS_ACTIVE;
         $this->eventParty = $eventParty;
         $this->user       = $user;
         $this->setAction($action);
@@ -94,7 +92,6 @@ class EventPartyHistory
 
         $eventParty->addHistory($this);
         $user->addEventPartyHistory($this);
-
     }
 
     public function getId(): ?int
@@ -102,7 +99,7 @@ class EventPartyHistory
         return $this->id;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -115,11 +112,6 @@ class EventPartyHistory
     public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
-    }
-
-    public function markAsDeleted(): void
-    {
-        $this->status = self::STATUS_DELETED;
     }
 
     public function getAction(): int
@@ -137,49 +129,70 @@ class EventPartyHistory
         return $this->action === self::ACTION_LEAVE;
     }
 
+    public function delete(): self
+    {
+        $this->setDeletedAt(new \DateTime());
+
+        return $this;
+    }
+
     /**
-     * @return JoinHistory|LeaveHistory|MeetingPointOfferHistory|MeetingPointOfferAnswerHistory
+     * @return JoinHistory|EmptyDataHistory|MeetingPointOfferHistory|AnswerToMeetingPointOfferHistory
      */
     public function getData(): HistoryDataInterface
     {
-        $data = (array) $this->data;
+        $dataClass = self::ACTION_DATA_CLASSES[$this->action];
 
-        switch ($this->action) {
-            case self::ACTION_JOIN:
-                return JoinHistory::fromArray($data);
+        return $dataClass::fromArray((array) $this->data);
+    }
 
-            case self::ACTION_LEAVE:
-                return LeaveHistory::fromArray($data);
-
-            case self::ACTION_MEETING_POINT_OFFER:
-                return MeetingPointOfferHistory::fromArray($data);
-
-            case self::ACTION_MEETING_POINT_OFFER_ANSWER:
-                return MeetingPointOfferAnswerHistory::fromArray($data);
-
-            default:
-                throw new \LogicException('Invalid action stored');
+    public function generateOfferLines(): array
+    {
+        if (self::ACTION_MEETING_POINT_OFFER !== $this->action) {
+            return [];
         }
+
+        $lines = [];
+
+        if (!$this->user->isWeb()) {
+            $lines[] = 'Тут предложили встретиться в другое время/месте:';
+        }
+
+        $offerData = $this->getData();
+
+        $timeStart = $offerData->getEventTimeStart();
+        $timeEnd   = $offerData->getEventTimeEnd();
+
+        $durationInterval = $timeStart && $timeEnd ?
+            "(на {$timeStart->format('H:i')}-{$timeEnd->format('H:i')})"
+            : null;
+
+        $lines['point'] = \sprintf('Встречаемся %s в %s %s - %s',
+            Date::convertDateToString($offerData->getMeetingDateTime()),
+            $offerData->getMeetingDateTime()->format('H:i'),
+            $durationInterval,
+            $offerData->getMeetingPlace()
+        );
+
+        return $lines;
     }
 
     private function setAction(int $action): void
     {
-        if (!\in_array($action, self::ACTIONS, true)) {
-            throw new \InvalidArgumentException('Invalid action given');
-        }
+        Assert::oneOf($action, self::ACTIONS);
 
         $this->action = $action;
     }
 
     private function setData(HistoryDataInterface $historyData)
     {
-        if ((self::ACTION_JOIN === $this->action && !$historyData instanceof JoinHistory)
-            || (self::ACTION_LEAVE === $this->action && !$historyData instanceof LeaveHistory)
-            || (self::ACTION_MEETING_POINT_OFFER === $this->action && !$historyData instanceof MeetingPointOfferHistory)
-        ) {
-            throw new \InvalidArgumentException('Invalid data object given');
-        }
+        Assert::notNull($this->action);
 
-        $this->data = $historyData->toArray();
+        $requiredClass = self::ACTION_DATA_CLASSES[$this->action];
+        $givenClass    = \get_class($historyData);
+
+        Assert::eq($givenClass, $requiredClass);
+
+        $this->data = \json_decode(\json_encode($historyData->toArray()), true);
     }
 }

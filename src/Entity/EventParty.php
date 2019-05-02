@@ -5,19 +5,22 @@ namespace App\Entity;
 use App\Component\EventParty\AgeChecker;
 use App\Component\EventParty\EventTimeChecker;
 use App\Component\Model\DTO\EventPartyHistory\JoinHistory;
-use App\Component\Model\DTO\EventPartyHistory\LeaveHistory;
+use App\Component\Model\DTO\EventPartyHistory\EmptyDataHistory;
 use App\Component\Model\VO\TimeInterval;
 use App\Component\Util\Date;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventPartyRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class EventParty
 {
-    public const STATUS_DELETED = 0;
+    use SoftDeleteableEntity;
 
     public const STATUS_PENDING = 1;
 
@@ -25,15 +28,20 @@ class EventParty
 
     public const STATUS_READY = 3;
 
-    public const STATUS_DONE = 4;
+    public const STATUS_REVIEWS = 4;
+
+    public const STATUS_DONE = 5;
 
     private const STATUSES = [
         self::STATUS_PENDING => 'Ожидаем еще {{ N }} человек',
         self::STATUS_PLANING => 'Заполнение плана',
-        self::STATUS_READY   => 'Встреча {{ DATE_TIME }}, {{ PLACE }}. Приятно провести время!',
+        self::STATUS_READY   => 'Все! Встречаетесь {{ DATE_TIME }}, {{ PLACE }}. Приятно провести время! И не забудьте потом зайти сюда и поделиться впечатлениями',
+        self::STATUS_REVIEWS => 'Заполнение карты симпатий',
+        self::STATUS_DONE    => 'Окончено',
     ];
 
-    public const MEETING_TIME_OFFSET_BEFORE_EVENT = 10;
+    // offset before event for default meeting point
+    private const MEETING_TIME_OFFSET = 10;
 
     /**
      * @ORM\Id()
@@ -43,6 +51,12 @@ class EventParty
     private $id;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Event")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $event;
+
+    /**
      * @var ArrayCollection|User[]
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="eventParties")
@@ -50,15 +64,19 @@ class EventParty
     private $users;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Event")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="integer")
      */
-    private $event;
+    private $status;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $status;
+    private $numberOfGirls;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $numberOfGuys;
 
     /**
      * @var \DateTime
@@ -73,32 +91,29 @@ class EventParty
     private $meetingPlace;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $numberOfGirls;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $numberOfGuys;
-
-    /**
      * @var EventPartyHistory[]|ArrayCollection
      * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", cascade={"persist","remove"}, mappedBy="eventParty")
      */
     private $histories;
 
+    /**
+     * @var EventPartyMessage[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="App\Entity\EventPartyMessage", cascade={"persist","remove"}, mappedBy="eventParty")
+     * @ORM\OrderBy({"createdAt"="ASC"})
+     */
+    private $messages;
+
     public function __construct(Event $event, int $numberOfGuys, int $numberOfGirls)
     {
+        $this->users     = new ArrayCollection();
+        $this->histories = new ArrayCollection();
+        $this->messages  = new ArrayCollection();
+
         $this->event         = $event;
         $this->numberOfGuys  = $numberOfGuys;
         $this->numberOfGirls = $numberOfGirls;
 
         $this->status       = self::STATUS_PENDING;
-        $this->meetingPlace = $event->getAddress();
-
-        $this->users     = new ArrayCollection();
-        $this->histories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -107,7 +122,7 @@ class EventParty
     }
 
     /**
-     * @return Collection|User[]
+     * @return ArrayCollection|User[]
      */
     public function getUsers(): Collection
     {
@@ -124,12 +139,42 @@ class EventParty
         return $this->status;
     }
 
+    public function isPlaning(): bool
+    {
+        return self::STATUS_PLANING === $this->status;
+    }
+
+    public function isReady(): bool
+    {
+        return self::STATUS_READY === $this->status;
+    }
+
+    public function isReviews(): bool
+    {
+        return self::STATUS_REVIEWS === $this->status;
+    }
+
+    public function isDone(): bool
+    {
+        return self::STATUS_DONE === $this->status;
+    }
+
     /**
-     * @return Collection|EventPartyHistory[]
+     * @return ArrayCollection|EventPartyHistory[]
      */
     public function getHistories(): Collection
     {
         return $this->histories;
+    }
+
+    public function getNumberOfGirls(): int
+    {
+        return $this->numberOfGirls;
+    }
+
+    public function getNumberOfGuys(): int
+    {
+        return $this->numberOfGuys;
     }
 
     public function getMeetingAt(): ?\DateTime
@@ -140,6 +185,7 @@ class EventParty
     public function setMeetingAt(?\DateTime $meetingAt): self
     {
         $this->meetingAt = $meetingAt;
+        $this->onPlanProgress();
 
         return $this;
     }
@@ -152,33 +198,27 @@ class EventParty
     public function setMeetingPlace(?string $meetingPlace): self
     {
         $this->meetingPlace = $meetingPlace;
+        $this->onPlanProgress();
 
         return $this;
     }
 
-    public function getNumberOfGirls(): ?int
+    private function onPlanProgress(): void
     {
-        return $this->numberOfGirls;
+        if ($this->status !== self::STATUS_PLANING) {
+            return;
+        }
+
+        if ($this->meetingPlace && $this->meetingAt) {
+            $this->status = self::STATUS_READY;
+        }
     }
 
-    public function getNumberOfGuys(): ?int
+    public function markAsFillReviews(): self
     {
-        return $this->numberOfGuys;
-    }
+        $this->status = self::STATUS_REVIEWS;
 
-    public function isReady(): bool
-    {
-        return self::STATUS_READY === $this->status;
-    }
-
-    public function isDone(): bool
-    {
-        return self::STATUS_DONE === $this->status;
-    }
-
-    public function markAsReady(): void
-    {
-        $this->status = self::STATUS_READY;
+        return $this;
     }
 
     public function addUser(User $user): self
@@ -188,11 +228,10 @@ class EventParty
         }
 
         if (!$this->canUserJoin($user)) {
-            throw new \LogicException('Невозможно добавить пользователя в евент пати');
+            throw new \LogicException('Unable to add user to event party');
         }
 
         $this->users[] = $user;
-
 
         $historyData = new JoinHistory($this->createNicknameForUser($user));
         $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_JOIN, $historyData));
@@ -204,32 +243,42 @@ class EventParty
         return $this;
     }
 
+    public function findFirstUser(): ?User
+    {
+        return $this->users->first();
+    }
+
     public function removeUser(User $user): self
     {
+        if ($this->isReviews() || $this->isDone()) {
+            throw new \LogicException('User can not be removed from done event party');
+        }
+
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
-            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE, new LeaveHistory()));
+            $this->addHistory(new EventPartyHistory($this, $user, EventPartyHistory::ACTION_LEAVE, new EmptyDataHistory()));
 
-            $this->revertToPending();
-
-            $this->status = $this->users->count() !== 0 ? self::STATUS_PENDING : self::STATUS_DELETED;
+            $this->revertAfterUserLeave();
         }
 
         return $this;
     }
 
-    private function revertToPending(): void
+    private function revertAfterUserLeave(): void
     {
         foreach ($this->histories as $history) {
             if (\in_array($history->getAction(), EventPartyHistory::PLAN_ACTIONS, true)) {
-                $history->markAsDeleted();
+                $history->delete();
             }
         }
 
-        $this->meetingPlace = $this->event->getAddress();
+        $this->status       = self::STATUS_PENDING;
+        $this->meetingPlace = null;
         $this->meetingAt    = null;
 
-        $this->status = self::STATUS_PENDING;
+        if ($this->users->count() === 0) {
+            $this->setDeletedAt(new \DateTime());
+        }
     }
 
     public function canUserJoin(User $user): bool
@@ -268,25 +317,6 @@ class EventParty
         }, $this->users->toArray());
     }
 
-    public function getUsersSearchCriteriaDate(): ?\DateTime
-    {
-        if ($this->users->count() === 0) {
-            return null;
-        }
-
-        /** @var User $firstUser */
-        $firstUser = $this->users->first();
-
-        return $firstUser->getSearchCriteria()->getDay();
-    }
-
-    public function getUsersSearchCriteriaDateString(): ?string
-    {
-        return $this->getUsersSearchCriteriaDate()
-            ? Date::convertDateToString($this->getUsersSearchCriteriaDate())
-            : null;
-    }
-    
     public function isAppropriateDay(\DateTime $date): bool
     {
         if ($this->users->count() === 0) {
@@ -299,9 +329,18 @@ class EventParty
         return $searchDay == $selectedDay;
     }
 
+    public function getUsersSearchCriteriaDate(): ?\DateTime
+    {
+        if ($this->users->count() === 0) {
+            return null;
+        }
+
+        return $this->findFirstUser()->getSearchCriteria()->getDay();
+    }
+
     public function findAvailableTimetable(User $user = null): ?Timetable
     {
-        $user = $user ?? $this->users->first();
+        $user = $user ?? $this->findFirstUser();
 
         if (!$user) {
             return null;
@@ -345,8 +384,8 @@ class EventParty
         $timeTo   = TimeInterval::timeDayEnd();
 
         foreach ($this->users as $user) {
-            $userTimeFrom = TimeInterval::time($user->getSearchCriteria()->getTimeFrom());
-            $userTimeTo   = TimeInterval::time($user->getSearchCriteria()->getTimeTo());
+            $userTimeFrom = $user->getSearchCriteria()->getTimeFrom();
+            $userTimeTo   = $user->getSearchCriteria()->getTimeTo();
 
             if ($userTimeFrom > $timeFrom) {
                 $timeFrom = $userTimeFrom;
@@ -360,6 +399,69 @@ class EventParty
         return new TimeInterval($timeFrom, $timeTo);
     }
 
+    public function generateMeetingAt(): ?\DateTime
+    {
+        if ($this->getMeetingAt()) {
+            return $this->getMeetingAt();
+        }
+
+        $availableTimetable = $this->findAvailableTimetable();
+
+        if (!$availableTimetable) {
+            return null;
+        }
+
+        $offset = self::MEETING_TIME_OFFSET;
+        $time   = $availableTimetable->getTimeFrom();
+
+        if ($this->getEvent()->getTimetableType() === Event::TIMETABLE_TYPE_DAY) {
+            $time = $this->getUsersTimeInterval()->getFrom() > $availableTimetable->getTimeFrom()
+                ? $this->getUsersTimeInterval()->getFrom()
+                : $availableTimetable->getTimeFrom();
+        }
+
+        $time = $time->modify("-{$offset} min");
+        $day  = $this->getUsersSearchCriteriaDate();
+
+        return $day->modify($time->format('H:i:s'));
+    }
+
+    public function generateEventTimeInterval(\DateTime $meetingDateTime): ?TimeInterval
+    {
+        if (!$this->findFirstUser()) {
+            throw new \LogicException('Unable to generate event time interval without any users in event party');
+        }
+
+        if (!$this->getEvent()->getDuration()) {
+            return null;
+        }
+
+        $availableTimetable = EventTimeChecker::findAvailableEventTimetableForUser(
+            $this->findFirstUser(),
+            $this->getEvent(),
+            new TimeInterval($meetingDateTime, $this->getUsersTimeInterval()->getTo()),
+            (int) $meetingDateTime->format('w')
+        );
+
+        if (!$availableTimetable) {
+            return null;
+        }
+
+        $offset = self::MEETING_TIME_OFFSET;
+
+        if ($this->getEvent()->getTimetableType() === Event::TIMETABLE_TYPE_DAY) {
+            $start = TimeInterval::time($meetingDateTime) > $availableTimetable->getTimeFrom()
+                ? (clone $meetingDateTime)->modify("+{$offset} min")
+                : $availableTimetable->getTimeFrom();
+
+            $end = (clone $start)->modify("+{$this->getEvent()->getDuration()} min");
+
+            return new TimeInterval($start, $end);
+        }
+
+        return new TimeInterval($availableTimetable->getTimeFrom(), $availableTimetable->getTimeTo());
+    }
+
     public function getNumberOfPeople(): int
     {
         return $this->getNumberOfGuys() + $this->getNumberOfGirls();
@@ -370,7 +472,7 @@ class EventParty
         return $this->getNumberOfPeople() - $this->users->count();
     }
 
-    public function getCurrentNumberOfGirls()
+    public function getCurrentNumberOfGirls(): int
     {
         $girls = \array_filter($this->getUsers()->toArray(), function (User $user) {
             return $user->getSex()->isFemale();
@@ -379,7 +481,7 @@ class EventParty
         return \count($girls);
     }
 
-    public function getCurrentNumberOfGuys()
+    public function getCurrentNumberOfGuys(): int
     {
         $guys = \array_filter($this->getUsers()->toArray(), function (User $user) {
             return $user->getSex()->isMale();
@@ -403,6 +505,36 @@ class EventParty
         return $this;
     }
 
+    /**
+     * @return ArrayCollection|EventPartyMessage[]
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    public function getMessageHistoryFor(User $user)
+    {
+        $historyJoin = $user->getLastEPHistoryFor($this, EventPartyHistory::ACTION_JOIN);
+
+        if (!$historyJoin) {
+            return [];
+        }
+
+        return $this->messages->filter(static function(EventPartyMessage $message) use ($historyJoin) {
+            return $message->getCreatedAt() > $historyJoin->getCreatedAt();
+        });
+    }
+
+    public function addMessage(EventPartyMessage $message)
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages[] = $message;
+        }
+
+        return $this;
+    }
+
     public function getCurrentStatusTitle(): string
     {
         switch ($this->status) {
@@ -421,53 +553,22 @@ class EventParty
                 return self::STATUSES[self::STATUS_PLANING];
 
             case self::STATUS_READY:
+                $meetingAtString = Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i');
+
                 $title = \str_replace('{{ PLACE }}', $this->meetingPlace, self::STATUSES[self::STATUS_READY]);
-                $title = \str_replace('{{ DATE_TIME }}', $this->getMeetingAtString(), $title);
+                $title = \str_replace('{{ DATE_TIME }}', $meetingAtString, $title);
 
                 return $title;
+
+            case self::STATUS_REVIEWS:
+                return self::STATUSES[self::STATUS_REVIEWS];
+
+            case self::STATUS_DONE:
+                return self::STATUSES[self::STATUS_DONE];
 
             default:
                 return 'Event status not found';
         }
-    }
-
-    public function getMeetingAtString(): ?string
-    {
-        return $this->meetingAt ?
-            Date::convertDateToString($this->meetingAt) . ' ' . $this->meetingAt->format('H:i')
-            : null;
-    }
-
-    /**
-     * @param User $user
-     * @return EventPartyHistory[]
-     */
-    public function getActiveOffersFor(User $user): array
-    {
-        $answerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER_ANSWER];
-
-        $answeredIds = [];
-        foreach ($this->histories as $history) {
-            $isAnswer = \in_array($history->getAction(), $answerActions, true);
-
-            if ($isAnswer && $history->getUser() === $user) {
-                $answeredIds[] = $history->getData()->getOfferId();
-            }
-        }
-
-        $offerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER];
-
-        $offers = [];
-        foreach ($this->histories as $history) {
-            $isOffer    = \in_array($history->getAction(), $offerActions, true);
-            $isAnswered = \in_array($history->getId(), $answeredIds, true);
-
-            if ($isOffer && !$isAnswered && $history->getUser() !== $user) {
-                $offers[] = $history;
-            }
-        }
-
-        return $offers;
     }
 
     /**
@@ -488,11 +589,40 @@ class EventParty
     }
 
     /**
+     * @param User $user
+     * @return EventPartyHistory[]
+     */
+    public function getActiveOffers(User $user = null): array
+    {
+        $answerActions = [EventPartyHistory::ACTION_ANSWER_TO_MEETING_POINT_OFFER];
+
+        $answeredIds = [];
+        foreach ($this->histories as $history) {
+            $isAnswer = \in_array($history->getAction(), $answerActions, true);
+
+            if ($isAnswer && $history->getUser() === $user) {
+                $answeredIds[] = $history->getData()->getOfferId();
+            }
+        }
+
+        $offers = [];
+        foreach ($this->getOffers() as $offer) {
+            $isAnswered = \in_array($offer->getId(), $answeredIds, true);
+
+            if (!$isAnswered && $offer->getUser() !== $user) {
+                $offers[] = $offer;
+            }
+        }
+
+        return $offers;
+    }
+
+    /**
      * @return EventPartyHistory[]
      */
     public function getAnswersForOffer(EventPartyHistory $offer)
     {
-        $answerActions = [EventPartyHistory::ACTION_MEETING_POINT_OFFER_ANSWER];
+        $answerActions = [EventPartyHistory::ACTION_ANSWER_TO_MEETING_POINT_OFFER];
 
         $answers = [];
         foreach ($this->histories as $history) {
@@ -506,32 +636,28 @@ class EventParty
         return $answers;
     }
 
-    public function getAcceptedAnswersCountFor(EventPartyHistory $offer): int
+    public function getAcceptedOfferUsers(EventPartyHistory $offer): array
     {
         $answers = $this->getAnswersForOffer($offer);
 
-        $count = 1;
+        $acceptedUsers = [];
+
+        if ($this->users->contains($offer->getUser())) {
+            $acceptedUsers[] = $offer->getUser();
+        }
+
         foreach ($answers as $answer) {
-            if ($answer->getData()->getAnswer() === true) {
-                $count++;
+            if ($this->users->contains($answer->getUser()) && $answer->getData()->getAnswer() === true) {
+                $acceptedUsers[] = $answer->getUser();
             }
         }
 
-        return $count;
+        return $acceptedUsers;
     }
 
     public function isOfferAccepted(EventPartyHistory $offer): bool
     {
-        $answers = $this->getAnswersForOffer($offer);
-
-        foreach ($answers as $answer) {
-            if ($answer->getData()->getAnswer() === false) {
-                return false;
-            }
-        }
-
-        // is all users answer to this offer positive
-        return ($this->users->count() - 1) === \count($answers);
+        return $this->users->count() === \count($this->getAcceptedOfferUsers($offer));
     }
 
     public function isOfferRejected(EventPartyHistory $offer): bool

@@ -24,7 +24,7 @@ class MainController extends BaseController
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->redirectToRoute('app_current_event_party');
+            return $this->redirectToRoute('app_event_party_current');
         }
 
         $searchCriteriaForm = $this->createForm(SearchCriteriaType::class, $user->getSearchCriteria())

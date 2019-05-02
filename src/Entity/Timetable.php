@@ -4,23 +4,13 @@ namespace App\Entity;
 
 use App\Component\Model\VO\TimeInterval;
 use Doctrine\ORM\Mapping as ORM;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TimetableRepository")
  */
 class Timetable
 {
-    public const MIN_MINS_FOR_DAY_EVENT = 90;
-
-    public const TYPE_VISIT = 1;
-
-    public const TYPE_DAY = 2;
-
-    public const TYPES = [
-        self::TYPE_VISIT,
-        self::TYPE_DAY,
-    ];
-
     public const MONDAY = 1;
 
     public const TUESDAY = 2;
@@ -83,33 +73,19 @@ class Timetable
      */
     private $timeTo;
 
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $length;
-
     public function __construct(
         Event $event,
         int $weekDay,
         \DateTime $timeFrom,
-        \DateTime $timeTo,
-        int $type,
-        int $length
+        \DateTime $timeTo
     ) {
-        $this->setType($type);
         $this->setWeekDay($weekDay);
 
-        $this->event    = $event;
         $this->timeFrom = TimeInterval::time($timeFrom);
         $this->timeTo   = TimeInterval::time($timeTo);
 
+        $this->event = $event;
         $event->addTimetable($this);
-        $this->length = $length;
     }
 
     public function getId(): ?int
@@ -132,40 +108,17 @@ class Timetable
         return TimeInterval::time($this->timeTo);
     }
 
-    public function getType(): int
-    {
-        return $this->type;
-    }
-
     public function getWeekDay(): int
     {
         return $this->weekDay;
     }
 
-    private function setType(int $type): self
-    {
-        if (!\in_array($type, self::TYPES, true)) {
-            throw new \InvalidArgumentException('Такого типа времени работы не сущуствует');
-        }
-
-        $this->type = $type;
-
-        return $this;
-    }
-
     private function setWeekDay(int $weekDay): self
     {
-        if (!\array_key_exists($weekDay, self::WEEK_DAYS)) {
-            throw new \InvalidArgumentException('Такого дня недели нет');
-        }
+        Assert::keyExists(self::WEEK_DAYS, $weekDay);
 
         $this->weekDay = $weekDay;
 
         return $this;
-    }
-
-    public function getTimeLength(): int
-    {
-        return $this->length;
     }
 }

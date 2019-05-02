@@ -29,10 +29,12 @@
                         <a class="nav-item nav-link {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
                             <i class="fas fa-tasks"></i> План
 
-                            {% set offersCount = eventParty.activeOffersFor(app.user)|length %}
+                            {% set offersCount = eventParty.activeOffers(app.user)|length %}
 
-                            {% if offersCount > 0 %}
+                            {% if offersCount > 0  %}
                                 <span class="badge badge-info">{{ offersCount }}</span>
+                            {% elseif eventParty.event.reserveRequired and eventParty.activeOffers()|length == 0 and eventParty.planing %}
+                                <span class="badge badge-info">1</span>
                             {% endif %}
                         </a>
                     </div>
@@ -65,7 +67,7 @@
             <div class="col-sm-4">
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
-                        <div class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %} current-user{% endif %}">
+                        <div class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %}current-user{% endif %}">
                             <img class="user-icon-img" src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
                             <div class="user-icon-name">{{ user.nicknameIn(eventParty) }}</div>
                         </div>
@@ -76,7 +78,7 @@
                 <div class="block chat-block">
                     <div class="block-body chat-wrapper">
                         <div class="chat-messages-block invisible">
-                            {% for message in messagesHistory %}
+                            {% for message in eventParty.messageHistoryFor(app.user) %}
                                 <p>
                                     <b>{{ message.user.name }}: </b>
                                     {{ message.message }}
@@ -98,17 +100,23 @@
                 </div>
 
                 <div class="row event-party-actions">
-                    <div class="col-sm-6">
-                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#skipModal">
-                            Дальше
-                        </button>
-                    </div>
+                    {% if eventParty.reviews or eventParty.done %}
+                        <div class="col-sm-12">
+                            <button type="button" class="btn btn-warning w-100">Карта симпатий</button>
+                        </div>
+                    {% else %}
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#skipModal">
+                                Дальше
+                            </button>
+                        </div>
 
-                    <div class="col-sm-6">
-                        <button type="button" class="btn btn-danger w-100" data-toggle="modal" data-target="#leaveModal">
-                            Выход
-                        </button>
-                    </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-danger w-100" data-toggle="modal" data-target="#leaveModal">
+                                Выход
+                            </button>
+                        </div>
+                    {% endif %}
 
                     <div class="modal fade" id="skipModal" tabindex="-1" role="dialog" aria-labelledby="skipModalTitle" aria-hidden="true">
                         <div class="modal-dialog modal-sm mt-25vh" role="document">
@@ -152,8 +160,12 @@
             <div id="current-user-data"
                  data-temp-hash="{{ app.user.tempHash }}"
                  data-id="{{ app.user.id }}"
+                 data-web-id="{{ constant('App\\Entity\\User::WEB_ID') }}"
             ></div>
-            <div id="event-party-data" data-id="{{ eventParty.id }}"></div>
+            <div id="event-party-data"
+                 data-id="{{ eventParty.id }}"
+                 data-reserve-required="{{ eventParty.event.reserveRequired }}"
+            ></div>
 
             <div class="load-spinner">
                 <div class="spinner-border text-secondary" role="status">

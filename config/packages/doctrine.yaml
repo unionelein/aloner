@@ -28,4 +28,5 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
         filters:
+            softdeleteable: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
             deletion_filter: App\Doctrine\DeletionFilter

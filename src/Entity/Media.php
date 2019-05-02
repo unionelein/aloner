@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MediaRepository")
@@ -73,9 +74,7 @@ class Media
 
     private function setType(int $type): self
     {
-        if (!\array_key_exists($type, self::TYPES)) {
-            throw new \InvalidArgumentException('Неизвестный тип ресурса');
-        }
+        Assert::keyExists(self::TYPES, $type);
 
         $this->type = $type;
 

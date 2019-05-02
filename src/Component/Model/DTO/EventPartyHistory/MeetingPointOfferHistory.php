@@ -2,24 +2,32 @@
 
 namespace App\Component\Model\DTO\EventPartyHistory;
 
+use App\Component\Model\VO\TimeInterval;
 use App\Component\Util\Date;
 
 class MeetingPointOfferHistory implements HistoryDataInterface
 {
     /** @var string */
-    private $place;
+    private $meetingPlace;
 
     /** @var \DateTime */
-    private $day;
+    private $meetingDateTime;
 
     /** @var \DateTime */
-    private $time;
+    private $eventTimeStart;
 
-    public function __construct(string $place, \DateTime $day, \DateTime $time)
+    /** @var \DateTime */
+    private $eventTimeEnd;
+
+    public function __construct(string $meetingPlace, \DateTime $meetingDateTime, ?TimeInterval $eventTimeInterval)
     {
-        $this->place = $place;
-        $this->day = $day;
-        $this->time = $time;
+        $this->meetingPlace = $meetingPlace;
+        $this->meetingDateTime = $meetingDateTime;
+
+        if ($eventTimeInterval) {
+            $this->eventTimeStart = $eventTimeInterval->getFrom();
+            $this->eventTimeEnd   = $eventTimeInterval->getTo();
+        }
     }
 
     /**
@@ -27,27 +35,32 @@ class MeetingPointOfferHistory implements HistoryDataInterface
      */
     public static function fromArray(array $data): HistoryDataInterface
     {
-        return new self($data['place'], new \DateTime($data['day']['date']), new \DateTime($data['time']['date']));
+        $start = $data['eventTimeStart']['date'] ?? null;
+        $end   = $data['eventTimeEnd']['date'] ?? null;
+
+        $timeInterval = $start && $end ? new TimeInterval(new \DateTime($start), new \DateTime($end)) : null;
+
+        return new self($data['meetingPlace'], new \DateTime($data['meetingDateTime']['date']), $timeInterval);
     }
 
-    public function getPlace(): string
+    public function getMeetingPlace(): string
     {
-        return $this->place;
+        return $this->meetingPlace;
     }
 
-    public function getDay(): \DateTime
+    public function getMeetingDateTime(): \DateTime
     {
-        return $this->day;
+        return $this->meetingDateTime;
     }
 
-    public function getTime(): \DateTime
+    public function getEventTimeStart(): ?\DateTime
     {
-        return $this->time;
+        return $this->eventTimeStart;
     }
 
-    public function meetingDateTimeString(): string
+    public function getEventTimeEnd(): ?\DateTime
     {
-        return \sprintf('%s, %s', Date::convertDateToString($this->day), $this->time->format('H:i'));
+        return $this->eventTimeEnd;
     }
 
     public function toArray(): array

@@ -6,8 +6,8 @@ use App\Component\Model\Collection\TimetableCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
@@ -15,6 +15,15 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 class Event
 {
     use TimestampableEntity;
+
+    public const TIMETABLE_TYPE_VISIT = 1;
+
+    public const TIMETABLE_TYPE_DAY = 2;
+
+    public const TIMETABLE_TYPES = [
+        self::TIMETABLE_TYPE_VISIT,
+        self::TIMETABLE_TYPE_DAY,
+    ];
 
     /**
      * @ORM\Id()
@@ -29,13 +38,7 @@ class Event
     private $title;
 
     /**
-     * @Gedmo\Slug(fields={"title"})
-     * @ORM\Column(type="string", length=255)
-     */
-    private $slug;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="text")
      */
     private $description;
 
@@ -46,41 +49,14 @@ class Event
     private $city;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $site;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $address;
 
     /**
-     * @var ArrayCollection|Timetable[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Timetable", mappedBy="event", cascade={"persist", "remove"})
+     * @ORM\Column(type="boolean")
      */
-    private $timetables;
-
-    /**
-     * @ORM\Column(type="string", length=15, nullable=true)
-     */
-    private $phone;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Media", cascade={"persist"})
-     */
-    private $media;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $priceText;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $yandexMapSrc;
+    private $reserveRequired;
 
     /**
      * @ORM\Column(type="smallint")
@@ -93,24 +69,72 @@ class Event
     private $maxNumberOfPeople;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $site;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $price;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $yandexMapSrc;
+
+    /**
+     * @var ArrayCollection|Timetable[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Timetable", mappedBy="event", cascade={"persist", "remove"})
+     */
+    private $timetables;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $timetableType;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $duration;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Media", cascade={"persist"})
+     */
+    private $media;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Cafe")
      */
-    private $nearCafe;
+    private $cafe;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $pathToCafeYandexMapSrc;
 
-    public function __construct(string $title, City $city, int $minNumberOfPeople, int $maxNumberOfPeople)
+    public function __construct(string $title, string $description, City $city, string $address, bool $reserveRequired, int $minNumberOfPeople, int $maxNumberOfPeople)
     {
         $this->timetables = new ArrayCollection();
-        $this->media = new ArrayCollection();
+        $this->media      = new ArrayCollection();
 
-        $this->title = $title;
-        $this->city  = $city;
+        $this->title       = $title;
+        $this->description = $description;
+
+        $this->city            = $city;
+        $this->address         = $address;
+        $this->reserveRequired = $reserveRequired;
+
         $this->minNumberOfPeople = $minNumberOfPeople;
         $this->maxNumberOfPeople = $maxNumberOfPeople;
+
     }
 
     public function getId(): ?int
@@ -118,31 +142,39 @@ class Event
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
-
-    public function getCity(): ?City
-    {
-        return $this->city;
-    }
-
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function getCity(): City
     {
-        $this->description = $description;
+        return $this->city;
+    }
 
-        return $this;
+    public function getAddress(): string
+    {
+        return $this->address;
+    }
+
+    public function isReserveRequired(): bool
+    {
+        return $this->reserveRequired;
+    }
+
+    public function getMinNumberOfPeople(): int
+    {
+        return $this->minNumberOfPeople;
+    }
+
+    public function getMaxNumberOfPeople(): int
+    {
+        return $this->maxNumberOfPeople;
     }
 
     public function getSite(): ?string
@@ -150,28 +182,52 @@ class Event
         return $this->site;
     }
 
-    public function setSite(string $site): self
+    public function setSite(?string $site): self
     {
         $this->site = $site;
 
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getPrice(): ?string
     {
-        return $this->address;
+        return $this->price;
     }
 
-    public function setAddress(string $address): self
+    public function setPrice(?string $price): self
     {
-        $this->address = $address;
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getYandexMapSrc(): ?string
+    {
+        return $this->yandexMapSrc;
+    }
+
+    public function setYandexMapSrc(?string $yandexMapSrc): self
+    {
+        $this->yandexMapSrc = $yandexMapSrc;
 
         return $this;
     }
 
     public function getTimetables(): TimetableCollection
     {
-        $timetableCollection = new TimetableCollection();
+        $timetableCollection = new TimetableCollection($this->timetableType);
 
         foreach ($this->timetables as $timetable) {
             $timetableCollection->add($timetable);
@@ -198,99 +254,64 @@ class Event
         return $this;
     }
 
-    public function getEventTimeLengths(\DateTime $day = null): array
+    public function getTimetableType(): ?int
     {
-        $timetables = $day
-            ? $this->getTimetables()->getForWeekDay((int) $day->format('w'))
-            : $this->timetables->toArray();
-
-        $lengths = \array_map(static function (Timetable $timetable) {
-            return $timetable->getTimeLength();
-        }, $timetables);
-
-        return \array_unique($lengths);
+        return $this->timetableType;
     }
 
-    public function getPhone(): ?string
+    public function setTimetableType(?int $timetableType): self
     {
-        return $this->phone;
+        $this->timetableType = $timetableType;
+
+        return $this;
     }
 
-    public function setPhone(?string $phone): self
+    public function getDuration(): ?int
     {
-        $this->phone = $phone;
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): self
+    {
+        $this->duration = $duration;
 
         return $this;
     }
 
     /**
-     * @return Collection|Media[]
+     * @return ArrayCollection|Media[]
      */
     public function getMedia(): Collection
     {
         return $this->media;
     }
 
-    public function addMedia(Media $medium): self
+    public function addMedia(Media $media): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media[] = $medium;
+        if (!$this->media->contains($media)) {
+            $this->media[] = $media;
         }
 
         return $this;
     }
 
-    public function removeMedia(Media $medium): self
+    public function removeMedia(Media $media): self
     {
-        if ($this->media->contains($medium)) {
-            $this->media->removeElement($medium);
+        if ($this->media->contains($media)) {
+            $this->media->removeElement($media);
         }
 
         return $this;
     }
 
-    public function getPriceText(): ?string
+    public function getCafe(): ?Cafe
     {
-        return $this->priceText;
+        return $this->cafe;
     }
 
-    public function setPriceText(?string $priceText): self
+    public function setCafe(?Cafe $cafe): self
     {
-        $this->priceText = $priceText;
-
-        return $this;
-    }
-
-    public function getYandexMapSrc(): ?string
-    {
-        return $this->yandexMapSrc;
-    }
-
-    public function setYandexMapSrc(?string $yandexMapSrc): self
-    {
-        $this->yandexMapSrc = $yandexMapSrc;
-
-        return $this;
-    }
-
-    public function getMinNumberOfPeople(): int
-    {
-        return $this->minNumberOfPeople;
-    }
-
-    public function getMaxNumberOfPeople(): int
-    {
-        return $this->maxNumberOfPeople;
-    }
-
-    public function getNearCafe(): ?Cafe
-    {
-        return $this->nearCafe;
-    }
-
-    public function setNearCafe(?Cafe $nearCafe): self
-    {
-        $this->nearCafe = $nearCafe;
+        $this->cafe = $cafe;
 
         return $this;
     }

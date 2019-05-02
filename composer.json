@@ -27,7 +27,9 @@
         "symfony/validator": "4.2.*",
         "symfony/web-server-bundle": "4.2.*",
         "symfony/yaml": "4.2.*",
-        "vkcom/vk-php-sdk": "^5.80"
+        "twig/extensions": "^1.5",
+        "vkcom/vk-php-sdk": "^5.80",
+        "webmozart/assert": "^1.4"
     },
     "config": {
         "preferred-install": {

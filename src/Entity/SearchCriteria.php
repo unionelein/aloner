@@ -14,6 +14,8 @@ class SearchCriteria
 {
     public const ALLOWED_MINS_OFFSET = 10;
 
+    public const DEFAULT_DAY = 'now';
+
     public const DEFAULT_TIME_FROM = '18:00';
 
     public const DEFAULT_TIME_TO = '23:00';
@@ -52,10 +54,9 @@ class SearchCriteria
     {
         $this->user = $user;
 
-        $this->day = new \DateTime();
-
-        $this->timeFrom = TimeInterval::time(new \DateTime(self::DEFAULT_TIME_FROM));
-        $this->timeTo   = TimeInterval::time(new \DateTime(self::DEFAULT_TIME_TO));
+        $this->setDay(new \DateTime(self::DEFAULT_DAY));
+        $this->setTimeFrom(new \DateTime(self::DEFAULT_TIME_FROM));
+        $this->setTimeTo(new \DateTime(self::DEFAULT_TIME_TO));
     }
 
     public function getId(): ?int

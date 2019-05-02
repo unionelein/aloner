@@ -95,28 +95,46 @@ class Receiver {
 
     onFilled(data) {
         this.helper.openTab('plan');
+
+        if (this.$epData.data('reserve-required')) {
+            this.helper.showReserveRequiredAlert();
+        }
     }
 
     onMeetingPointOffer(data) {
-        const meetingPointText = `${data.place} - ${data.meetingDateTimeString}`;
-
-        this.helper.addMeetingPointOfferHistoryRow(data.offerId, meetingPointText);
+        this.helper.addMeetingPointOfferHistoryRow(
+            data.offerId,
+            data.lines.point,
+            data.userId === this.$userData.data('web-id')
+        );
 
         if (this.$userData.data('id') !== data.userId) {
-            this.plan.addMeetingPointOfferAlert(data.offerId, meetingPointText);
+            this.plan.addMeetingPointOfferAlert(data.offerId, data.lines);
+        }
+
+        if (this.$epData.data('reserve-required')) {
+            this.helper.hideReserveRequiredAlert();
         }
     }
 
     onMeetingPointOfferAnswer(data) {
-        data.answer
-            ? this.helper.addAcceptedAnswerToMeetingPointHistoryRow(data.offerId)
-            : this.helper.markMeetingPointHistoryRowAsRejected(data.offerId);
+        if (data.answer === true) {
+            this.helper.addAcceptedAnswerToMeetingPointHistoryRow(data.offerId);
+        }
+
+        if (data.answer === false) {
+            this.helper.removeMeetingPointOfferAlert(data.offerId);
+            this.helper.markMeetingPointHistoryRowAsRejected(data.offerId);
+        }
     }
 
     onMeetingPointOfferAccepted(data) {
         this.helper.updateEpStatus(data.epStatus);
+
         this.helper.updateMeetingPlace(data.place);
         this.helper.updateMeetingDateTime(data.meetingDateTimeString);
+
+        this.helper.showOfferBtn();
         this.helper.showNearCafe();
     }
 }

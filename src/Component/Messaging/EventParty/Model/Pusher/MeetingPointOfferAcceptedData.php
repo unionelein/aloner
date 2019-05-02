@@ -3,6 +3,7 @@
 namespace App\Component\Messaging\EventParty\Model\Pusher;
 
 use App\Component\Messaging\EventParty\Pusher;
+use App\Component\Util\Date;
 use App\Entity\EventParty;
 
 class MeetingPointOfferAcceptedData extends AbstractPusherData
@@ -27,7 +28,10 @@ class MeetingPointOfferAcceptedData extends AbstractPusherData
         return [
             'epStatus' => $this->eventParty->getCurrentStatusTitle(),
             'place' => $this->eventParty->getMeetingPlace(),
-            'meetingDateTimeString' => $this->eventParty->getMeetingAtString(),
+            'meetingDateTimeString' => \sprintf('%s в %s',
+                Date::convertDateToString($this->eventParty->getMeetingAt()),
+                $this->eventParty->getMeetingAt()->format('H:i')
+            ),
         ];
     }
 }

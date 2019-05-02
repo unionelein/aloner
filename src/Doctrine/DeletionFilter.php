@@ -11,11 +11,6 @@ class DeletionFilter extends SQLFilter
 {
     public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
     {
-        switch ($targetEntity->getReflectionClass()->name) {
-            case EventPartyHistory::class:
-                return  \sprintf('%s.status != %d', $targetTableAlias, EventPartyHistory::STATUS_DELETED);
-        }
-
         return '';
     }
 }

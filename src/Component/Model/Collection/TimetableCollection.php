@@ -2,14 +2,22 @@
 
 namespace App\Component\Model\Collection;
 
+use App\Entity\Event;
 use App\Entity\Timetable;
+use Webmozart\Assert\Assert;
 
 class TimetableCollection
 {
+    /** @var int event timetable type */
+    private $type;
+
     private $timetables;
 
-    public function __construct()
+    public function __construct(int $type)
     {
+        Assert::oneOf($type, Event::TIMETABLE_TYPES);
+
+        $this->type       = $type;
         $this->timetables = new \SplObjectStorage();
     }
 

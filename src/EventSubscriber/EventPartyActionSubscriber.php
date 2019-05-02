@@ -53,10 +53,6 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
         $this->pusherFacade->send(
             new JoinData($event->getUser(), $event->getEventParty())
         );
-
-        if ($event->getEventParty()->isFilled()) {
-            $this->dispatcher->dispatch(Events::EVENT_PARTY_FILLED, $event);
-        }
     }
 
     public function onEventPartySkip(EventPartyActionEvent $event): void
@@ -69,13 +65,7 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
     public function onMeetingPointOffered(MeetingPointOfferedEvent $event)
     {
         $this->pusherFacade->send(
-            new MeetingPointOfferData(
-                $event->getUser(),
-                $event->getEventParty(),
-                $event->getOffer()->getId(),
-                $event->getPlace(),
-                $event->getMeetingDateTime()
-            )
+            new MeetingPointOfferData($event->getUser(), $event->getEventParty(), $event->getOffer())
         );
     }
 
@@ -89,15 +79,12 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
         );
 
         if ($eventParty->isOfferAccepted($offer)) {
-            $day   = clone $offer->getData()->getDay();
-            $time  = clone $offer->getData()->getTime();
-            $place = $offer->getData()->getPlace();
-
-            $meetingDateTime = $day->modify($time->format('H:i:s'));
+            $meetingDateTime = clone $offer->getData()->getMeetingDateTime();
+            $meetingPlace    = $offer->getData()->getMeetingPlace();
 
             $this->dispatcher->dispatch(
                 Events::MEETING_POINT_OFFER_ACCEPTED,
-                new MeetingPointOfferAcceptedEvent($eventParty, $place, $meetingDateTime)
+                new MeetingPointOfferAcceptedEvent($eventParty, $meetingPlace, $meetingDateTime)
             );
         }
     }
@@ -108,7 +95,6 @@ class EventPartyActionSubscriber implements EventSubscriberInterface
 
         $eventParty->setMeetingAt($event->getMeetingDateTime());
         $eventParty->setMeetingPlace($event->getPlace());
-        $eventParty->markAsReady();
 
         $this->em->persist($eventParty);
         $this->em->flush();

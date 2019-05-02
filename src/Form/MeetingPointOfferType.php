@@ -4,10 +4,12 @@ namespace App\Form;
 
 use App\Component\Model\DTO\Form\MeetingPointData;
 use App\Component\Util\Date;
+use App\Entity\Event;
 use App\Entity\EventParty;
 use App\Entity\Timetable;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,6 +19,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 class MeetingPointOfferType extends AbstractType
 {
+    private const MEETING_TIME_OFFSET_BEFORE_EVENT = 10;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var EventParty $eventParty */
@@ -37,7 +41,7 @@ class MeetingPointOfferType extends AbstractType
                 'required' => true,
                 'widget' => 'single_text',
                 'constraints' => [new NotNull(['message' => 'Выберите время'])],
-                'data' => $this->findMeetingTime($eventParty),
+                'data' => $eventParty->generateMeetingAt(),
             ])
             ->add('place', TextType::class, [
                 'label' => false,
@@ -49,7 +53,11 @@ class MeetingPointOfferType extends AbstractType
                         'min' => 4,  'minMessage' => 'Сликшом короткое описание',
                     ])
                 ],
-                'data' => $eventParty->getMeetingPlace(),
+                'data' => $eventParty->getEvent()->getAddress(),
+            ])
+            ->add('rejectedOfferId', HiddenType::class, [
+                'mapped' => false,
+                'data' => $options['rejectedOfferId'],
             ]);
     }
 
@@ -57,29 +65,9 @@ class MeetingPointOfferType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => MeetingPointData::class,
+            'rejectedOfferId' => null,
         ]);
 
         $resolver->setRequired(['eventParty']);
-    }
-
-    private function findMeetingTime(EventParty $eventParty): ?\DateTime
-    {
-        if ($eventParty->getMeetingAt()) {
-            return $eventParty->getMeetingAt();
-        }
-
-        $availableTimetable = $eventParty->findAvailableTimetable();
-
-        if (!$availableTimetable) {
-            return null;
-        }
-
-        $offset = EventParty::MEETING_TIME_OFFSET_BEFORE_EVENT;
-
-        if ($availableTimetable->getType() === Timetable::TYPE_DAY) {
-            return $eventParty->getUsersTimeInterval()->getFrom()->modify("-{$offset} min");
-        }
-
-        return $availableTimetable->getTimeFrom()->modify("-{$offset} min");
     }
 }

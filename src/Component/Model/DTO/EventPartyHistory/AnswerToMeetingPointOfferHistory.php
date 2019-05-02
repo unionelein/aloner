@@ -3,7 +3,7 @@
 namespace App\Component\Model\DTO\EventPartyHistory;
 
 
-class MeetingPointOfferAnswerHistory implements HistoryDataInterface
+class AnswerToMeetingPointOfferHistory implements HistoryDataInterface
 {
     /** @var int */
     private $offerId;
@@ -18,7 +18,7 @@ class MeetingPointOfferAnswerHistory implements HistoryDataInterface
     }
 
     /**
-     * @return MeetingPointOfferAnswerHistory
+     * @return AnswerToMeetingPointOfferHistory
      */
     public static function fromArray(array $data): HistoryDataInterface
     {

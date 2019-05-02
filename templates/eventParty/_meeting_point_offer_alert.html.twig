@@ -1,12 +1,19 @@
-<div class="alert alert-info meeting-point-alert"
-     data-offer-id="{{ offerId }}"
-     data-url="{{ path('app_meeting_point_offer_answer', {id: epId}) }}"
->
-    <div>Предложено новое время и место встречи:</div>
-    <p class="meeting-point-text font-weight-bold mb-2">{{ place }} - {{ meetingDataText }}</p>
+<div class="alert alert-info meeting-point-alert" data-offer-id="{{ offerId }}">
+    <div class="meeting-point-text mb-2">
+        {% for key, line in lines %}
+            <div class="{% if (key ~ '') == 'point' %}font-weight-bold{% endif %}">{{ line }}</div>
+        {% endfor %}
+    </div>
 
     <div class="text-center">
-        <button type="button" class="btn btn-sm btn-primary accept-meeting-point-offer" data-answer="1">Подходит</button>
-        <button type="button" class="btn btn-sm btn-secondary reject-meeting-point-offer" data-answer="0">Не подходит</button>
+        <button type="button" class="btn btn-sm btn-primary accept-meeting-point-offer"
+                data-url="{{ path('app_meeting_point_offer_answer', {id: epId}) }}"
+        >Подходит</button>
+
+        <button type="button" class="btn btn-sm btn-secondary offer-another-meeting-point"
+                data-toggle="modal"
+                data-target="#meetingPointOfferModal"
+                data-url="{{ path('app_meeting_point_offer', {id: epId}) }}"
+        >Нет, предложить другое</button>
     </div>
 </div>

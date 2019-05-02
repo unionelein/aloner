@@ -43,7 +43,7 @@ class VkSignUpService
         $userInfo = \reset($usersInfo);
 
         $user = (new User($userInfo['first_name']))
-            ->addVkToken($accessToken);
+            ->setVkToken($accessToken);
 
         if (isset($userInfo['city']['title']) && $city = $this->cityRepo->findOneBy(['name' => $userInfo['city']['title']])) {
             $user->setCity($city);

@@ -2,17 +2,23 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <b>Время работы сегодня:</b>
+        <b>Время работы {{ eventParty.usersSearchCriteriaDate|dateToString }}:</b>
         <p class="mb-1">
-            {% for timetable in eventParty.event.timetables.forWeekDay('now'|date('w')) %}
-                {{ printTimetableMacro.print(timetable) }}
+            {% for timetable in eventParty.event.timetables.forWeekDay(eventParty.usersSearchCriteriaDate|date('w')) %}
+                {{ printTimetableMacro.print(timetable, eventParty.event.timetableType) }}
             {% endfor %}
         </p>
         <a href="#fullTimetable" data-toggle="collapse" role="button">Подробнее</a>
     </div>
+
     <div class="col-sm-6">
-        <div><b>Телефон:</b> {{ eventParty.event.phone }}</div>
-        <div><b>Сайт:</b> <a href="{{ eventParty.event.site }}">{{ eventParty.event.site }}</a></div>
+        {% if eventParty.event.phone %}
+            <div><b>Телефон:</b> {{ eventParty.event.phone }}</div>
+        {% endif %}
+
+        {% if eventParty.event.site %}
+            <div><b>Сайт:</b> <a href="{{ eventParty.event.site }}">{{ eventParty.event.site }}</a></div>
+        {% endif %}
     </div>
 
     <div class="col-sm-12">
@@ -24,7 +30,7 @@
                             <td class="pr-1"><b>{{ dayName }}:</b></td>
                             <td>
                                 {% for timetable in eventParty.event.timetables.forWeekDay(day) %}
-                                    {{ printTimetableMacro.print(timetable) }}
+                                    {{ printTimetableMacro.print(timetable, eventParty.event.timetableType) }}
                                 {% endfor %}
                             </td>
                         </tr>
@@ -37,6 +43,7 @@
 
 <div class="row col-sm-12 mt-1">
     <p><b>Адрес:</b> <i>{{ eventParty.event.address }}</i></p>
+
     {% if eventParty.event.yandexMapSrc %}
         <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.yandexMapSrc }}"></script>
     {% endif %}

@@ -5,7 +5,9 @@ namespace App\Component\Messaging\EventParty\Model\Pusher;
 use App\Component\Messaging\EventParty\Pusher;
 use App\Component\Util\Date;
 use App\Entity\EventParty;
+use App\Entity\EventPartyHistory;
 use App\Entity\User;
+use App\Repository\UserRepository;
 
 class MeetingPointOfferData extends AbstractPusherData
 {
@@ -15,24 +17,16 @@ class MeetingPointOfferData extends AbstractPusherData
     /** @var EventParty */
     private $eventParty;
 
-    /** @var string */
-    private $place;
+    /** @var EventPartyHistory */
+    private $offer;
 
-    /** @var \DateTime */
-    private $meetingDateTime;
-
-    /** @var int */
-    private $offerId;
-
-    public function __construct(User $user, EventParty $eventParty, int $offerId, string $place, \DateTime $meetingDateTime)
+    public function __construct(User $user, EventParty $eventParty, EventPartyHistory $offer)
     {
         parent::__construct(Pusher::TYPE_MEETING_POINT_OFFER);
 
         $this->user = $user;
+        $this->offer = $offer;
         $this->eventParty = $eventParty;
-        $this->place = $place;
-        $this->meetingDateTime = $meetingDateTime;
-        $this->offerId = $offerId;
     }
 
     public function getTopicId(): string
@@ -43,13 +37,9 @@ class MeetingPointOfferData extends AbstractPusherData
     public function toArray(): array
     {
         return [
-            'userId'                => $this->user->getId(),
-            'offerId'               => $this->offerId,
-            'place'                 => $this->place,
-            'meetingDateTimeString' => \sprintf('%s, %s',
-                Date::convertDateToString($this->meetingDateTime),
-                $this->meetingDateTime->format('H:i')
-            ),
+            'userId'  => $this->user->getId(),
+            'offerId' => $this->offer->getId(),
+            'lines'   => $this->offer->generateOfferLines(),
         ];
     }
 }

@@ -6,6 +6,8 @@ class Helper {
         this.$participantsWrapper = $('.participants-wrapper');
         this.$meetingOffersHistory = $('.meeting-point-offers-history');
 
+        this.$reserveRequiredAlert = $('.reserve-required-alert');
+
         this.$planTime  = $('.plan-time');
         this.$planPlace = $('.plan-place');
         this.$planCafe  = $('.plan-near-cafe');
@@ -57,15 +59,49 @@ class Helper {
         $(`#nav-${name}`).addClass('d-none');
     }
 
-    addMeetingPointOfferAlert(offerId, meetingPointText) {
-        let $meetingPointAlert = $('.meeting-point-offer-alert-template .meeting-point-alert').clone();
+    showReserveRequiredAlert() {
+        if (this.$reserveRequiredAlert.hasClass('d-none')) {
+            this.$reserveRequiredAlert.removeClass('d-none');
+            this.updatePlanAlertsCount(+1);
+        }
+    }
 
-        $meetingPointAlert.data('offer-id', offerId);
-        $meetingPointAlert.find('.meeting-point-text').html(meetingPointText);
+    hideReserveRequiredAlert() {
+        if (!this.$reserveRequiredAlert.hasClass('d-none')) {
+            this.$reserveRequiredAlert.addClass('d-none');
+            this.updatePlanAlertsCount(-1);
+        }
+    }
+
+    addMeetingPointOfferAlert(offerId, lines) {
+        let $meetingPointAlert = $('.meeting-point-offer-alert-template .meeting-point-alert').clone();
+        $meetingPointAlert.attr('data-offer-id', offerId);
+
+        const $alertText = $meetingPointAlert.find('.meeting-point-text');
+        $alertText.html('');
+
+        for (let [key, text] of Object.entries(lines)) {
+            let $line = $('<div>').html(text);
+
+            if (key === 'point') {
+                $line.addClass('font-weight-bold');
+            }
+
+            $alertText.append($line);
+        }
 
         $('.tab-plan-body').prepend($meetingPointAlert);
 
         this.updatePlanAlertsCount(+1);
+    }
+
+    removeMeetingPointOfferAlert(offerId) {
+        let $alert = $(`.meeting-point-alert[data-offer-id=${offerId}]`);
+
+        if ($alert.length) {
+            $alert.remove();
+            this.updatePlanAlertsCount(-1);
+        }
     }
 
     updatePlanAlertsCount(number) {
@@ -86,12 +122,16 @@ class Helper {
         $badge.html(newCount);
     }
 
-    addMeetingPointOfferHistoryRow(offerId, meetingPointText) {
+    addMeetingPointOfferHistoryRow(offerId, meetingPointText, isOfferFromWeb = false) {
         const $meetingPointOffer = $('.meeting-point-offers-history-template .meeting-point-offer').clone();
         $meetingPointOffer.addClass(`meeting-point-offer-${offerId}`);
         $meetingPointOffer.find('.meeting-point-offer-text').html(meetingPointText);
 
         $('#meeting-point-offers').prepend($meetingPointOffer);
+
+        if (isOfferFromWeb) {
+            $meetingPointOffer.find('.meeting-point-offer-accepted-answers-count').html('0');
+        }
 
         this.updateMeetingPointHistoryCount(+1);
     }
@@ -154,7 +194,17 @@ class Helper {
         this.$planTime.html(this.$planTime.data('default'));
         this.$planPlace.html(this.$planPlace.data('default'));
 
+        this.hideOfferBtn();
+
         this.$planCafe.addClass('d-none');
+    }
+
+    hideOfferBtn() {
+        $('.meeting-point-offer-btn-wrapper').addClass('d-none');
+    }
+
+    showOfferBtn() {
+        $('.meeting-point-offer-btn-wrapper').removeClass('d-none');
     }
 
     showNearCafe() {

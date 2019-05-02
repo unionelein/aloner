@@ -31,7 +31,7 @@ class EventPartyMessage
     private $message;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\EventParty")
+     * @ORM\ManyToOne(targetEntity="App\Entity\EventParty", inversedBy="messages")
      * @ORM\JoinColumn(nullable=false)
      */
     private $eventParty;
@@ -45,9 +45,11 @@ class EventPartyMessage
     public function __construct(User $user, EventParty $eventParty, string $message, \DateTime $createdAt = null)
     {
         $this->user = $user;
-        $this->eventParty = $eventParty;
         $this->message = $message;
         $this->createdAt = $createdAt;
+        $this->eventParty = $eventParty;
+
+        $this->eventParty->addMessage($this);
     }
 
     public function getId(): ?int

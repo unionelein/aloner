@@ -13,7 +13,7 @@
         <div class="col-sm-4">{{ form_row(form.day, {attr: {class: 'form-control-sm'}}) }}</div>
         <div class="col-sm-4">{{ form_row(form.time, {attr: {class: 'form-control-sm'}}) }}</div>
         <div class="col-sm-12">
-            {% set usersDay = eventParty.usersSearchCriteriaDateString %}
+            {% set usersDay = eventParty.usersSearchCriteriaDate|dateToString %}
             {% set usersTime = eventParty.usersTimeInterval %}
 
             <div class="help">*Нужно позвонить и узнать, свободно ли это время</div>
@@ -37,6 +37,8 @@
             </div>
         </div>
     </div>
+
+    {{ form_row(form.rejectedOfferId) }}
 
     {{ form_end(form) }}
 </div>

@@ -32,4 +32,15 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function getWebUser(): User
+    {
+        $user = $this->find(User::WEB_ID);
+
+        if (!$user) {
+            throw new \LogicException('Web user does not exists');
+        }
+
+        return $user;
+    }
 }
