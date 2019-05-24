@@ -67,10 +67,10 @@
             <div class="col-sm-4">
                 <div class="participants-wrapper">
                     {% for user in eventParty.users %}
-                        <div class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %}current-user{% endif %}">
+                        <a href="{{ user.vkExtension.VkPageUrl }}" target="_blank" class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %}current-user{% endif %}">
                             <img class="user-icon-img" src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
                             <div class="user-icon-name">{{ user.nicknameIn(eventParty) }}</div>
-                        </div>
+                        </a>
                     {% endfor %}
                 </div>
                 <div class="clearfix"></div>

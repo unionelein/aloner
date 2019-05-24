@@ -15,14 +15,22 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', null, [
+            ->add('name', TextType::class, [
                 'label' => false,
+                'placeholder' => 'Имя',
+                'constraints' => [
+                    new Length([
+                        'min' => 2, 'minMessage' => 'Слишком короткое имя',
+                        'max' => 11, 'maxMessage' => 'Слишком короткое имя',
+                    ])
+                ]
             ])
             ->add('city', EntityType::class, [
                 'label' => false,
@@ -40,13 +48,6 @@ class UserType extends AbstractType
                 'label' => false,
                 'help' => 'Дата рождения',
                 'constraints' => [new UserAgeRange()],
-            ])
-            ->add('phone', TextType::class, [
-                'label' => false,
-                'attr' => [
-                    'placeholder' => 'Номер телефона'
-                ],
-                'help' => 'Номер телефона нужен для записи (например занять место на квест для вас) и для связи с людьми, с которыми вы туда пойдете'
             ])
             ->add('acceptLicense', CheckboxType::class, [
                 'label' => 'Я согласен с правилами сайта',

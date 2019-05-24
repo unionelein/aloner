@@ -29,8 +29,9 @@
 }
 
 .user-icon-block img {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
 }
 
 .current-user .user-icon-name {

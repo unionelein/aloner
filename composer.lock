@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "33865270a51f30301933e9050a7e1bdb",
@@ -2807,16 +2807,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v4.2.3",
+            "version": "v4.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "7c5b85bcc5f87dd7938123be12ce3323be6cde5a"
+                "reference": "9e64db924324700e19ef4f21c2c279a35ff9bdff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/7c5b85bcc5f87dd7938123be12ce3323be6cde5a",
-                "reference": "7c5b85bcc5f87dd7938123be12ce3323be6cde5a",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/9e64db924324700e19ef4f21c2c279a35ff9bdff",
+                "reference": "9e64db924324700e19ef4f21c2c279a35ff9bdff",
                 "shasum": ""
             },
             "require": {
@@ -2880,7 +2880,7 @@
                 "caching",
                 "psr6"
             ],
-            "time": "2019-01-31T15:08:08+00:00"
+            "time": "2019-04-16T09:36:45+00:00"
         },
         {
             "name": "symfony/config",
@@ -3143,16 +3143,16 @@
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v4.2.3",
+            "version": "v4.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "72c14cbc0c27706b9b4c33b9cd7a280972ff4806"
+                "reference": "d161c0c8bc77ad6fdb8f5083b9e34c3015d43eb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/72c14cbc0c27706b9b4c33b9cd7a280972ff4806",
-                "reference": "72c14cbc0c27706b9b4c33b9cd7a280972ff4806",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/d161c0c8bc77ad6fdb8f5083b9e34c3015d43eb1",
+                "reference": "d161c0c8bc77ad6fdb8f5083b9e34c3015d43eb1",
                 "shasum": ""
             },
             "require": {
@@ -3212,7 +3212,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-30T17:51:38+00:00"
+            "time": "2019-04-27T11:48:17+00:00"
         },
         {
             "name": "symfony/doctrine-bridge",
@@ -3653,16 +3653,16 @@
         },
         {
             "name": "symfony/framework-bundle",
-            "version": "v4.2.3",
+            "version": "v4.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/framework-bundle.git",
-                "reference": "5707ad22d7dcf39643128e73a85efc0f20745b44"
+                "reference": "98e203073ad9fd05929b52849a300a81bf0d9ec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/5707ad22d7dcf39643128e73a85efc0f20745b44",
-                "reference": "5707ad22d7dcf39643128e73a85efc0f20745b44",
+                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/98e203073ad9fd05929b52849a300a81bf0d9ec9",
+                "reference": "98e203073ad9fd05929b52849a300a81bf0d9ec9",
                 "shasum": ""
             },
             "require": {
@@ -3671,11 +3671,11 @@
                 "symfony/cache": "~4.2",
                 "symfony/config": "~4.2",
                 "symfony/contracts": "^1.0.2",
-                "symfony/dependency-injection": "^4.2",
+                "symfony/dependency-injection": "^4.2.5",
                 "symfony/event-dispatcher": "^4.1",
                 "symfony/filesystem": "~3.4|~4.0",
                 "symfony/finder": "~3.4|~4.0",
-                "symfony/http-foundation": "^4.1.2",
+                "symfony/http-foundation": "^4.2.5",
                 "symfony/http-kernel": "^4.2",
                 "symfony/polyfill-mbstring": "~1.0",
                 "symfony/routing": "^4.1"
@@ -3768,20 +3768,20 @@
             ],
             "description": "Symfony FrameworkBundle",
             "homepage": "https://symfony.com",
-            "time": "2019-01-29T09:49:29+00:00"
+            "time": "2019-04-17T15:01:37+00:00"
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v4.2.3",
+            "version": "v4.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "8d2318b73e0a1bc75baa699d00ebe2ae8b595a39"
+                "reference": "1ea878bd3af18f934dedb8c0de60656a9a31a718"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/8d2318b73e0a1bc75baa699d00ebe2ae8b595a39",
-                "reference": "8d2318b73e0a1bc75baa699d00ebe2ae8b595a39",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/1ea878bd3af18f934dedb8c0de60656a9a31a718",
+                "reference": "1ea878bd3af18f934dedb8c0de60656a9a31a718",
                 "shasum": ""
             },
             "require": {
@@ -3822,7 +3822,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-29T09:49:29+00:00"
+            "time": "2019-05-01T08:36:31+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -4772,16 +4772,16 @@
         },
         {
             "name": "symfony/security-http",
-            "version": "v4.2.3",
+            "version": "v4.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-http.git",
-                "reference": "b564efb51c5355bd83e3aad231a0d87a307002ad"
+                "reference": "ff2189e9921e4a88c4f621fa44444fe2b4fb1b11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-http/zipball/b564efb51c5355bd83e3aad231a0d87a307002ad",
-                "reference": "b564efb51c5355bd83e3aad231a0d87a307002ad",
+                "url": "https://api.github.com/repos/symfony/security-http/zipball/ff2189e9921e4a88c4f621fa44444fe2b4fb1b11",
+                "reference": "ff2189e9921e4a88c4f621fa44444fe2b4fb1b11",
                 "shasum": ""
             },
             "require": {
@@ -4834,7 +4834,7 @@
             ],
             "description": "Symfony Security Component - HTTP Integration",
             "homepage": "https://symfony.com",
-            "time": "2019-01-16T21:31:25+00:00"
+            "time": "2019-04-17T14:56:00+00:00"
         },
         {
             "name": "symfony/serializer",
@@ -6197,6 +6197,56 @@
             ],
             "description": "A security checker for your composer.lock",
             "time": "2018-12-19T17:14:59+00:00"
+        },
+        {
+            "name": "snapappointments/bootstrap-select",
+            "version": "v1.13.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/snapappointments/bootstrap-select.git",
+                "reference": "b6135994a96269c7920169ae18d42852c62a6c1b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/snapappointments/bootstrap-select/zipball/b6135994a96269c7920169ae18d42852c62a6c1b",
+                "reference": "b6135994a96269c7920169ae18d42852c62a6c1b",
+                "shasum": ""
+            },
+            "suggest": {
+                "components/jquery": "1.9.1 - 3",
+                "twbs/bootstrap": ">=3.0.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Silvio Moreto",
+                    "homepage": "https://github.com/silviomoreto"
+                },
+                {
+                    "name": "Casey Holzer",
+                    "homepage": "https://github.com/caseyjhol"
+                },
+                {
+                    "name": "SnapAppointments, LLC",
+                    "homepage": "https://snapappointments.com"
+                }
+            ],
+            "description": "The jQuery plugin that brings select elements into the 21st century with intuitive multiselection, searching, and much more. Now with Bootstrap 4 support.",
+            "homepage": "https://developer.snapappointments.com/bootstrap-select",
+            "keywords": [
+                "bootstrap",
+                "dropdown",
+                "form",
+                "javascript",
+                "jquery",
+                "replacement",
+                "select"
+            ],
+            "time": "2019-04-19T15:54:51+00:00"
         },
         {
             "name": "symfony/debug-bundle",

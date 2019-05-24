@@ -4,10 +4,8 @@ namespace App\Controller;
 
 use App\Component\Vk\Authentication\VkAuthService;
 use App\Component\Vk\Authentication\VkSignUpService;
-use App\Repository\VkUserTokenRepository;
+use App\Repository\VkUserExtensionRepository;
 use App\Security\Authenticator\VkAuthenticator;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -22,7 +20,7 @@ class SecurityController extends BaseController
         Request $request,
         VkAuthService $vkAuth,
         VkSignUpService $vkSignUpService,
-        VkUserTokenRepository $vkTokenRepo,
+        VkUserExtensionRepository $vkExtensionRepo,
         GuardAuthenticatorHandler $guardHandler,
         VkAuthenticator $vkAuthenticator
     ) {
@@ -30,16 +28,16 @@ class SecurityController extends BaseController
         $redirectUrl = $this->generateUrl('app_vk_auth', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         if ($accessCode && ($accessToken = $vkAuth->getAccessToken($accessCode, $redirectUrl))) {
-            $vkToken = $vkTokenRepo->findOneBy(['vkUserId' => $accessToken->getUserId()]);
+            $vkExtension = $vkExtensionRepo->findOneBy(['vkUserId' => $accessToken->getUserId()]);
 
-            if (!$vkToken) {
-                // create new user with vk token
+            if (!$vkExtension) {
+                // create new user with vk extension
                 $user = $vkSignUpService->execute($accessToken);
-                $vkToken = $user->getVkToken();
+                $vkExtension = $user->getVkExtension();
             }
 
             return $guardHandler->authenticateUserAndHandleSuccess(
-                $vkToken->getUser(),
+                $vkExtension->getUser(),
                 $request,
                 $vkAuthenticator,
                 'main'

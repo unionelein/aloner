@@ -38,7 +38,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
             return new RedirectResponse($this->urlGenerator->generate('app_vk_auth'));
         }
 
-        if (!$user->isFullFilled()) {
+        if (!$user->hasRole(User::ROLE_FULL_REG) || !$user->isFullFilled()) {
             return new RedirectResponse($this->urlGenerator->generate('app_fill_user'));
         }
 

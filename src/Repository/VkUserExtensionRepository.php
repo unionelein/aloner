@@ -2,21 +2,21 @@
 
 namespace App\Repository;
 
-use App\Entity\VkUserToken;
+use App\Entity\VkUserExtension;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method VkUserToken|null find($id, $lockMode = null, $lockVersion = null)
- * @method VkUserToken|null findOneBy(array $criteria, array $orderBy = null)
- * @method VkUserToken[]    findAll()
- * @method VkUserToken[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method VkUserExtension|null find($id, $lockMode = null, $lockVersion = null)
+ * @method VkUserExtension|null findOneBy(array $criteria, array $orderBy = null)
+ * @method VkUserExtension[]    findAll()
+ * @method VkUserExtension[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VkUserTokenRepository extends ServiceEntityRepository
+class VkUserExtensionRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, VkUserToken::class);
+        parent::__construct($registry, VkUserExtension::class);
     }
 
     // /**

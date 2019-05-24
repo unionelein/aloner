@@ -37,13 +37,13 @@ class VkSignUpService
     public function execute(AccessToken $accessToken): User
     {
         $usersInfo = $this->vkClient->users()->get($accessToken->getAccessToken(), [
-            'fields' => ['bdate', 'sex', 'city'],
+            'fields' => ['bdate', 'sex', 'city', 'photo_50'],
         ]);
 
         $userInfo = \reset($usersInfo);
 
         $user = (new User($userInfo['first_name']))
-            ->setVkToken($accessToken);
+            ->setVkExtension($accessToken);
 
         if (isset($userInfo['city']['title']) && $city = $this->cityRepo->findOneBy(['name' => $userInfo['city']['title']])) {
             $user->setCity($city);
@@ -55,6 +55,10 @@ class VkSignUpService
 
         if (isset($userInfo['bdate'])) {
             $user->setBirthday(new \DateTime($userInfo['bdate']));
+        }
+
+        if (isset($userInfo['photo_50'])) {
+            $user->setAvatar($userInfo['photo_50']);
         }
 
         $this->em->persist($user);

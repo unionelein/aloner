@@ -6,10 +6,12 @@ use App\Component\Vk\DTO\AccessToken;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\VkUserTokenRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\VkUserExtensionRepository")
  */
-class VkUserToken
+class VkUserExtension
 {
+    private const VK_URL = 'https://vk.com';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -33,7 +35,7 @@ class VkUserToken
     private $expiresAt;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="vkToken", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="vkExtension", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
@@ -75,5 +77,10 @@ class VkUserToken
     public function getVkUserId(): int
     {
         return $this->vkUserId;
+    }
+
+    public function getVkPageUrl(): string
+    {
+        return self::VK_URL . '/id' . $this->vkUserId;
     }
 }

@@ -49,9 +49,9 @@ class User implements UserInterface
     private $roles = [];
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\VkUserToken", mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="VkUserExtension", mappedBy="user", cascade={"persist", "remove"})
      */
-    private $vkToken;
+    private $vkExtension;
 
     /**
      * @Assert\NotNull()
@@ -70,12 +70,6 @@ class User implements UserInterface
      * @ORM\Column(type="date", nullable=true)
      */
     private $birthday;
-
-    /**
-     * @Assert\NotBlank()
-     * @ORM\Column(type="string", length=15, nullable=true)
-     */
-    private $phone;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\EventParty", mappedBy="users")
@@ -169,6 +163,11 @@ class User implements UserInterface
         return $this;
     }
 
+    public function hasRole(string $role): bool
+    {
+        return \in_array($role, $this->roles, true);
+    }
+
     /**
      * @see UserInterface
      */
@@ -206,14 +205,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getVkToken(): ?VkUserToken
+    public function getVkExtension(): ?VkUserExtension
     {
-        return $this->vkToken;
+        return $this->vkExtension;
     }
 
-    public function setVkToken(AccessToken $accessToken): self
+    public function setVkExtension(AccessToken $accessToken): self
     {
-        $this->vkToken = new VkUserToken($accessToken, $this);
+        $this->vkExtension = new VkUserExtension($accessToken, $this);
 
         return $this;
     }
@@ -230,24 +229,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(string $phone): self
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
     public function isFullFilled(): bool
     {
-        return $this->phone
-            && $this->city
+        return $this->city
             && $this->birthday
-            && null !== $this->sex;
+            && null !== $this->sex
+            && $this->vkExtension;
     }
 
     public function getCity(): ?City
@@ -319,7 +306,7 @@ class User implements UserInterface
     public function getAvatarPath(): string
     {
         if ($this->avatar) {
-            return ResourceLocator::USER_AVATAR_DIR . $this->avatar;
+            return $this->avatar;
         }
 
         if ($sex = $this->getSex()) {
