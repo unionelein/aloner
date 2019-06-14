@@ -1,3 +1,7 @@
+'use strict';
+
+import $ from 'jquery';
+
 class Chat {
 
     static get TYPE_IDENTIFY() {
@@ -90,3 +94,5 @@ class Chat {
         });
     }
 }
+
+export default Chat;

@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/vk_auth.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/vk_auth.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -29,4 +29,9 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('build/vk_auth.js') }}"></script>
 {% endblock %}

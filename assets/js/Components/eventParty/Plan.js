@@ -1,3 +1,8 @@
+'use strict';
+
+import $ from 'jquery';
+import Helper from './Helper';
+
 class Plan {
     constructor() {
         this.helper = new Helper();
@@ -103,3 +108,5 @@ class Plan {
         });
     }
 }
+
+export default Plan;

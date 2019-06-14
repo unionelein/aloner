@@ -1,3 +1,10 @@
+'use strict';
+
+import $ from 'jquery';
+import Helper from './Helper';
+import Plan from './Plan';
+import ab from '../authoban';
+
 class Receiver {
     static get TYPE_JOIN() {
         return 'join';
@@ -138,3 +145,5 @@ class Receiver {
         this.helper.showNearCafe();
     }
 }
+
+export default Receiver;

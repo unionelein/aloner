@@ -47,7 +47,7 @@ class UserController extends BaseController
             return $response;
         }
 
-        return $this->render('user/fill_user.twig', [
+        return $this->render('user/fill_user.html.twig', [
             'form' => $form->createView(),
         ]);
     }

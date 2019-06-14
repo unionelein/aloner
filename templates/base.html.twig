@@ -4,12 +4,8 @@
         <meta charset="UTF-8">
         <title>{% block title %}Aloner{% endblock %}</title>
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/bootstrap/awesome-bootstrap-checkbox.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/font-awesome/css/all.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/bootstrap/font-awesome.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/base.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/markup.css') }}">
+            {#<link rel="stylesheet" href="{{ asset('build/vendor.css') }}">#}
+            <link rel="stylesheet" href="{{ asset('build/base.css') }}">
         {% endblock %}
     </head>
     <body>
@@ -43,9 +39,8 @@
         </footer>
 
         {% block javascripts %}
-            <script src="{{ asset('js/libs/jquery/jquery-3.3.1.min.js') }}"></script>
-            <script src="{{ asset('js/libs/bootstrap/bootstrap.min.js') }}"></script>
-            <script src="{{ asset('js/base.js') }}"></script>
+            {#<script src="{{ asset('build/vendor.js') }}"></script>#}
+            <script src="{{ asset('build/base.js') }}"></script>
         {% endblock %}
     </body>
 </html>

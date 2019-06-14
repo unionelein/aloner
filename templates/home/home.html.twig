@@ -2,7 +2,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/home.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -14,9 +14,9 @@
                         Здесь ты сможешь найти полезную информацию и новости сайта
                     </div>
                     <div class="block-body ml-4">
-                        <p><i class="fas fa-angle-right"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
-                        <p><i class="fas fa-angle-right"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
-                        <p><i class="fas fa-angle-right"></i> Ну вроде пока все :) И помни: <br></p>
+                        <p><i class="fas fa fa-circle"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
+                        <p><i class="fas fa fa-circle"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
+                        <p><i class="fas fa fa-circle"></i> Ну вроде пока все :) И помни: <br></p>
                         <p><i>Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление</i></p>
 
                         <div class="text-center">
@@ -66,11 +66,7 @@
                                     <button type="submit" class="btn btn-primary search-event-party-btn">Найти</button>
                                 </div>
 
-                                <div style=" margin-bottom: 20px;width: 100%; height: 20px; border-bottom: 1px solid black; text-align: center">
-                                  <span style="font-size: 40px; background-color: #F3F5F6; padding: 0 10px;">
-                                    или
-                                  </span>
-                                </div>
+                                <div class="text-center m-1">--------- или ---------</div>
 
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-warning search-event-party-btn">Создать</button>
@@ -86,5 +82,5 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/main/main.js') }}"></script>
+    <script src="{{ asset('build/home.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,13 @@
+@import "./Components/_bootstrap.scss";
+@import "./Components/_fontawesome.scss";
+
+$font-family-icon: 'Font Awesome 5 Free';
+$check-icon: fa-content($fa-var-check);
+
+@import "~awesome-bootstrap-checkbox/awesome-bootstrap-checkbox";
+
+input[type="checkbox"], input[type="radio"] {
+    &:checked + label::after{
+        font-weight: bold!important;
+    }
+}

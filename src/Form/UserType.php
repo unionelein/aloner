@@ -24,7 +24,9 @@ class UserType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => false,
-                'placeholder' => 'Имя',
+                'attr' => [
+                    'placeholder' => 'Имя',
+                ],
                 'constraints' => [
                     new Length([
                         'min' => 2, 'minMessage' => 'Слишком короткое имя',

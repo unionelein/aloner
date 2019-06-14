@@ -822,3 +822,5 @@ ab.Session.prototype.publish = function () {
 
     self._send(msg);
 };
+
+export default ab;

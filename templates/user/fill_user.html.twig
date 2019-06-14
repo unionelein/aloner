@@ -2,6 +2,11 @@
 
 {% block title %}Ваш аккаунт{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('build/fill_user.css') }}">
+{% endblock %}
+
 {% block body %}
     <div class="container">
         {{ form_start(form) }}
@@ -27,7 +32,6 @@
                     </div>
                 </div>
             </div>
-
         <div class="row">
             <div class="col-sm-4 offset-sm-3 abc-checkbox abc-checkbox-primary">
                 {{ form_row(form.acceptLicense) }}
@@ -41,4 +45,9 @@
 
         {{ form_end(form) }}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('build/fill_user.js') }}"></script>
 {% endblock %}

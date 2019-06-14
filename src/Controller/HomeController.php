@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @IsGranted(User::ROLE_PARTIAL_REG)
  * @Route("/")
  */
-class MainController extends BaseController
+class HomeController extends BaseController
 {
     /**
      * @Route("/", name="app_main")
@@ -40,7 +40,7 @@ class MainController extends BaseController
             return $this->redirectToRoute('app_join_to_event_party');
         }
 
-        return $this->render('main/main.html.twig', [
+        return $this->render('home/home.html.twig', [
             'searchCriteriaForm' => $searchCriteriaForm->createView(),
         ]);
     }

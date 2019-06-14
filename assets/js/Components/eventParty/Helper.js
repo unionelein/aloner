@@ -1,3 +1,7 @@
+'use strict';
+
+import $ from 'jquery';
+
 class Helper {
 
     constructor() {
@@ -211,3 +215,5 @@ class Helper {
         this.$planCafe.removeClass('d-none');
     }
 }
+
+export default Helper;

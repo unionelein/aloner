@@ -3,10 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    <link rel="stylesheet" href="{{ asset('node_modules/lightgallery/src/css/lightgallery.css') }}">
-    <link rel="stylesheet" href="http://vjs.zencdn.net/4.12/video-js.css">
-
-    <link rel="stylesheet" href="{{ asset('css/event_party.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/event_party.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -43,22 +40,22 @@
                 <div class="tab-content nav-block-content-wrapper">
                     <div class="tab-pane fade show active block nav-block" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
                         <div class="block-body">
-                            {% include 'eventParty/tab_info.html.twig' %}
+                            {% include 'eventParty/tabs/tab_info.html.twig' %}
                         </div>
                     </div>
                     <div class="tab-pane fade show block nav-block" id="nav-gallery" role="tabpanel" aria-labelledby="nav-gallery-tab">
                         <div class="block-body">
-                            {% include 'eventParty/tab_gallery.html.twig' %}
+                            {% include 'eventParty/tabs/tab_gallery.html.twig' %}
                         </div>
                     </div>
                     <div class="tab-pane fade block nav-block" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
                         <div class="block-body">
-                            {% include 'eventParty/tab_contacts.html.twig' %}
+                            {% include 'eventParty/tabs/tab_contacts.html.twig' %}
                         </div>
                     </div>
                     <div class="tab-pane fade block nav-block {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan" role="tabpanel" aria-labelledby="nav-plan-tab">
                         <div class="block-body">
-                            {% include 'eventParty/tab_plan.html.twig' %}
+                            {% include 'eventParty/tabs/tab_plan.html.twig' %}
                         </div>
                     </div>
                 </div>
@@ -178,16 +175,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/libs/authoban.js') }}"></script>
 
-    <script src="{{ asset('node_modules/lightgallery/src/js/lightgallery.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/lib/jquery.mousewheel.min.js') }}"></script>
-    <script src="{{ asset('node_modules/lightgallery/modules/lg-video.min.js') }}"></script>
-    <script src="{{ asset('node_modules/video/video.js') }}"></script>
-
-    <script src="{{ asset('js/event_party/Chat.js') }}"></script>
-    <script src="{{ asset('js/event_party/Helper.js') }}"></script>
-    <script src="{{ asset('js/event_party/Receiver.js') }}"></script>
-    <script src="{{ asset('js/event_party/Plan.js') }}"></script>
-    <script src="{{ asset('js/event_party/event_party.js') }}"></script>
+    <script src="{{ asset('build/event_party.js') }}"></script>
 {% endblock %}
