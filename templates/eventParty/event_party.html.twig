@@ -15,16 +15,16 @@
                 <nav>
                     <div class="nav nav-tabs event-party-tabs-wrapper" id="nav-tab" role="tablist">
                         <a class="nav-item nav-link active" id="nav-info-tab" href="#nav-info" data-toggle="tab" role="tab" aria-controls="nav-info" aria-selected="true">
-                            <i class="far fa-list-alt"></i> Инфо
+                            <i class="fa fa-list-alt"></i> Инфо
                         </a>
                         <a class="nav-item nav-link" id="nav-gallery-tab" href="#nav-gallery" data-toggle="tab" role="tab" aria-controls="nav-gallery" aria-selected="false">
                             <i class="fa fa-file-image-o"></i> Галерея
                         </a>
                         <a class="nav-item nav-link" id="nav-contacts-tab" href="#nav-contacts" data-toggle="tab" role="tab" aria-controls="nav-contacts" aria-selected="false">
-                            <i class="fas fa-address-book"></i> Контакты
+                            <i class="fa fa-address-book"></i> Контакты
                         </a>
                         <a class="nav-item nav-link {% if not eventParty.filled %}d-none{% endif %}" id="nav-plan-tab" href="#nav-plan" data-toggle="tab" role="tab" aria-controls="nav-plan" aria-selected="false">
-                            <i class="fas fa-tasks"></i> План
+                            <i class="fa fa-tasks"></i> План
 
                             {% set offersCount = eventParty.activeOffers(app.user)|length %}
 
