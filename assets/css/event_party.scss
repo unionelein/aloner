@@ -1,3 +1,7 @@
+@import "./components/loader";
+@import "./components/eventParty/tabs";
+@import "./components/eventParty/gallery";
+
 .event-party-status {
     text-align: center;
     font-size: 20px;
@@ -53,110 +57,4 @@
 
 .event-party-actions {
     margin-top: 20px;
-}
-
-/* =================================== TAB INFO ====================================== */
-
-.event-title {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.event-description p {
-    margin-bottom: 20px;
-}
-
-.event-description {
-    margin-bottom: 40px;
-}
-
-.media-wrapper {
-    padding: 0;
-}
-
-.p5 {
-    padding: 5px;
-}
-
-.event-party-title {
-    height: 47px;
-    margin-bottom: 0;
-}
-
-.media {
-    padding: 0;
-}
-
-.mt-25vh {
-    margin-top: 25vh;
-}
-
-/* ============== GALLERY =========== */
-
-.lg-outer {
-    background-color: rgba(0, 0, 0, 0.85);
-}
-
-.lg-backdrop {
-    background-color: transparent;
-}
-
-.gallery .media {
-    cursor: pointer;
-    border: 3px solid #FFF;
-    border-radius: 3px;
-    display: block;
-    overflow: hidden;
-    position: relative;
-    float: left;
-}
-
-.gallery .media > img {
-    transition: transform 0.15s ease 0s;
-    transform: scale3d(1, 1, 1);
-    width: 100%;
-}
-
-.gallery .media:hover > img {
-    transform: scale3d(1.1, 1.1, 1.1);
-}
-
-.gallery .media:hover .gallery-poster > img {
-    opacity: 1;
-}
-
-.gallery .media .gallery-poster {
-    background-color: rgba(0, 0, 0, 0.1);
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: background-color 0.15s ease 0s;
-}
-
-.gallery .media .gallery-poster > img {
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    opacity: 0;
-    position: absolute;
-    top: 50%;
-    transition: opacity 0.3s ease 0s;
-}
-
-.gallery .media:hover .gallery-poster {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.gallery .gallery-poster.video-poster img {
-    height: 48px;
-    margin-left: -24px;
-    margin-top: -24px;
-    opacity: 0.8;
-    width: 48px;
-}
-
-.gallery.dark .media {
-    border: 3px solid #04070a;
 }

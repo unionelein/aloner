@@ -7,12 +7,6 @@
     margin-bottom: 30px;
 }
 
-.fa-article-p {
-    margin-right: 10px;
-    color: rgb(199, 199, 199);
-    font-size: 10px;
-}
-
 .vk-auth-btn {
     padding: 0.3em 1.1em;
     text-decoration: none;
@@ -50,15 +44,6 @@
 .vk-auth-btn:hover:before {
     transform: skewX(-45deg) translateX(13.5em);
     transition: all 0.5s ease-in-out;
-}
-
-@keyframes sheen {
-    0% {
-        transform: skewY(-45deg) translateX(0);
-    }
-    100% {
-        transform: skewY(-45deg) translateX(12.5em);
-    }
 }
 
 .vk-auth-btn-help {

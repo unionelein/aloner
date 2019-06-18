@@ -4,7 +4,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('build/vk_auth.css') }}">
+
+    {{ encore_entry_link_tags('vk_auth') }}
 {% endblock %}
 
 {% block body %}
@@ -33,5 +34,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('build/vk_auth.js') }}"></script>
+
+    {{ encore_entry_script_tags('vk_auth') }}
 {% endblock %}

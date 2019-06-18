@@ -69,10 +69,10 @@ EOF;
             $event->setPrice('1 билет стоит ' . \rand(5, 15) . 'p.');
             $event->setYandexMapSrc('https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2e1c2828ada34d35b904da18a05c22fbb6d6e3cefe4bc77f09bb381d4ccc6b4d&amp;width=650&amp;height=350&amp;lang=ru_RU&amp;scroll=true');
 
-            $event->addMedia(new Media('/media/img/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
-            $event->addMedia(new Media('/media/img/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));
-            $event->addMedia(new Media('/media/img/neoland_3.jpg', Media::TYPE_IMAGE));
-            $event->addMedia(new Media('/media/video/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', '/media/img/neoland_3.jpg'));
+            $event->addMedia(new Media('build/static/img/event/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
+            $event->addMedia(new Media('build/static/img/event/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));
+            $event->addMedia(new Media('build/static/img/event/neoland_3.jpg', Media::TYPE_IMAGE));
+            $event->addMedia(new Media('build/static/video/event/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', 'build/static/img/event/neoland_3.jpg'));
 
             $this->addTimeTables($event);
 

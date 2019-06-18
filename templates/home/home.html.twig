@@ -2,7 +2,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('build/home.css') }}">
+
+    {{ encore_entry_link_tags('home') }}
 {% endblock %}
 
 {% block body %}
@@ -14,13 +15,13 @@
                         Здесь ты сможешь найти полезную информацию и новости сайта
                     </div>
                     <div class="block-body ml-4">
-                        <p><i class="fa fa fa-circle"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
-                        <p><i class="fa fa fa-circle"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
-                        <p><i class="fa fa fa-circle"></i> Ну вроде пока все :) И помни: <br></p>
+                        <p><i class="fa fa fa-angle-right"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
+                        <p><i class="fa fa fa-angle-right"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
+                        <p><i class="fa fa fa-angle-right"></i> Ну вроде пока все :) И помни: <br></p>
                         <p><i>Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление</i></p>
 
                         <div class="text-center">
-                            <img src="{{ asset('img/gatsby_motivation.png') }}" class="m-3">
+                            <img src="{{ asset('build/static/img/gatsby_motivation.png') }}" class="m-3">
                         </div>
 
                         <blockquote class="blockquote text-right mb-0">
@@ -82,5 +83,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('build/home.js') }}"></script>
+
+    {{ encore_entry_script_tags('home') }}
 {% endblock %}

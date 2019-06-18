@@ -11,16 +11,16 @@
     {% for media in eventParty.event.media|slice(0, 9)  %}
         {% if media.type == constant('App\\Entity\\Media::TYPE_IMAGE') %}
             <a class="col-sm-4 media" href="{{ media.src }}">
-                <img src="{{ media.src }}"/>
+                <img src="{{ asset(media.src) }}"/>
                 <div class="gallery-poster">
-                    <img src="{{ asset('img/zoom.png') }}" alt="{{ media.alt }}">
+                    <img src="{{ asset('build/static/img/components/zoom.png') }}" alt="{{ media.alt }}">
                 </div>
             </a>
         {% elseif media.type == constant('App\\Entity\\Media::TYPE_VIDEO') %}
             <a class="col-sm-4 media" data-poster="{{ media.videoPoster }}" data-sub-html="video caption1" data-html="#video-{{ media.id }}" >
-                <img src="{{ media.videoPoster }}" alt="{{ media.alt }}"/>
+                <img src="{{ asset(media.videoPoster) }}" alt="{{ media.alt }}"/>
                 <div class="gallery-poster video-poster">
-                    <img src="{{ asset('img/play-button.png') }}" alt="{{ media.alt }}">
+                    <img src="{{ asset('build/static/img/components/play-button.png') }}" alt="{{ media.alt }}">
                 </div>
             </a>
         {% endif %}

@@ -4,5 +4,5 @@ namespace App\Component\Infrastructure;
 
 class ResourceLocator
 {
-    public const USER_AVATAR_DIR = 'img/avatar/';
+    public const USER_AVATAR_DIR = 'build/static/img/avatar/';
 }

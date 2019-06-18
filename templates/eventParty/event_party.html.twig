@@ -3,7 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    <link rel="stylesheet" href="{{ asset('build/event_party.css') }}">
+    {{ encore_entry_link_tags('event_party') }}
 {% endblock %}
 
 {% block body %}
@@ -176,5 +176,5 @@
 {% block javascripts %}
     {{ parent() }}
 
-    <script src="{{ asset('build/event_party.js') }}"></script>
+    {{ encore_entry_script_tags('event_party') }}
 {% endblock %}

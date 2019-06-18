@@ -4,7 +4,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('build/fill_user.css') }}">
+
+    {{ encore_entry_link_tags('fill_user') }}
 {% endblock %}
 
 {% block body %}
@@ -49,5 +50,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('build/fill_user.js') }}"></script>
+
+    {{ encore_entry_script_tags('fill_user') }}
 {% endblock %}
