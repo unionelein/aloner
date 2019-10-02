@@ -1,43 +1,5 @@
-.block {
-    background-color: #fff;
-    border-radius: 6px;
-    border: 1px solid rgba(0,0,0,.0975);
-    padding: 25px;
-}
-
-.nav-block-content-wrapper .block:first-child {
-    border-top-left-radius: 0;
-}
-
-.block-header {
-    text-align: center;
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 25px;
-    color: #1d2124;
-}
-
-.block-body {
-    font-size: 16px;
-}
-
-.user-icon-block {
-    float: left;
-    text-align: center;
-    margin: 5px;
-    font-size: 12px;
-}
-
-.user-icon-block img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-}
-
-.current-user .user-icon-name {
-    font-weight: bold;
-    color: #212529;
-}
+@import "./markup/_block.scss";
+@import "./markup/_user.scss";
 
 .delimiter {
     border-top: 1px solid rgba(0,0,0,.0975);

@@ -7,78 +7,77 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8 ">
-                <div class="block">
-                    <div class="block-header">
-                        Здесь ты сможешь найти полезную информацию и новости сайта
-                    </div>
-                    <div class="block-body ml-4">
-                        <p><i class="fa fa fa-angle-right"></i> Чтобы начать поиск компании нажми кнопку <i>[Поиск]</i> справа</p>
-                        <p><i class="fa fa fa-angle-right"></i> Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку <i>[Дальше]</i>. Так можно сделать только 2 раза в день.</p>
-                        <p><i class="fa fa fa-angle-right"></i> Ну вроде пока все :) И помни: <br></p>
-                        <p><i>Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление</i></p>
-
-                        <div class="text-center">
-                            <img src="{{ asset('build/static/img/gatsby_motivation.png') }}" class="m-3">
-                        </div>
-
-                        <blockquote class="blockquote text-right mb-0">
-                            <p class="mb-0">Живешь ведь только раз! Решайся!</p>
-                            <footer class="blockquote-footer">Великий Гэтсби</footer>
-                        </blockquote>
-                    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8 ">
+            <div class="block">
+                <div class="block-header">
+                    Здесь ты сможешь найти полезную информацию и новости сайта
                 </div>
-            </div>
 
-            <div class="col-sm-4">
-                <div class="block">
-                    <div class="block-body">
-                        <div class="user-party-wrapper">
-                            <a href="{{ app.user.avatarPath }}" target="_blank" class="user-icon-block float-left">
-                                <img src="{{ asset(app.user.avatarPath) }}" alt="Аватар пользователя {{ app.user.name }}">
-                                <br>
-                                {{ app.user.name }}
-                            </a>
-                            <div class="clearfix"></div>
-                        </div>
+                <div class="block-body ml-4">
+                    + Чтобы начать поиск компании нажми кнопку [Поиск] справа<br>
+                    + Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку [Дальше]. Так можно сделать только 3 раза в день.<br>
+                    + Ну вроде пока все :) И помни:<br>
+                    - Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление
 
-                        <div class="event-party-history-wrapper">
-                            <button type="button" class="btn btn-light event-party-history-btn">История</button>
-                        </div>
-                        <hr>
+                    <div class="text-center">
+                        <img src="{{ asset('build/static/img/gatsby_motivation.png') }}" class="m-3">
+                    </div>
 
-                        <div class="search-criteria-wrapper">
-                            {{ form_start(searchCriteriaForm) }}
-                                <p>В какое время вы сможете пойти?</p>
-
-                                <div class="row mb-1">
-                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeFrom) }}</div>
-                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.timeTo) }}</div>
-                                </div>
-
-                                <p>В какой день?</p>
-                                <div class="row mb-3">
-                                    <div class="col-sm-6 form-group">{{ form_widget(searchCriteriaForm.day) }}</div>
-                                </div>
-
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-primary search-event-party-btn">Найти</button>
-                                </div>
-
-                                <div class="text-center m-1">--------- или ---------</div>
-
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-warning search-event-party-btn">Создать</button>
-                                </div>
-                            {{ form_end(searchCriteriaForm) }}
-                        </div>
+                    <div class="text-right">
+                        - Живешь ведь только раз! Решайся!<br>
+                        Великий Гэтсби
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="col-sm-4">
+            <div class="block">
+                <div class="block-body">
+
+                    <div class="users-block">
+                        <a href="{{ app.user.vkExtension.vkPageUrl }}" target="_blank" class="user-icon-block">
+                            <img src="{{ asset(app.user.avatarPath) }}" alt="Аватар пользователя {{ app.user.name }}">
+                            <div>{{ app.user.name }}</div>
+                        </a>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <hr class="mt-2">
+
+                    {{ form_start(searchCriteriaForm) }}
+
+                    <div class="search-criteria-wrapper">
+                        <b class="ml-1">День:</b>
+                        <div class="row mb-1 mt-1">
+                            <div class="col-sm-12 form-group">{{ form_widget(searchCriteriaForm.day) }}</div>
+                        </div>
+
+                        <b class="ml-1">Время:</b>
+                        <div class="row mt-1">
+                            <div class="col-sm-6 form-group mb-2">{{ form_widget(searchCriteriaForm.timeFrom) }}</div>
+                            <div class="col-sm-6 form-group mb-2">{{ form_widget(searchCriteriaForm.timeTo) }}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">{{ form_errors(searchCriteriaForm) }}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary search-event-party-btn">Поиск</button>
+                    </div>
+
+                    {{ form_end(searchCriteriaForm) }}
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}

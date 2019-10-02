@@ -4,44 +4,45 @@ namespace App\Component\Util;
 
 class Date
 {
-    private const JANUARY = 'января';
+    private const RESET_TIME = '00:00:00';
 
-    private const FEBRUARY = 'февраля';
+    private const RESET_DATE = '0000-01-01';
 
-    private const MARCH = 'марта';
+    /**
+     * @param string|\DateTime $date
+     *
+     * @return \DateTime
+     */
+    public static function date($date): \DateTime
+    {
+        if ($date instanceof \DateTime) {
+            return (clone $date)->modify(self::RESET_TIME);
+        }
 
-    private const APRIL = 'апреля';
+        if (\is_string($date)) {
+            return (new \DateTime($date))->modify(self::RESET_TIME);
+        }
 
-    private const MAY = 'мая';
+        throw new \InvalidArgumentException('Invalid date argument given');
+    }
 
-    private const JUNE = 'июня';
+    /**
+     * @param string|\DateTime $date
+     *
+     * @return \DateTime
+     */
+    public static function time($date): \DateTime
+    {
+        if ($date instanceof \DateTime) {
+            return (clone $date)->modify(self::RESET_DATE);
+        }
 
-    private const JULY = 'июля';
+        if (\is_string($date)) {
+            return (new \DateTime($date))->modify(self::RESET_DATE);
+        }
 
-    private const AUGUST = 'августа';
-
-    private const SEPTEMBER = 'сентября';
-
-    private const OCTOBER = 'октября';
-
-    private const NOVEMBER = 'ноября';
-
-    private const DECEMBER = 'декабря';
-
-    private const MONTHS = [
-        1  => self::JANUARY,
-        2  => self::FEBRUARY,
-        3  => self::MARCH,
-        4  => self::APRIL,
-        5  => self::MAY,
-        6  => self::JUNE,
-        7  => self::JULY,
-        8  => self::AUGUST,
-        9  => self::SEPTEMBER,
-        10 => self::OCTOBER,
-        11 => self::NOVEMBER,
-        12 => self::DECEMBER,
-    ];
+        throw new \InvalidArgumentException('Invalid date argument given');
+    }
 
     public static function convertDateToString(\DateTime $dateTime): string
     {
@@ -59,13 +60,6 @@ class Date
         $month = (int) $dateTime->format('m');
         $year  = ($dateTime->format('Y') === $today->format('Y')) ? '' : $dateTime->format('Y');
 
-        return $day . ' ' . self::MONTHS[$month] . ' ' . $year;
-    }
-
-    public static function date(\DateTime $dateTime): \DateTime
-    {
-        $clone = clone $dateTime;
-
-        return $clone->modify('00:00:00');
+        return $day . ' ' . Month::MONTHS[$month] . ' ' . $year;
     }
 }
