@@ -4,16 +4,20 @@ namespace App\Entity;
 
 use App\Component\Infrastructure\HashGenerator;
 use App\Component\Infrastructure\ResourceLocator;
-use App\Component\Vk\DTO\AccessToken;
-use App\Component\Model\VO\Sex;
+use App\Component\Util\Date;
+use App\Entity\VO\SearchCriteria;
+use App\Entity\VO\Sex;
+use App\Entity\VO\VkExtension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Webmozart\Assert\Assert as WebmozAssert;
 
 /**
+ * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface
@@ -25,53 +29,86 @@ class User implements UserInterface
     public const ROLE_FULL_REG = 'ROLE_FULL_REG';
 
     /**
+     * @var int
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="user_id")
      */
     private $id;
 
     /**
+     * @var string
+     *
      * @Assert\NotBlank()
-     * @ORM\Column(type="string", length=255, nullable=false)
+     * @ORM\Column(type="string", name="user_name", length=50)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @var string
+     *
+     * @ORM\Column(type="string", name="user_login", length=100, unique=true)
      * @Gedmo\Slug(fields={"name"})
      */
     private $login;
 
     /**
-     * @ORM\Column(type="json")
+     * @var array<string>
+     *
+     * @ORM\Column(type="json", name="user_roles")
      */
     private $roles = [];
 
     /**
-     * @ORM\OneToOne(targetEntity="VkUserExtension", mappedBy="user", cascade={"persist", "remove"})
+     * @var null|VkExtension
+     *
+     * @ORM\Embedded(class="App\Entity\VO\VkExtension", columnPrefix="user_")
      */
-    private $vkExtension;
+    private $vk;
 
     /**
+     * @var null|Sex
+     *
      * @Assert\NotNull()
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Embedded(class="App\Entity\VO\Sex", columnPrefix="user_")
      */
     private $sex;
 
     /**
+     * @var null|City
+     *
      * @Assert\NotBlank()
      * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="users")
+     * @ORM\JoinColumn(name="user_city_id", referencedColumnName="city_id", nullable=true)
      */
     private $city;
 
     /**
+     * @var null|\DateTime
+     *
      * @Assert\NotBlank()
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="date", name="user_birthday", nullable=true)
      */
     private $birthday;
 
     /**
+     * @var null|string
+     *
+     * @ORM\Column(type="string", name="user_avatar_path", length=255, nullable=true)
+     */
+    private $avatarPath;
+
+    /**
+     * @var null|SearchCriteria
+     *
+     * @ORM\Embedded(class="App\Entity\VO\SearchCriteria", columnPrefix="user_")
+     */
+    private $searchCriteria;
+
+    /**
+     * @var ArrayCollection|EventParty[]
+     *
      * @ORM\ManyToMany(targetEntity="App\Entity\EventParty", mappedBy="users")
      * @ORM\OrderBy({"id"="DESC"})
      */
@@ -86,20 +123,15 @@ class User implements UserInterface
     private $eventPartyHistories;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $avatar;
-
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\SearchCriteria", mappedBy="user", cascade={"persist", "remove"})
-     */
-    private $searchCriteria;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string
+     *
+     * @ORM\Column(type="string", name="user_temp_hash", length=50)
      */
     private $tempHash;
 
+    /**
+     * @param string $name
+     */
     public function __construct(string $name)
     {
         $this->eventParties        = new ArrayCollection();
@@ -107,22 +139,30 @@ class User implements UserInterface
 
         $this->name = $name;
         $this->updateTempHash();
-        $this->setSearchCriteria(new SearchCriteria($this));
 
         $this->addRole(self::ROLE_PARTIAL_REG);
     }
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * @return bool
+     */
     public function isWeb(): bool
     {
         return self::WEB_ID === $this->id;
     }
 
-    public function getLogin(): ?string
+    /**
+     * @return string
+     */
+    public function getLogin(): string
     {
         return $this->login;
     }
@@ -147,6 +187,11 @@ class User implements UserInterface
         return \array_unique($roles);
     }
 
+    /**
+     * @param array $roles
+     *
+     * @return User
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = \array_unique($roles);
@@ -154,6 +199,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param string $role
+     *
+     * @return User
+     */
     public function addRole(string $role): self
     {
         if (!\in_array($role, $this->roles, true)) {
@@ -163,6 +213,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param string $role
+     *
+     * @return bool
+     */
     public function hasRole(string $role): bool
     {
         return \in_array($role, $this->roles, true);
@@ -187,17 +242,25 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return User
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -205,71 +268,101 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getVkExtension(): ?VkUserExtension
+    /**
+     * @return VkExtension|null
+     */
+    public function getVk(): ?VkExtension
     {
-        return $this->vkExtension;
+        return $this->vk;
     }
 
-    public function setVkExtension(AccessToken $accessToken): self
+    /**
+     * @param VkExtension $vk
+     *
+     * @return User
+     */
+    public function setVk(VkExtension $vk): self
     {
-        $this->vkExtension = new VkUserExtension($accessToken, $this);
+        $this->vk = $vk;
 
         return $this;
     }
 
+    /**
+     * @return Sex|null
+     */
     public function getSex(): ?Sex
     {
-        return null !== $this->sex ? new Sex($this->sex) : null;
+        return $this->sex;
     }
 
+    /**
+     * @param Sex $sex
+     *
+     * @return User
+     */
     public function setSex(Sex $sex): self
     {
-        $this->sex = $sex->toValue();
+        $this->sex = $sex;
 
         return $this;
     }
 
-    public function isFullFilled(): bool
+    /**
+     * @return bool
+     */
+    public function isFilled(): bool
     {
         return $this->city
             && $this->birthday
-            && null !== $this->sex
-            && $this->vkExtension;
+            && $this->sex
+            && $this->vk;
     }
 
+    /**
+     * @return City|null
+     */
     public function getCity(): ?City
     {
         return $this->city;
     }
 
-    public function setCity(?City $city): self
+    /**
+     * @param City $city
+     *
+     * @return User
+     */
+    public function setCity(City $city): self
     {
         $this->city = $city;
 
         return $this;
     }
 
+    /**
+     * @return \DateTime|null
+     */
     public function getBirthday(): ?\DateTime
     {
         return $this->birthday;
     }
 
-    public function setBirthday(?\DateTime $birthday): self
+    /**
+     * @param \DateTime $birthday
+     *
+     * @return User
+     */
+    public function setBirthday(\DateTime $birthday): self
     {
         $this->birthday = $birthday;
 
         return $this;
     }
 
-    public function getAge(): int
-    {
-        return (int) $this->getBirthday()->diff(new \DateTime())->format('%y');
-    }
-
     /**
      * @return ArrayCollection|EventParty[]
      */
-    public function getEventParties(): Collection
+    public function getEventParties(): ArrayCollection
     {
         return $this->eventParties;
     }
@@ -277,11 +370,16 @@ class User implements UserInterface
     /**
      * @return ArrayCollection|EventPartyHistory[]
      */
-    public function getEventPartyHistories(): Collection
+    public function getEventPartyHistories(): ArrayCollection
     {
         return $this->eventPartyHistories;
     }
 
+    /**
+     * @param EventPartyHistory $history
+     *
+     * @return User
+     */
     public function addEventPartyHistory(EventPartyHistory $history): self
     {
         if (!$this->eventPartyHistories->contains($history)) {
@@ -291,52 +389,65 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getAvatar(): ?string
+    /**
+     * @param string $avatarPath
+     *
+     * @return User
+     */
+    public function setAvatarPath(string $avatarPath): self
     {
-        return $this->avatar;
-    }
-
-    public function setAvatar(string $avatar): self
-    {
-        $this->avatar = $avatar;
+        $this->avatarPath = $avatarPath;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getAvatarPath(): string
     {
-        if ($this->avatar) {
-            return $this->avatar;
+        if ($this->avatarPath) {
+            return $this->avatarPath;
         }
 
-        if ($sex = $this->getSex()) {
-            return ResourceLocator::USER_AVATAR_DIR . ($sex->isMale() ? 'guy_default.png' : 'girl_default.png');
+        if ($this->sex) {
+            return ResourceLocator::getDefaultAvatarForSex($this->sex);
         }
 
-        return ResourceLocator::USER_AVATAR_DIR . 'unknown_default.png';
+        return ResourceLocator::getDefaultAvatar();
     }
 
-    public function getSearchCriteria(): SearchCriteria
+    /**
+     * @return SearchCriteria|null
+     */
+    public function getSearchCriteria(): ?SearchCriteria
     {
         return $this->searchCriteria;
     }
 
-    private function setSearchCriteria(SearchCriteria $searchCriteria): self
+    /**
+     * @param SearchCriteria $searchCriteria
+     *
+     * @return User
+     */
+    public function setSearchCriteria(SearchCriteria $searchCriteria): self
     {
         $this->searchCriteria = $searchCriteria;
-
-        if ($this !== $searchCriteria->getUser()) {
-            $searchCriteria->setUser($this);
-        }
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getTempHash(): string
     {
         return $this->tempHash;
     }
 
+    /**
+     * @return User
+     */
     public function updateTempHash(): self
     {
         $this->tempHash = HashGenerator::createUnique();
@@ -344,8 +455,25 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getAge(): int
+    {
+        WebmozAssert::notNull($this->birthday, "У пользователя #{$this->id} не выставлена дата рождения ");
+
+        return (int) $this->birthday->diff(new \DateTime())->format('%y');
+    }
+
+    /**
+     * @param EventParty $eventParty
+     *
+     * @return User
+     */
     public function joinToEventParty(EventParty $eventParty): self
     {
+        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} не заполнил все данные");
+
         if (!$this->eventParties->contains($eventParty)) {
             $this->eventParties[] = $eventParty;
             $eventParty->addUser($this);
@@ -354,6 +482,9 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @return EventParty|null
+     */
     public function findLastActiveEventParty(): ?EventParty
     {
         foreach ($this->getEventParties() as $eventParty) {
@@ -365,6 +496,9 @@ class User implements UserInterface
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function hasActiveEventParty(): bool
     {
         return null !== $this->findLastActiveEventParty();
@@ -373,12 +507,12 @@ class User implements UserInterface
     /**
      * @return ArrayCollection|EventParty[]
      */
-    public function getSkippedEventParties(): Collection
+    public function getSkippedEventParties(): ArrayCollection
     {
         $skipped = new ArrayCollection();
 
         foreach ($this->eventPartyHistories as $history) {
-            if ($history->isActionSkip()) {
+            if ($history->isSkipAction()) {
                 $skipped[] = $history->getEventParty();
             }
         }
@@ -387,22 +521,36 @@ class User implements UserInterface
     }
 
     /**
+     * @param \DateTime|null $day
+     *
      * @return ArrayCollection|EventParty[]
      */
-    public function getSkippedTodayEvents(): Collection
+    public function getSkippedEvents(\DateTime $day = null): Collection
     {
-        $events = new ArrayCollection();
-        $today  = new \DateTime('00:00:00');
+        $day     = $day ? Date::date($day) : null;
+        $nextDay = $day ? (clone $day)->modify('+1 day') : null;
 
+        $events = new ArrayCollection();
         foreach ($this->eventPartyHistories as $history) {
-            if ($history->isActionSkip() && $history->getCreatedAt() > $today) {
-                $events[] = $history->getEventParty()->getEvent();
+            if (!$history->isSkipAction()) {
+                continue;
             }
+
+            if ($day && ($history->getCreatedAt() < $day || $history->getCreatedAt() > $nextDay)) {
+                continue;
+            }
+
+            $events[] = $history->getEventParty()->getEvent();
         }
 
         return $events;
     }
 
+    /**
+     * @param EventParty $eventParty
+     *
+     * @return User
+     */
     public function skipEventParty(EventParty $eventParty): self
     {
         if ($this->eventParties->contains($eventParty)) {
@@ -413,6 +561,12 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param EventParty $eventParty
+     * @param int        $action
+     *
+     * @return EventPartyHistory|null
+     */
     public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EventPartyHistory
     {
         foreach ($this->eventPartyHistories as $history) {
@@ -424,6 +578,11 @@ class User implements UserInterface
         return null;
     }
 
+    /**
+     * @param EventParty $eventParty
+     *
+     * @return string
+     */
     public function getNicknameIn(EventParty $eventParty): string
     {
         if ($history = $this->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN)) {

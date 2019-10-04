@@ -14,6 +14,11 @@ class TransactionalService
         $this->em = $em;
     }
 
+    /**
+     * @param callable $operation
+     *
+     * @throws \Exception
+     */
     public function execute(callable $operation): void
     {
         $this->em->beginTransaction();

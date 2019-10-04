@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\SearchCriteria;
+use App\Entity\VO\SearchCriteria;
 use App\Entity\User;
 use App\Form\SearchCriteriaType;
 use Doctrine\ORM\EntityManagerInterface;

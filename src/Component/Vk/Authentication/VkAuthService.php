@@ -18,6 +18,10 @@ class VkAuthService
     /** @var string */
     private $vkAppSecret;
 
+    /**
+     * @param int    $vkAppId
+     * @param string $vkAppSecret
+     */
     public function __construct(int $vkAppId, string $vkAppSecret)
     {
         $this->vkOAuth = new VKOAuth();
@@ -25,22 +29,31 @@ class VkAuthService
         $this->vkAppSecret = $vkAppSecret;
     }
 
-    public function getAccessToken(string $accessCode, string $redirectUrl): ?AccessToken
+    /**
+     * @param string $accessCode
+     * @param string $redirectUrl
+     *
+     * @return AccessToken
+     *
+     * @throws \Exception
+     */
+    public function getAccessToken(string $accessCode, string $redirectUrl): AccessToken
     {
-        try {
-            $response = $this->vkOAuth->getAccessToken($this->vkAppId, $this->vkAppSecret, $redirectUrl, $accessCode);
+        $response = $this->vkOAuth->getAccessToken($this->vkAppId, $this->vkAppSecret, $redirectUrl, $accessCode);
 
-            $expiresAt = $response['expires_in'] > 0
-                ? new \DateTime("+{$response['expires_in']} sec")
-                : null;
+        $expiresAt = $response['expires_in'] > 0
+            ? new \DateTime("+{$response['expires_in']} sec")
+            : null;
 
-            return new AccessToken($response['user_id'], $response['access_token'], $expiresAt);
-
-        } catch (\Exception $e) {
-            return null;
-        }
+        return new AccessToken($response['user_id'], $response['access_token'], $expiresAt);
     }
 
+    /**
+     * @param string $redirectUrl
+     * @param array  $scope
+     *
+     * @return string
+     */
     public function getAuthorizeUrl(string $redirectUrl, array $scope = []): string
     {
         return $this->vkOAuth->getAuthorizeUrl(

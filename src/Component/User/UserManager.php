@@ -46,6 +46,20 @@ class UserManager
         $this->userRepo      = $userRepo;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return User
+     */
+    public function create(string $name): User
+    {
+        $user = new User($name);
+
+        $this->em->persist($user);
+
+        return $user;
+    }
+
     public function join(User $user, EventParty $eventParty): void
     {
         $this->transactional->execute(static function (EntityManagerInterface $em) use ($user, $eventParty) {

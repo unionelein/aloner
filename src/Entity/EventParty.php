@@ -8,6 +8,8 @@ use App\Component\Model\DTO\EventPartyHistory\JoinHistory;
 use App\Component\Model\DTO\EventPartyHistory\EmptyDataHistory;
 use App\Component\Model\VO\TimeInterval;
 use App\Component\Util\Date;
+use App\Entity\VO\EPComposition;
+use App\Entity\VO\MeetingOptions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,6 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 /**
+ * @ORM\Table(name="event_party")
  * @ORM\Entity(repositoryClass="App\Repository\EventPartyRepository")
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
@@ -44,15 +47,19 @@ class EventParty
     private const MEETING_TIME_OFFSET = 10;
 
     /**
+     * @var int
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="ep_id")
      */
     private $id;
 
     /**
+     * @var Event
+     *
      * @ORM\ManyToOne(targetEntity="App\Entity\Event")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="ep_event_id", nullable=false)
      */
     private $event;
 
@@ -60,35 +67,33 @@ class EventParty
      * @var ArrayCollection|User[]
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="eventParties")
+     * @ORM\JoinTable(name="ep_user_map",
+     *     joinColumns={@ORM\JoinColumn(name="epu_ep_id", referencedColumnName="ep_id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="epu_user_id", referencedColumnName="user_id", onDelete="CASCADE")}
+     * )
      */
     private $users;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $status;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $numberOfGirls;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $numberOfGuys;
-
-    /**
-     * @var \DateTime
+     * @var int
      *
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="integer", name="ep_status")
      */
-    private $meetingAt;
+    private $status = self::STATUS_PENDING;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var EPComposition
+     *
+     * @ORM\Embedded(class="Composition", columnPrefix="ep_")
      */
-    private $meetingPlace;
+    private $composition;
+
+    /**
+     * @var MeetingOptions
+     *
+     * @ORM\Embedded(class="App\Entity\VO\MeetingOptions", columnPrefix="ep_")
+     */
+    private $meetingOptions;
 
     /**
      * @var EventPartyHistory[]|ArrayCollection
@@ -103,20 +108,24 @@ class EventParty
      */
     private $messages;
 
-    public function __construct(Event $event, int $numberOfGuys, int $numberOfGirls)
+    /**
+     * @param Event         $event
+     * @param EPComposition $epComposition
+     */
+    public function __construct(Event $event, EPComposition $epComposition)
     {
         $this->users     = new ArrayCollection();
         $this->histories = new ArrayCollection();
         $this->messages  = new ArrayCollection();
 
-        $this->event         = $event;
-        $this->numberOfGuys  = $numberOfGuys;
-        $this->numberOfGirls = $numberOfGirls;
-
-        $this->status       = self::STATUS_PENDING;
+        $this->event       = $event;
+        $this->composition = $epComposition;
     }
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
@@ -124,101 +133,101 @@ class EventParty
     /**
      * @return ArrayCollection|User[]
      */
-    public function getUsers(): Collection
+    public function getUsers(): ArrayCollection
     {
         return $this->users;
     }
 
+    /**
+     * @return Event
+     */
     public function getEvent(): Event
     {
         return $this->event;
     }
 
+    /**
+     * @return int
+     */
     public function getStatus(): int
     {
         return $this->status;
     }
 
+    /**
+     * @return ArrayCollection|EventPartyHistory[]
+     */
+    public function getHistories(): ArrayCollection
+    {
+        return $this->histories;
+    }
+
+    /**
+     * @return EPComposition
+     */
+    public function getComposition(): EPComposition
+    {
+        return $this->composition;
+    }
+
+    /**
+     * @return MeetingOptions
+     */
+    public function getMeetingOptions(): MeetingOptions
+    {
+        return $this->meetingOptions;
+    }
+
+    /**
+     * @param MeetingOptions $meetingOptions
+     *
+     * @return EventParty
+     */
+    public function setMeetingOptions(MeetingOptions $meetingOptions): self
+    {
+        $this->meetingOptions = $meetingOptions;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection|EventPartyMessage[]
+     */
+    public function getMessages(): ArrayCollection
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @return bool
+     */
     public function isPlaning(): bool
     {
         return self::STATUS_PLANING === $this->status;
     }
 
+    /**
+     * @return bool
+     */
     public function isReady(): bool
     {
         return self::STATUS_READY === $this->status;
     }
 
+    /**
+     * @return bool
+     */
     public function isReviews(): bool
     {
         return self::STATUS_REVIEWS === $this->status;
     }
 
+    /**
+     * @return bool
+     */
     public function isDone(): bool
     {
         return self::STATUS_DONE === $this->status;
-    }
-
-    /**
-     * @return ArrayCollection|EventPartyHistory[]
-     */
-    public function getHistories(): Collection
-    {
-        return $this->histories;
-    }
-
-    public function getNumberOfGirls(): int
-    {
-        return $this->numberOfGirls;
-    }
-
-    public function getNumberOfGuys(): int
-    {
-        return $this->numberOfGuys;
-    }
-
-    public function getMeetingAt(): ?\DateTime
-    {
-        return $this->meetingAt;
-    }
-
-    public function setMeetingAt(?\DateTime $meetingAt): self
-    {
-        $this->meetingAt = $meetingAt;
-        $this->onPlanProgress();
-
-        return $this;
-    }
-
-    public function getMeetingPlace(): ?string
-    {
-        return $this->meetingPlace;
-    }
-
-    public function setMeetingPlace(?string $meetingPlace): self
-    {
-        $this->meetingPlace = $meetingPlace;
-        $this->onPlanProgress();
-
-        return $this;
-    }
-
-    private function onPlanProgress(): void
-    {
-        if ($this->status !== self::STATUS_PLANING) {
-            return;
-        }
-
-        if ($this->meetingPlace && $this->meetingAt) {
-            $this->status = self::STATUS_READY;
-        }
-    }
-
-    public function markAsFillReviews(): self
-    {
-        $this->status = self::STATUS_REVIEWS;
-
-        return $this;
     }
 
     public function addUser(User $user): self
@@ -503,14 +512,6 @@ class EventParty
         }
 
         return $this;
-    }
-
-    /**
-     * @return ArrayCollection|EventPartyMessage[]
-     */
-    public function getMessages()
-    {
-        return $this->messages;
     }
 
     public function getMessageHistoryFor(User $user)

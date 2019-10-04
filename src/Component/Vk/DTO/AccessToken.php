@@ -2,6 +2,8 @@
 
 namespace App\Component\Vk\DTO;
 
+use Webmozart\Assert\Assert;
+
 class AccessToken
 {
     /** @var int */
@@ -13,21 +15,18 @@ class AccessToken
     /** @var null|\DateTime */
     private $expiresAt;
 
-    /** @var array */
-    private $extraFields;
-
     /**
      * @param int $userId
      * @param string $accessToken
      * @param null|\DateTime $expiresAt
-     * @param array $extraFields
      */
-    public function __construct(int $userId, string $accessToken, ?\DateTime $expiresAt, array $extraFields = [])
+    public function __construct(int $userId, string $accessToken, ?\DateTime $expiresAt)
     {
+        Assert::notEmpty($accessToken, 'Empty vk access token given');
+
         $this->userId = $userId;
         $this->accessToken = $accessToken;
         $this->expiresAt = $expiresAt;
-        $this->extraFields = $extraFields;
     }
 
     /**
@@ -52,13 +51,5 @@ class AccessToken
     public function getExpiresAt(): ?\DateTime
     {
         return $this->expiresAt;
-    }
-
-    /**
-     * @return array
-     */
-    public function getExtraFields(): array
-    {
-        return $this->extraFields;
     }
 }

@@ -34,7 +34,10 @@ class UserController extends BaseController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
-            $user->addRole(User::ROLE_FULL_REG);
+
+            if ($user->isFilled()) {
+                $user->addRole(User::ROLE_FULL_REG);
+            }
 
             $em->persist($user);
             $em->flush();

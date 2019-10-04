@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-class SympathyCardController
+class SympathyCardController extends BaseController
 {
 
 }

@@ -52,7 +52,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
         /** @var null|User $user */
         $user = $token->getUser();
 
-        if ($user && !$user->isFullFilled()) {
+        if ($user && !$user->isFilled()) {
             return new RedirectResponse($this->urlGenerator->generate('app_fill_user'));
         }
 

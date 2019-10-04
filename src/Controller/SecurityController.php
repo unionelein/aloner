@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Component\Vk\Authentication\VkAuthService;
 use App\Component\Vk\Authentication\VkSignUpService;
-use App\Repository\VkUserExtensionRepository;
+use App\Repository\UserRepository;
 use App\Security\Authenticator\VkAuthenticator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,30 +18,31 @@ class SecurityController extends BaseController
      */
     public function vkAuth(
         Request $request,
+        UserRepository $userRepo,
         VkAuthService $vkAuth,
         VkSignUpService $vkSignUpService,
-        VkUserExtensionRepository $vkExtensionRepo,
         GuardAuthenticatorHandler $guardHandler,
         VkAuthenticator $vkAuthenticator
     ) {
         $accessCode  = $request->get('code');
         $redirectUrl = $this->generateUrl('app_vk_auth', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        if ($accessCode && ($accessToken = $vkAuth->getAccessToken($accessCode, $redirectUrl))) {
-            $vkExtension = $vkExtensionRepo->findOneBy(['vkUserId' => $accessToken->getUserId()]);
-
-            if (!$vkExtension) {
-                // create new user with vk extension
-                $user = $vkSignUpService->execute($accessToken);
-                $vkExtension = $user->getVkExtension();
+        if ($accessCode) {
+            try {
+                $accessToken = $vkAuth->getAccessToken($accessCode, $redirectUrl);
+            } catch (\Exception $e) {
+                return $this->render('security/vk_auth.html.twig', [
+                    'vk_auth_url' => $vkAuth->getAuthorizeUrl($redirectUrl),
+                ]);
             }
 
-            return $guardHandler->authenticateUserAndHandleSuccess(
-                $vkExtension->getUser(),
-                $request,
-                $vkAuthenticator,
-                'main'
-            );
+            $user = $userRepo->findOneBy(['vk.userId' => $accessToken->getUserId()]);
+
+            if (!$user) {
+                $user = $vkSignUpService->execute($accessToken);
+            }
+
+            return $guardHandler->authenticateUserAndHandleSuccess($user, $request, $vkAuthenticator, 'main');
         }
 
         return $this->render('security/vk_auth.html.twig', [
@@ -52,7 +53,7 @@ class SecurityController extends BaseController
     /**
      * @Route("/logout", name="app_logout")
      */
-    public function logout()
+    public function logout(): void
     {
     }
 }
