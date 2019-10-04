@@ -28,7 +28,7 @@ class EventPartyController extends BaseController
     /**
      * @Route("/", name="app_event_party_current")
      */
-    public function current(EventDispatcherInterface $dispatcher)
+    public function current()
     {
         $user       = $this->getUser();
         $eventParty = $user->findLastActiveEventParty();
@@ -37,7 +37,7 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_main');
         }
 
-        return $this->eventParty($eventParty, $dispatcher);
+        return $this->redirectToRoute('app_event_party', ['id' => $eventParty->getId()]);
     }
 
     /**

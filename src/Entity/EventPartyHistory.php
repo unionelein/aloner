@@ -119,12 +119,12 @@ class EventPartyHistory
         return $this->action;
     }
 
-    public function isActionJoin(): bool
+    public function isJoinAction(): bool
     {
         return $this->action === self::ACTION_JOIN;
     }
 
-    public function isActionSkip(): bool
+    public function isSkipAction(): bool
     {
         return $this->action === self::ACTION_LEAVE;
     }

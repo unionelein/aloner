@@ -74,7 +74,7 @@ class EventPartyManager
         \shuffle($events);
 
         foreach ($events as $event) {
-            if ($user->getSkippedTodayEvents()->contains($event)) {
+            if ($user->getSkippedEvents(new \DateTime())->contains($event)) {
                 continue;
             }
 

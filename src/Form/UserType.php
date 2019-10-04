@@ -2,37 +2,38 @@
 
 namespace App\Form;
 
-use App\Component\Model\VO\Sex;
 use App\Entity\City;
 use App\Entity\User;
+use App\Entity\VO\Sex;
 use App\Validator\UserAgeRange;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 
 class UserType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', TextType::class, [
                 'label' => false,
-                'attr' => [
-                    'placeholder' => 'Имя',
-                ],
+                'attr' => ['placeholder' => 'Имя'],
                 'constraints' => [
                     new Length([
-                        'min' => 2, 'minMessage' => 'Слишком короткое имя',
-                        'max' => 11, 'maxMessage' => 'Слишком короткое имя',
-                    ])
-                ]
+                        'min' => 2,  'minMessage' => 'Слишком короткое имя',
+                        'max' => 11, 'maxMessage' => 'Слишком длинное имя',
+                    ]),
+                ],
             ])
             ->add('city', EntityType::class, [
                 'label' => false,
@@ -42,7 +43,10 @@ class UserType extends AbstractType
             ->add('sex', ChoiceType::class, [
                 'label' => false,
                 'placeholder' => 'Пол',
-                'choices' => \array_flip(Sex::SEX),
+                'choices' => [
+                    Sex::SEX[Sex::MALE]   => new Sex(Sex::MALE),
+                    Sex::SEX[Sex::FEMALE] => new Sex(Sex::FEMALE),
+                ],
             ])
             ->add('birthday', DateType::class, [
                 'widget' => 'single_text',
@@ -54,19 +58,16 @@ class UserType extends AbstractType
             ->add('acceptLicense', CheckboxType::class, [
                 'label' => 'Я согласен с правилами сайта',
                 'mapped' => false,
+                'constraints' => [
+                    new IsTrue(['message' => 'Для использования сервиса вы должны согласиться с правилами']),
+                ],
             ]);
-
-        $builder->get('sex')->addModelTransformer(new CallbackTransformer(
-            function (Sex $sex) {
-                return $sex->toValue();
-            },
-            function (bool $sex) {
-                return new Sex($sex);
-            }
-        ));
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,

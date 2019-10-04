@@ -2,6 +2,7 @@
 
 namespace App\Component\EventParty;
 
+use App\Component\Util\Date;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Repository\EventPartyRepository;
@@ -28,7 +29,7 @@ class EventPartyFinder
                 continue;
             }
 
-            if ($user->getSkippedTodayEvents()->contains($eventParty->getEvent())) {
+            if ($user->getSkippedEvents(new \DateTime())->contains($eventParty->getEvent())) {
                 continue;
             }
 

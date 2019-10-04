@@ -3,14 +3,13 @@
 namespace App\Form;
 
 use App\Component\Util\Date;
-use App\Entity\SearchCriteria;
+use App\Entity\VO\SearchCriteria;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class SearchCriteriaType extends AbstractType
@@ -25,13 +24,11 @@ class SearchCriteriaType extends AbstractType
                 'label' => false,
                 'required' => true,
                 'widget' => 'single_text',
-                'constraints' => [new NotNull()],
             ])
             ->add('timeTo', TimeType::class, [
                 'label' => false,
                 'required' => true,
                 'widget' => 'single_text',
-                'constraints' => [new NotNull()],
             ])
             ->add('day', ChoiceType::class, [
                 'label' => false,

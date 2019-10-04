@@ -13,7 +13,7 @@ class EventPartyVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return \in_array($attribute, [self::DO_ACTIONS]) && $subject instanceof EventParty;
+        return $attribute ===self::DO_ACTIONS && $subject instanceof EventParty;
     }
 
     /**
