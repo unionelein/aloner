@@ -3,19 +3,24 @@
 namespace App\Component\User;
 
 use App\Component\EventParty\EventPartyManager;
-use App\Component\Events\EventPartyEvent;
+use App\Component\Events\EPEvent;
 use App\Component\Events\Events;
-use App\Component\Events\EventPartyActionEvent;
-use App\Component\Events\MeetingPointOfferAnsweredEvent;
-use App\Component\Events\MeetingPointOfferedEvent;
+use App\Component\Events\EPActionEvent;
+use App\Component\Events\MOAnsweredEvent;
+use App\Component\Events\MOOfferedEvent;
 use App\Component\Infrastructure\TransactionalService;
 use App\Component\Model\DTO\EventPartyHistory\AnswerToMeetingPointOfferHistory;
 use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferHistory;
 use App\Component\Model\DTO\Form\MeetingPointData;
 use App\Component\Model\VO\TimeInterval;
+use App\Entity\EPAnswerMOHistory;
+use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
-use App\Entity\EventPartyHistory;
+use App\Entity\EPHistory;
 use App\Entity\User;
+use App\Entity\VO\History\MOAnswerData;
+use App\Entity\VO\History\MOOfferData;
+use App\Entity\VO\MeetingOptions;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -34,6 +39,12 @@ class UserManager
     /** @var UserRepository */
     private $userRepo;
 
+    /**
+     * @param TransactionalService     $transactional
+     * @param UserRepository           $userRepo
+     * @param EventDispatcherInterface $dispatcher
+     * @param EntityManagerInterface   $em
+     */
     public function __construct(
         TransactionalService $transactional,
         UserRepository $userRepo,
@@ -60,6 +71,10 @@ class UserManager
         return $user;
     }
 
+    /**
+     * @param User       $user
+     * @param EventParty $eventParty
+     */
     public function join(User $user, EventParty $eventParty): void
     {
         $this->transactional->execute(static function (EntityManagerInterface $em) use ($user, $eventParty) {
@@ -70,26 +85,21 @@ class UserManager
             $em->flush();
         });
 
-        $this->dispatcher->dispatch(
-            Events::JOIN_TO_EVENT_PARTY,
-            new EventPartyActionEvent($user, $eventParty)
-        );
+        $this->dispatcher->dispatch(Events::EP_JOIN, new EPActionEvent($user, $eventParty));
 
         if ($eventParty->isFilled()) {
-            $this->dispatcher->dispatch(Events::EVENT_PARTY_FILLED, new EventPartyEvent($eventParty));
+            $this->dispatcher->dispatch(Events::EP_FILLED, new EPEvent($eventParty));
 
-            // if no reserve required we can just offer supposed datetime
-            if ($eventParty->getEvent()->isReserveRequired() === false) {
-                $webUser   = $this->userRepo->getWebUser();
-                $place     = $eventParty->getEvent()->getAddress();
-                $meetingAt = $eventParty->generateMeetingAt();
-                $interval  = $eventParty->generateEventTimeInterval($meetingAt);
-
-                $this->offerMeetingPoint($webUser, $eventParty, $place, $meetingAt, $interval);
+            if (false === $eventParty->getEvent()->isReservationRequired()) {
+                $this->offerDefaultMO($eventParty);
             }
         }
     }
 
+    /**
+     * @param User       $user
+     * @param EventParty $eventParty
+     */
     public function skip(User $user, EventParty $eventParty): void
     {
         $this->transactional->execute(static function (EntityManagerInterface $em) use ($user, $eventParty) {
@@ -100,12 +110,12 @@ class UserManager
             $em->flush();
         });
 
-        $this->dispatcher->dispatch(
-            Events::SKIP_EVENT_PARTY,
-            new EventPartyActionEvent($user, $eventParty)
-        );
+        $this->dispatcher->dispatch(Events::EP_SKIP, new EPActionEvent($user, $eventParty));
     }
 
+    /**
+     * @param User $user
+     */
     public function updateTempHash(User $user): void
     {
         $user->updateTempHash();
@@ -114,52 +124,55 @@ class UserManager
         $this->em->flush();
     }
 
-    public function offerMeetingPoint(
-        User $user,
-        EventParty $eventParty,
-        string $meetingPlace,
-        \DateTime $meetingDateTime,
-        TimeInterval $eventTimeInterval = null
-    ): void {
-        $eventTimeInterval = $eventTimeInterval ?? $eventParty->generateEventTimeInterval($meetingDateTime);
-
-        $offer = new EventPartyHistory(
-            $eventParty,
-            $user,
-            EventPartyHistory::ACTION_MEETING_POINT_OFFER,
-            new MeetingPointOfferHistory($meetingPlace, $meetingDateTime, $eventTimeInterval)
-        );
+    /**
+     * @param User           $user
+     * @param EventParty     $eventParty
+     * @param MeetingOptions $MO
+     */
+    public function offerMO(User $user, EventParty $eventParty, MeetingOptions $MO): void
+    {
+        $offer = new EPOfferMOHistory($eventParty, $user, new MOOfferData($MO));
 
         $this->em->persist($offer);
         $this->em->flush();
 
-        $this->dispatcher->dispatch(
-            Events::MEETING_POINT_OFFERED,
-            new MeetingPointOfferedEvent($user, $eventParty, $offer)
-        );
+        $this->dispatcher->dispatch(Events::MO_OFFERED, new MOOfferedEvent($offer));
     }
 
-    public function answerOnMeetingPointOffer(User $user, int $offerId, bool $answer)
+    /**
+     * @param EventParty $eventParty
+     */
+    public function offerDefaultMO(EventParty $eventParty): void
     {
-        $offerHistory = $this->em->getRepository(EventPartyHistory::class)->find($offerId);
+        $event     = $eventParty->getEvent();
+        $web       = $this->userRepo->getWebUser();
+        $timetable = $event->findAvailableTimetableForSC($eventParty->getUsersSearchCriteria());
+        $address   = $event->getContacts()->getAddress();
 
-        if (!$offerHistory) {
-            throw new \InvalidArgumentException('No offer found');
+        if ($timetable) {
+            $this->offerMO($web, $eventParty, new MeetingOptions($timetable->getTimeFrom(), $address));
         }
+    }
 
-        $history = new EventPartyHistory(
-            $offerHistory->getEventParty(),
-            $user,
-            EventPartyHistory::ACTION_ANSWER_TO_MEETING_POINT_OFFER,
-            new AnswerToMeetingPointOfferHistory($offerId, $answer)
-        );
+    /**
+     * @param User                $user
+     * @param EventParty          $eventParty
+     * @param EPOfferMOHistory    $offer
+     * @param bool                $answer
+     * @param MeetingOptions|null $newMO
+     */
+    public function answerMO(
+        User $user,
+        EventParty $eventParty,
+        EPOfferMOHistory $offer,
+        bool $answer,
+        MeetingOptions $newMO = null
+    ): void {
+        $answerHistory = new EPAnswerMOHistory($eventParty, $user, $offer, new MOAnswerData($answer, $newMO));
 
-        $this->em->persist($history);
+        $this->em->persist($answerHistory);
         $this->em->flush();
 
-        $this->dispatcher->dispatch(
-            Events::MEETING_POINT_OFFER_ANSWERED,
-            new MeetingPointOfferAnsweredEvent($offerHistory->getEventParty(), $offerHistory, $answer)
-        );
+        $this->dispatcher->dispatch(Events::MO_ANSWERED, new MOAnsweredEvent($answerHistory));
     }
 }

@@ -2,91 +2,83 @@
 
 namespace App\Entity;
 
-use App\Component\Model\Collection\TimetableCollection;
+use App\Component\Util\Week;
+use App\Entity\VO\Contacts;
+use App\Entity\VO\Range;
+use App\Entity\VO\SearchCriteria;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Webmozart\Assert\Assert as WebmozAssert;
 
 /**
+ * @ORM\Table(name="event")
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
  */
 class Event
 {
     use TimestampableEntity;
 
-    public const TIMETABLE_TYPE_VISIT = 1;
-
-    public const TIMETABLE_TYPE_DAY = 2;
-
-    public const TIMETABLE_TYPES = [
-        self::TIMETABLE_TYPE_VISIT,
-        self::TIMETABLE_TYPE_DAY,
-    ];
-
     /**
+     * @var int
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="event_id")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var string
+     *
+     * @ORM\Column(type="string", name="event_name", length=255)
      */
-    private $title;
+    private $name;
 
     /**
-     * @ORM\Column(type="text")
+     * @var string
+     *
+     * @ORM\Column(type="text", name="event_desc", nullable=true)
      */
     private $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="events")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Contacts
+     *
+     * @ORM\Embedded(class="App\Entity\VO\Contacts", columnPrefix="event_")
      */
-    private $city;
+    private $contacts;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", name="event_reservation_req")
      */
-    private $address;
+    private $reservationRequired = false;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @var Range
+     *
+     * @ORM\Embedded(class="App\Entity\VO\Range", columnPrefix="event_people_")
      */
-    private $reserveRequired;
+    private $numberOfPeople;
 
     /**
-     * @ORM\Column(type="smallint")
-     */
-    private $minNumberOfPeople;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $maxNumberOfPeople;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $site;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * Contains unit
+     *
+     * @var string
+     *
+     * @ORM\Column(type="string", name="event_price", length=20, nullable=true)
      */
     private $price;
 
     /**
-     * @ORM\Column(type="string", length=15, nullable=true)
+     * @var int
+     *
+     * @ORM\Column(type="integer", name="event_duration")
      */
-    private $phone;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $yandexMapSrc;
+    private $duration;
 
     /**
      * @var ArrayCollection|Timetable[]
@@ -96,146 +88,148 @@ class Event
     private $timetables;
 
     /**
-     * @ORM\Column(type="smallint", nullable=true)
-     */
-    private $timetableType;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $duration;
-
-    /**
+     * @var Media[]
+     *
      * @ORM\ManyToMany(targetEntity="App\Entity\Media", cascade={"persist"})
+     * @ORM\JoinTable(name="event_media_map",
+     *     joinColumns={@ORM\JoinColumn(name="emp_event_id", referencedColumnName="event_id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="emp_media_id", referencedColumnName="media_id", onDelete="CASCADE")}
+     * )
      */
     private $media;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Cafe")
+     * @param string   $name
+     * @param int      $duration
+     * @param Contacts $contacts
+     * @param Range    $numberOfPeople
      */
-    private $cafe;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $pathToCafeYandexMapSrc;
-
-    public function __construct(string $title, string $description, City $city, string $address, bool $reserveRequired, int $minNumberOfPeople, int $maxNumberOfPeople)
+    public function __construct(string $name, int $duration, Contacts $contacts, Range $numberOfPeople)
     {
         $this->timetables = new ArrayCollection();
         $this->media      = new ArrayCollection();
 
-        $this->title       = $title;
-        $this->description = $description;
-
-        $this->city            = $city;
-        $this->address         = $address;
-        $this->reserveRequired = $reserveRequired;
-
-        $this->minNumberOfPeople = $minNumberOfPeople;
-        $this->maxNumberOfPeople = $maxNumberOfPeople;
-
+        $this->name           = $name;
+        $this->duration       = $duration;
+        $this->contacts       = $contacts;
+        $this->numberOfPeople = $numberOfPeople;
     }
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getTitle(): string
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
-        return $this->title;
+        return $this->name;
     }
 
+    /**
+     * @return string
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function getCity(): City
+    /**
+     * @param string $description
+     *
+     * @return Event
+     */
+    public function setDescription(string $description): self
     {
-        return $this->city;
-    }
-
-    public function getAddress(): string
-    {
-        return $this->address;
-    }
-
-    public function isReserveRequired(): bool
-    {
-        return $this->reserveRequired;
-    }
-
-    public function getMinNumberOfPeople(): int
-    {
-        return $this->minNumberOfPeople;
-    }
-
-    public function getMaxNumberOfPeople(): int
-    {
-        return $this->maxNumberOfPeople;
-    }
-
-    public function getSite(): ?string
-    {
-        return $this->site;
-    }
-
-    public function setSite(?string $site): self
-    {
-        $this->site = $site;
+        $this->description = $description;
 
         return $this;
     }
 
+    /**
+     * @return Contacts
+     */
+    public function getContacts(): Contacts
+    {
+        return $this->contacts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReservationRequired(): bool
+    {
+        return $this->reservationRequired;
+    }
+
+    /**
+     * @param bool $reservationRequired
+     *
+     * @return Event
+     */
+    public function setReservationRequired(bool $reservationRequired): self
+    {
+        $this->reservationRequired = $reservationRequired;
+
+        return $this;
+    }
+
+    /**
+     * @return Range
+     */
+    public function getNumberOfPeople(): Range
+    {
+        return $this->numberOfPeople;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getPrice(): ?string
     {
         return $this->price;
     }
 
-    public function setPrice(?string $price): self
+    /**
+     * @param string $price
+     *
+     * @return Event
+     */
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getPhone(): ?string
+    /**
+     * @param null|int $weekDay
+     *
+     * @return ArrayCollection|Timetable[]
+     */
+    public function getTimetables(int $weekDay = null): ArrayCollection
     {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): self
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getYandexMapSrc(): ?string
-    {
-        return $this->yandexMapSrc;
-    }
-
-    public function setYandexMapSrc(?string $yandexMapSrc): self
-    {
-        $this->yandexMapSrc = $yandexMapSrc;
-
-        return $this;
-    }
-
-    public function getTimetables(): TimetableCollection
-    {
-        $timetableCollection = new TimetableCollection($this->timetableType);
-
-        foreach ($this->timetables as $timetable) {
-            $timetableCollection->add($timetable);
+        if (null === $weekDay) {
+            return $this->timetables;
         }
 
-        return $timetableCollection;
+        WebmozAssert::keyExists(Week::DAYS, $weekDay);
+
+        return $this->timetables->filter(function (Timetable $timetable) use ($weekDay) {
+            return $timetable->getWeekDay() === $weekDay;
+        });
     }
 
+    /**
+     * @param Timetable $timetable
+     *
+     * @return Event
+     */
     public function addTimetable(Timetable $timetable): self
     {
         if (!$this->timetables->contains($timetable)) {
@@ -245,6 +239,11 @@ class Event
         return $this;
     }
 
+    /**
+     * @param Timetable $timetable
+     *
+     * @return Event
+     */
     public function removeTimetable(Timetable $timetable): self
     {
         if ($this->timetables->contains($timetable)) {
@@ -254,38 +253,27 @@ class Event
         return $this;
     }
 
-    public function getTimetableType(): ?int
-    {
-        return $this->timetableType;
-    }
-
-    public function setTimetableType(?int $timetableType): self
-    {
-        $this->timetableType = $timetableType;
-
-        return $this;
-    }
-
-    public function getDuration(): ?int
+    /**
+     * @return int
+     */
+    public function getDuration(): int
     {
         return $this->duration;
-    }
-
-    public function setDuration(?int $duration): self
-    {
-        $this->duration = $duration;
-
-        return $this;
     }
 
     /**
      * @return ArrayCollection|Media[]
      */
-    public function getMedia(): Collection
+    public function getMedia(): ArrayCollection
     {
         return $this->media;
     }
 
+    /**
+     * @param Media $media
+     *
+     * @return Event
+     */
     public function addMedia(Media $media): self
     {
         if (!$this->media->contains($media)) {
@@ -295,6 +283,11 @@ class Event
         return $this;
     }
 
+    /**
+     * @param Media $media
+     *
+     * @return Event
+     */
     public function removeMedia(Media $media): self
     {
         if ($this->media->contains($media)) {
@@ -304,27 +297,30 @@ class Event
         return $this;
     }
 
-    public function getCafe(): ?Cafe
+    /**
+     * @param SearchCriteria $searchCriteria
+     *
+     * @return Timetable|null
+     */
+    public function findAvailableTimetableForSC(SearchCriteria $searchCriteria): ?Timetable
     {
-        return $this->cafe;
-    }
+        $dayTimetables = $this->getTimetables(Week::weekDay($searchCriteria->getDay()));
 
-    public function setCafe(?Cafe $cafe): self
-    {
-        $this->cafe = $cafe;
+        foreach ($dayTimetables as $timetable) {
+            $startTime = $timetable->getTimeFrom();
 
-        return $this;
-    }
+            if ($searchCriteria->getTimeFrom() >= $startTime || $searchCriteria->getTimeTo() < $startTime) {
+                continue;
+            }
 
-    public function getPathToCafeYandexMapSrc(): ?string
-    {
-        return $this->pathToCafeYandexMapSrc;
-    }
+            $availableTime = $searchCriteria->getTimeTo()->diff($timetable->getTimeFrom());
+            $availableMins = $availableTime->h * 60 + $availableTime->i;
 
-    public function setPathToCafeYandexMapSrc(?string $pathToCafeYandexMapSrc): self
-    {
-        $this->pathToCafeYandexMapSrc = $pathToCafeYandexMapSrc;
+            if ($availableMins > $this->duration/2) {
+                return $timetable;
+            }
+        }
 
-        return $this;
+        return null;
     }
 }

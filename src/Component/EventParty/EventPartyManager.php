@@ -2,89 +2,107 @@
 
 namespace App\Component\EventParty;
 
-use App\Component\Events\EventPartyActionEvent;
-use App\Component\Events\EventPartyEvent;
-use App\Component\Events\Events;
-use App\Component\Infrastructure\TransactionalService;
-use App\Component\Model\DTO\EventPartyHistory\EmptyDataHistory;
-use App\Entity\Event;
+use App\Component\Event\EventManager;
+use App\Component\EventParty\Exception\NoEventsForUserException;
 use App\Entity\EventParty;
-use App\Entity\EventPartyHistory;
 use App\Entity\User;
-use App\Repository\EventRepository;
-use App\Repository\UserRepository;
+use App\Entity\VO\PeopleComposition;
+use App\Repository\EventPartyRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Security;
 
 class EventPartyManager
 {
-    /** @var EventRepository */
-    private $eventRepo;
+    /** @var EventPartyRepository */
+    private $epRepo;
+
+    /** @var EntityManagerInterface */
+    private $em;
+
+    /** @var EventManager */
+    private $eventManager;
 
     /**
-     * @var EventDispatcherInterface
+     * @param EventPartyRepository   $epRepo
+     * @param EntityManagerInterface $em
+     * @param EventManager           $eventManager
      */
-    private $dispatcher;
-
-    /**
-     * @var TransactionalService
-     */
-    private $transactional;
-    /**
-     * @var UserRepository
-     */
-    private $userRepo;
-
     public function __construct(
-        TransactionalService $transactional,
-        EventDispatcherInterface $dispatcher,
-        EventRepository $eventRepo,
-        UserRepository $userRepo
+        EventPartyRepository $epRepo,
+        EntityManagerInterface $em,
+        EventManager $eventManager
     ) {
-        $this->eventRepo  = $eventRepo;
-        $this->dispatcher = $dispatcher;
-        $this->transactional = $transactional;
-        $this->userRepo = $userRepo;
+        $this->epRepo  = $epRepo;
+        $this->em = $em;
+        $this->eventManager = $eventManager;
     }
 
-    public function createForUser(User $user): ?EventParty
+    /**
+     * @param User $user
+     *
+     * @return EventParty
+     * @throws \Exception
+     */
+    public function createForUser(User $user): EventParty
     {
-        $event = $this->findEventForUser($user);
+        $event = $this->eventManager->findForUser($user);
 
         if (!$event) {
-            return null;
+            throw new NoEventsForUserException('No events for user found');
         }
 
-        $minNumOfEachSex = (int) \ceil($event->getMinNumberOfPeople() / 2);
-        $maxNumOfEachSex = (int) \floor($event->getMaxNumberOfPeople() / 2);
-        $numOfEachSex    = \random_int($minNumOfEachSex, $maxNumOfEachSex);
+        $numOfPeople = $event->getNumberOfPeople()->randomEven();
+        $composition = new PeopleComposition($numOfPeople / 2, $numOfPeople / 2);
 
-        return new EventParty($event, $numOfEachSex, $numOfEachSex);
+        $eventParty = new EventParty($event, $composition);
+
+        $this->em->persist($eventParty);
+        $this->em->flush();
+
+        return $eventParty;
     }
 
-    private function findEventForUser(User $user): ?Event
+    /**
+     * @param User $user
+     *
+     * @return null|EventParty
+     * @throws \Exception
+     */
+    public function findForUser(User $user): ?EventParty
     {
-        $events = $this->eventRepo->findAppropriateEventsForUser($user);
+        $eventParties = $this->epRepo->findAvailableForUser($user);
+        $this->sortByRelevance($eventParties);
 
-        if (\count($events) === 0) {
-            return null;
-        }
-
-        \shuffle($events);
-
-        foreach ($events as $event) {
-            if ($user->getSkippedEvents(new \DateTime())->contains($event)) {
+        $today = new \DateTime();
+        foreach ($eventParties as $eventParty) {
+            if ($user->getSkippedEventParties()->contains($eventParty)) {
                 continue;
             }
 
-            if (!EventTimeChecker::findAvailableEventTimetableForUser($user, $event)) {
+            if ($user->getSkippedEvents($today)->contains($eventParty->getEvent())) {
                 continue;
             }
 
-            return $event;
+            if (!$eventParty->canUserJoin($user)) {
+                continue;
+            }
+
+            return $eventParty;
         }
 
         return null;
+    }
+
+    /**
+     * @param EventParty[] $eventParties
+     */
+    private function sortByRelevance(array &$eventParties): void
+    {
+        \usort($eventParties, function (EventParty $ep1, EventParty $ep2) {
+            if ($ep1->getPeopleRemaining() === $ep2->getPeopleRemaining()) {
+                return $ep2->getUsers()->count() <=> $ep1->getUsers()->count();
+            }
+
+            return $ep1->getPeopleRemaining() <=> $ep2->getPeopleRemaining();
+        });
     }
 }

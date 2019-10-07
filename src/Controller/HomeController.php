@@ -34,10 +34,12 @@ class HomeController extends BaseController
             /** @var SearchCriteria $searchCriteria */
             $searchCriteria = $searchCriteriaForm->getData();
 
-            $em->persist($searchCriteria);
+            $user->setSearchCriteria($searchCriteria);
+
+            $em->persist($user);
             $em->flush();
 
-            return $this->redirectToRoute('app_join_to_event_party');
+            return $this->redirectToRoute('app_event_party_find');
         }
 
         return $this->render('home/home.html.twig', [

@@ -44,22 +44,26 @@ class Date
         throw new \InvalidArgumentException('Invalid date argument given');
     }
 
-    public static function convertDateToString(\DateTime $dateTime): string
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return string
+     */
+    public static function rusFormat(\DateTime $dateTime): string
     {
-        $today = new \DateTime();
+        $time = $dateTime->format('H:i');
 
-        if (self::date($dateTime) == self::date($today)) {
-            return 'Сегодня';
+        switch (true) {
+            case self::date($dateTime) == self::date(''):
+                $date = 'Сегодня';
+                break;
+            case self::date($dateTime) == self::date('+1 day'):
+                $date = 'Завтра';
+                break;
+            default:
+                $date  = $dateTime->format('d') . ' ' . Month::month($dateTime);
         }
 
-        if (self::date($dateTime) == self::date($today)->modify('+1 day')) {
-            return 'Завтра';
-        }
-
-        $day   = (int) $dateTime->format('d');
-        $month = (int) $dateTime->format('m');
-        $year  = ($dateTime->format('Y') === $today->format('Y')) ? '' : $dateTime->format('Y');
-
-        return $day . ' ' . Month::MONTHS[$month] . ' ' . $year;
+        return "{$date} в {$time}";
     }
 }

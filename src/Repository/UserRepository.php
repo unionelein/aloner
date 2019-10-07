@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -33,13 +34,13 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return User
+     */
     public function getWebUser(): User
     {
         $user = $this->find(User::WEB_ID);
-
-        if (!$user) {
-            throw new \LogicException('Web user does not exists');
-        }
+        Assert::notNull($user, 'Web user does not exists');
 
         return $user;
     }

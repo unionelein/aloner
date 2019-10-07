@@ -16,14 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class SearchCriteria
 {
-    public const ALLOWED_MINS_OFFSET = 10;
-
-    public const DEFAULT_DAY = 'now';
-
-    public const DEFAULT_TIME_FROM = '18:00';
-
-    public const DEFAULT_TIME_TO = '23:00';
-
     /**
      * @var \DateTime
      *
@@ -65,7 +57,7 @@ class SearchCriteria
      */
     public function getTimeFrom(): \DateTime
     {
-        return $this->timeFrom;
+        return clone $this->timeFrom;
     }
 
     /**
@@ -85,7 +77,7 @@ class SearchCriteria
      */
     public function getTimeTo(): \DateTime
     {
-        return $this->timeTo;
+        return clone $this->timeTo;
     }
 
     /**
@@ -105,7 +97,7 @@ class SearchCriteria
      */
     public function getDay(): \DateTime
     {
-        return $this->day;
+        return clone $this->day;
     }
 
     /**

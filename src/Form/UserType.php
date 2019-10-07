@@ -26,8 +26,8 @@ class UserType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => false,
-                'attr' => ['placeholder' => 'Имя'],
+                'label'       => false,
+                'attr'        => ['placeholder' => 'Имя'],
                 'constraints' => [
                     new Length([
                         'min' => 2,  'minMessage' => 'Слишком короткое имя',
@@ -36,28 +36,28 @@ class UserType extends AbstractType
                 ],
             ])
             ->add('city', EntityType::class, [
-                'label' => false,
-                'class' => City::class,
+                'label'       => false,
+                'class'       => City::class,
                 'placeholder' => 'Ваш город',
             ])
             ->add('sex', ChoiceType::class, [
-                'label' => false,
+                'label'       => false,
                 'placeholder' => 'Пол',
-                'choices' => [
+                'choices'     => [
                     Sex::SEX[Sex::MALE]   => new Sex(Sex::MALE),
                     Sex::SEX[Sex::FEMALE] => new Sex(Sex::FEMALE),
                 ],
             ])
             ->add('birthday', DateType::class, [
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'label' => false,
-                'help' => 'Дата рождения',
+                'widget'      => 'single_text',
+                'format'      => 'dd/MM/yyyy',
+                'label'       => false,
+                'help'        => 'Дата рождения',
                 'constraints' => [new UserAgeRange()],
             ])
             ->add('acceptLicense', CheckboxType::class, [
-                'label' => 'Я согласен с правилами сайта',
-                'mapped' => false,
+                'label'       => 'Я согласен с правилами сайта',
+                'mapped'      => false,
                 'constraints' => [
                     new IsTrue(['message' => 'Для использования сервиса вы должны согласиться с правилами']),
                 ],

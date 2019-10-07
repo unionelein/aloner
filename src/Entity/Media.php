@@ -25,7 +25,7 @@ class Media
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="media_id")
      */
     private $id;
 

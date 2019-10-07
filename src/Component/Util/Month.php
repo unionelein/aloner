@@ -7,6 +7,8 @@
 
 namespace App\Component\Util;
 
+use Webmozart\Assert\Assert;
+
 class Month
 {
     public const JANUARY = 'январь';
@@ -47,4 +49,17 @@ class Month
         11 => self::NOVEMBER,
         12 => self::DECEMBER,
     ];
+
+    /**
+     * @param \DateTime $date
+     *
+     * @return string
+     */
+    public static function month(\DateTime $date): string
+    {
+        $monthNum = (int) $date->format('m');
+        Assert::keyExists(self::MONTHS, $monthNum);
+
+        return self::MONTHS[$monthNum];
+    }
 }

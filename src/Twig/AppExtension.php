@@ -9,27 +9,44 @@ use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
-    public function getFilters()
+    /**
+     * @return array
+     */
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('dateToString', [$this, 'dateToString']),
+            new TwigFilter('rusDate', [$this, 'rusDate']),
         ];
     }
 
-    public function getFunctions()
+    /**
+     * @return array
+     */
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('area', [$this, 'calculateArea']),
         ];
     }
 
+    /**
+     * @param int $width
+     * @param int $length
+     *
+     * @return float|int
+     */
     public function calculateArea(int $width, int $length)
     {
         return $width * $length;
     }
 
-    public function dateToString(\DateTime $date): string
+    /**
+     * @param \DateTime $date
+     *
+     * @return string
+     */
+    public function rusDate(\DateTime $date): string
     {
-       return Date::convertDateToString($date);
+       return Date::rusFormat($date);
     }
 }

@@ -13,33 +13,6 @@ use Ratchet\Wamp\WampServerInterface;
 
 class Pusher implements WampServerInterface
 {
-    public const TYPE_JOIN = 'join';
-
-    public const TYPE_SKIP = 'skip';
-
-    public const TYPE_FILLED = 'filled';
-
-    public const TYPE_MEETING_POINT_OFFER = 'meeting_point_offer';
-
-    public const TYPE_MEETING_POINT_OFFER_ANSWER = 'meeting_point_offer_answer';
-
-    public const TYPE_MEETING_POINT_OFFER_ACCEPTED = 'meeting_point_offer_accepted';
-
-    public const TYPE_CAFE_OFFER = 'cafe_offer';
-
-    public const TYPE_CAFE_OFFER_ANSWER = 'cafe_offer_answer';
-
-    public const TYPES = [
-        self::TYPE_JOIN,
-        self::TYPE_SKIP,
-        self::TYPE_FILLED,
-        self::TYPE_MEETING_POINT_OFFER,
-        self::TYPE_MEETING_POINT_OFFER_ANSWER,
-        self::TYPE_MEETING_POINT_OFFER_ACCEPTED,
-        self::TYPE_CAFE_OFFER,
-        self::TYPE_CAFE_OFFER_ANSWER,
-    ];
-
     /** @var Topic[] */
     private $topics = [];
 
@@ -52,6 +25,9 @@ class Pusher implements WampServerInterface
     /** @var EventPartyRepository */
     private $epRepo;
 
+    /**
+     * @param EntityManagerInterface $em
+     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->em       = $em;
@@ -104,36 +80,16 @@ class Pusher implements WampServerInterface
      */
     public function onMessage(string $json): void
     {
-        $data = \json_decode($json, true);
-
-        $topicKey   = $data['topic'] ?? null;
-        $type       = $data['type'] ?? null;
-        $pusherData = $data['data'] ?? null;
-
-        if (!$topicKey || !$type || !$pusherData) {
-            return;
-        }
-
-        if (!\in_array($type, self::TYPES, true)) {
-            return;
-        }
+        $data     = \json_decode($json, true);
+        $topicKey = $data['topic'] ?? null;
 
         if (!\array_key_exists($topicKey, $this->topics)) {
             return;
         }
 
-        $topic = $this->topics[$topicKey] ?? null;
-
-        if (!$topic || $topic->count() === 0) {
-            return;
-        }
-
         echo "Send data {$json}\n";
 
-        $topic->broadcast(\json_encode([
-            'type' => $type,
-            'data' => $pusherData,
-        ]));
+        $this->topics[$topicKey]->broadcast($json);
     }
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)

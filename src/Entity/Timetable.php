@@ -3,122 +3,134 @@
 namespace App\Entity;
 
 use App\Component\Model\VO\TimeInterval;
+use App\Component\Util\Date;
+use App\Component\Util\Week;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
 
 /**
+ * @ORM\Table(name="timetable")
  * @ORM\Entity(repositoryClass="App\Repository\TimetableRepository")
  */
 class Timetable
 {
-    public const MONDAY = 1;
+    public const TYPE_VISIT = 1;
 
-    public const TUESDAY = 2;
+    public const TYPE_DAY = 2;
 
-    public const WEDNESDAY = 3;
-
-    public const THURSDAY = 4;
-
-    public const FRIDAY = 5;
-
-    public const SATURDAY = 6;
-
-    public const SUNDAY = 0;
-
-    public const WEEK_DAYS = [
-        self::MONDAY    => 'Понедельник',
-        self::TUESDAY   => 'Вторник',
-        self::WEDNESDAY => 'Среда',
-        self::THURSDAY  => 'Четверг',
-        self::FRIDAY    => 'Пятница',
-        self::SATURDAY  => 'Суббота',
-        self::SUNDAY    => 'Воскресенье',
-    ];
-
-    public const SHORT_WEEK_DAYS = [
-        self::MONDAY    => 'Пн',
-        self::TUESDAY   => 'Вт',
-        self::WEDNESDAY => 'Ср',
-        self::THURSDAY  => 'Чт',
-        self::FRIDAY    => 'Пт',
-        self::SATURDAY  => 'Сб',
-        self::SUNDAY    => 'Вс',
+    public const TYPES = [
+        self::TYPE_VISIT,
+        self::TYPE_DAY,
     ];
 
     /**
+     * @var int
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="timetable_id")
      */
     private $id;
 
     /**
+     * @var Event
+     *
      * @ORM\ManyToOne(targetEntity="App\Entity\Event", inversedBy="timetables")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="timetable_event_id", referencedColumnName="event_id", nullable=false)
      */
     private $event;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
+     *
+     * @ORM\Column(type="smallint", name="timetable_week_day")
      */
     private $weekDay;
 
     /**
-     * @ORM\Column(type="time")
+     * @var int
+     *
+     * @ORM\Column(type="smallint", name="timetable_type")
+     */
+    private $type;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="time", name="timetable_time_from")
      */
     private $timeFrom;
 
     /**
-     * @ORM\Column(type="time")
+     * @var \DateTime
+     *
+     * @ORM\Column(type="time", name="timetable_time_to")
      */
     private $timeTo;
 
+    /**
+     * @param Event     $event
+     * @param int       $weekDay
+     * @param \DateTime $timeFrom
+     * @param \DateTime $timeTo
+     * @param int       $type
+     */
     public function __construct(
         Event $event,
         int $weekDay,
         \DateTime $timeFrom,
-        \DateTime $timeTo
+        \DateTime $timeTo,
+        int $type
     ) {
-        $this->setWeekDay($weekDay);
+        Assert::keyExists(Week::DAYS, $weekDay);
+        Assert::oneOf($type, self::TYPES);
 
-        $this->timeFrom = TimeInterval::time($timeFrom);
-        $this->timeTo   = TimeInterval::time($timeTo);
+        $this->weekDay  = $weekDay;
+        $this->timeFrom = Date::time($timeFrom);
+        $this->timeTo   = Date::time($timeTo);
+        $this->type     = $type;
 
         $this->event = $event;
         $event->addTimetable($this);
     }
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * @return Event
+     */
     public function getEvent(): Event
     {
         return $this->event;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getTimeFrom(): \DateTime
     {
-        return TimeInterval::time($this->timeFrom);
+        return clone $this->timeFrom;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getTimeTo(): \DateTime
     {
-        return TimeInterval::time($this->timeTo);
+        return clone $this->timeTo;
     }
 
+    /**
+     * @return int
+     */
     public function getWeekDay(): int
     {
         return $this->weekDay;
-    }
-
-    private function setWeekDay(int $weekDay): self
-    {
-        Assert::keyExists(self::WEEK_DAYS, $weekDay);
-
-        $this->weekDay = $weekDay;
-
-        return $this;
     }
 }

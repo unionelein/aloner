@@ -15,13 +15,13 @@ use Webmozart\Assert\Assert;
  */
 class Sex
 {
-    public const FEMALE = false;
-
     public const MALE = true;
 
+    public const FEMALE = false;
+
     public const SEX = [
-        self::FEMALE => 'Девушка',
-        self::MALE   => 'Парень',
+        self::MALE      => 'Парень',
+        self::FEMALE    => 'Девушка',
     ];
 
     /**
@@ -55,5 +55,13 @@ class Sex
     public function isFemale(): bool
     {
         return self::FEMALE === $this->sex;
+    }
+
+    /**
+     * @return bool
+     */
+    public function toValue(): bool
+    {
+        return $this->sex;
     }
 }

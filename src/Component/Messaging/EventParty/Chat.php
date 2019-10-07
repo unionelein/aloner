@@ -5,7 +5,7 @@ namespace App\Component\Messaging\EventParty;
 use App\Component\Messaging\EventParty\Model\Chat\ClientDataCollection;
 use App\Component\Messaging\EventParty\Model\Chat\ClientData;
 use App\Entity\EventParty;
-use App\Entity\EventPartyMessage;
+use App\Entity\EPMessage;
 use App\Entity\User;
 use App\Repository\EventPartyRepository;
 use App\Repository\UserRepository;
@@ -115,7 +115,7 @@ class Chat implements MessageComponentInterface
     {
         $clientData = $this->clientCollection->findByConnection($from);
 
-        if (!$clientData || empty($data['message']) || \strlen($data['message']) > EventPartyMessage::MAX_MESSAGE_LENGTH) {
+        if (!$clientData || empty($data['message']) || \strlen($data['message']) > EPMessage::MAX_MSG_LENGTH) {
             return;
         }
 

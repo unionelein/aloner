@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
-use App\Component\EventParty\EventPartyFinder;
 use App\Component\EventParty\EventPartyManager;
+use App\Component\EventParty\Exception\NoEventsForUserException;
 use App\Component\Events\Events;
-use App\Component\Events\EventPartyActionEvent;
+use App\Component\Events\EPActionEvent;
 use App\Component\Model\DTO\Form\MeetingPointData;
 use App\Component\User\UserManager;
+use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
 use App\Entity\User;
+use App\Entity\VO\MeetingOptions;
 use App\Form\MeetingPointOfferType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,10 +28,21 @@ use App\Security\Voter\EventPartyVoter;
  */
 class EventPartyController extends BaseController
 {
+    /** @var UserManager */
+    private $userManager;
+
+    /**
+     * @param UserManager $userManager
+     */
+    public function __construct(UserManager $userManager)
+    {
+        $this->userManager = $userManager;
+    }
+
     /**
      * @Route("/", name="app_event_party_current")
      */
-    public function current()
+    public function current(): Response
     {
         $user       = $this->getUser();
         $eventParty = $user->findLastActiveEventParty();
@@ -44,20 +58,20 @@ class EventPartyController extends BaseController
      * @Route("/{id}", name="app_event_party", requirements={"id"="\d+"})
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
      */
-    public function eventParty(EventParty $eventParty, EventDispatcherInterface $dispatcher)
+    public function eventParty(EventParty $eventParty, EventDispatcherInterface $dispatcher): Response
     {
-        $dispatcher->dispatch(
-            Events::LOAD_EVENT_PARTY,
-            new EventPartyActionEvent($this->getUser(), $eventParty)
-        );
+        $user = $this->getUser();
+
+        $this->userManager->updateTempHash($user);
+        $dispatcher->dispatch(Events::EP_LOAD, new EPActionEvent($user, $eventParty));
 
         return $this->render('eventParty/event_party.html.twig', ['eventParty' => $eventParty]);
     }
 
     /**
-     * @Route("/join", name="app_join_to_event_party")
+     * @Route("/find", name="app_event_party_find")
      */
-    public function join(UserManager $userManager, EventPartyFinder $eventPartyFinder, EventPartyManager $epManager)
+    public function find(EventPartyManager $epManager): Response
     {
         $user = $this->getUser();
 
@@ -65,13 +79,13 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_event_party_current');
         }
 
-        $eventParty = $eventPartyFinder->findForUser($user) ?? $epManager->createForUser($user);
-
-        if (!$eventParty) {
+        try {
+            $eventParty = $epManager->findForUser($user) ?? $epManager->createForUser($user);
+        } catch (NoEventsForUserException $e) {
             return $this->redirectToRoute('app_no_events_found');
         }
 
-        $userManager->join($user, $eventParty);
+        $this->userManager->join($user, $eventParty);
 
         return $this->redirectToRoute('app_event_party_current');
     }
@@ -79,19 +93,19 @@ class EventPartyController extends BaseController
     /**
      * @Route("/skip/{id}", name="app_skip_event_party")
      */
-    public function skip(EventParty $eventParty, UserManager $userManager)
+    public function skip(EventParty $eventParty): Response
     {
-        $userManager->skip($this->getUser(), $eventParty);
+        $this->userManager->skip($this->getUser(), $eventParty);
 
-        return $this->redirectToRoute('app_join_to_event_party');
+        return $this->redirectToRoute('app_event_party_find');
     }
 
     /**
      * @Route("/leave/{id}", name="app_leave_event_party")
      */
-    public function leave(EventParty $eventParty, UserManager $userManager)
+    public function leave(EventParty $eventParty): Response
     {
-        $userManager->skip($this->getUser(), $eventParty);
+        $this->userManager->skip($this->getUser(), $eventParty);
 
         return $this->redirectToRoute('app_main');
     }
@@ -99,58 +113,40 @@ class EventPartyController extends BaseController
     /**
      * @Route("/no_events_found", name="app_no_events_found")
      */
-    public function noEventsFound()
+    public function noEventsFound(): Response
     {
         return $this->render('eventParty/no_events_found.html.twig');
     }
 
     /**
-     * @Route("/meeting_point_offer/{id}", name="app_meeting_point_offer")
+     * @Route("/offer_mo/{id}", name="app_offer_mo")
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     *
+     * @ParamConverter("MO", class="App\Entity\VO\MeetingOptions")
      */
-    public function meetingPointOffer(EventParty $eventParty, Request $request, UserManager $userManager)
+    public function offerMO(EventParty $eventParty, MeetingOptions $MO): JsonResponse
     {
-        $form = $this->createForm(MeetingPointOfferType::class, null, [
-            'eventParty'      => $eventParty,
-            'rejectedOfferId' => $request->get('rejected_offer_id'),
-        ])->handleRequest($request);
+        $this->userManager->offerMO($this->getUser(), $eventParty, $MO);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var MeetingPointData $meetingPointData */
-            $meetingPointData = $form->getData();
-
-            $place = $meetingPointData->getPlace();
-            $day   = clone $meetingPointData->getDay();
-            $time  = clone $meetingPointData->getTime();
-
-            $meetingDateTime  = $day->modify($time->format('H:i:s'));
-
-            if ($rejectedOfferId = $form->get('rejectedOfferId')->getData()) {
-                $userManager->answerOnMeetingPointOffer($this->getUser(), (int) $rejectedOfferId, false);
-            }
-
-            $userManager->offerMeetingPoint($this->getUser(), $eventParty, $place, $meetingDateTime);
-
-            return new JsonResponse(['status' => 'success']);
-        }
-
-        return $this->render('eventParty/meeting_point_offer.html.twig', [
-            'eventParty'        => $eventParty,
-            'form'              => $form->createView(),
-        ]);
+        return new JsonResponse(['success' => true]);
     }
 
     /**
-     * @Route("/meeting_point_offer_answer/{id}", name="app_meeting_point_offer_answer")
+     * @Route("/answer_mo/{epId}/{offerId}/{answer}", name="app_answer_mo")
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     *
+     * @ParamConverter("eventParty", class="App\Entity\EventParty", options={"id": "epId"})
+     * @ParamConverter("offer", class="App\Entity\EPOfferMOHistory", options={"id": "offerId"})
+     * @ParamConverter("newMO", class="App\Entity\VO\MeetingOptions")
      */
-    public function meetingPointOfferAnswer(EventParty $eventParty, Request $request, UserManager $userManager)
-    {
-        $offerId = (int) $request->get('offer_id');
-        $answer  = (bool) $request->get('answer');
+    public function answerMO(
+        EventParty $eventParty,
+        EPOfferMOHistory $offer,
+        bool $answer,
+        MeetingOptions $newMO = null
+    ): JsonResponse {
+        $this->userManager->answerMO($this->getUser(), $eventParty, $offer, $answer, $newMO);
 
-        $userManager->answerOnMeetingPointOffer($this->getUser(), $offerId, $answer);
-
-        return new Response();
+        return new JsonResponse(['success' => true]);
     }
 }

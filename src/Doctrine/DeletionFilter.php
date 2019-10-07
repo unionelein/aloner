@@ -3,7 +3,7 @@
 namespace App\Doctrine;
 
 use App\Entity\EventParty;
-use App\Entity\EventPartyHistory;
+use App\Entity\EPHistory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 

@@ -7,7 +7,7 @@
 
 namespace App\Component\Messaging\EventParty;
 
-use App\Component\Messaging\EventParty\Model\Pusher\PusherDataInterface;
+use App\Component\Messaging\EventParty\Model\Pusher\Data\PusherData;
 
 class PusherFacade
 {
@@ -22,16 +22,13 @@ class PusherFacade
         $this->socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my pusher');
     }
 
-    public function send(PusherDataInterface $data): void
+    /**
+     * @param PusherData $data
+     */
+    public function send(PusherData $data): void
     {
         $this->socket->connect(self::ADDRESS);
-
-        $this->socket->send(\json_encode([
-            'topic' => $data->getTopicId(),
-            'type'  => $data->getType(),
-            'data'  => $data,
-        ]));
-
+        $this->socket->send(\json_encode($data->toArray()));
         $this->socket->disconnect(self::ADDRESS);
     }
 }

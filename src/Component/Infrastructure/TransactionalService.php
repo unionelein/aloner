@@ -16,8 +16,6 @@ class TransactionalService
 
     /**
      * @param callable $operation
-     *
-     * @throws \Exception
      */
     public function execute(callable $operation): void
     {

@@ -78,7 +78,7 @@ class User implements UserInterface
     /**
      * @var null|City
      *
-     * @Assert\NotBlank()
+     * @Assert\NotNull()
      * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="users")
      * @ORM\JoinColumn(name="user_city_id", referencedColumnName="city_id", nullable=true)
      */
@@ -87,7 +87,7 @@ class User implements UserInterface
     /**
      * @var null|\DateTime
      *
-     * @Assert\NotBlank()
+     * @Assert\NotNull()
      * @ORM\Column(type="date", name="user_birthday", nullable=true)
      */
     private $birthday;
@@ -115,12 +115,12 @@ class User implements UserInterface
     private $eventParties;
 
     /**
-     * @var ArrayCollection|EventPartyHistory[]
+     * @var ArrayCollection|EPHistory[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\EventPartyHistory", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="EPHistory", mappedBy="user")
      * @ORM\OrderBy({"createdAt"="DESC"})
      */
-    private $eventPartyHistories;
+    private $epHistories;
 
     /**
      * @var string
@@ -134,8 +134,8 @@ class User implements UserInterface
      */
     public function __construct(string $name)
     {
-        $this->eventParties        = new ArrayCollection();
-        $this->eventPartyHistories = new ArrayCollection();
+        $this->eventParties = new ArrayCollection();
+        $this->epHistories  = new ArrayCollection();
 
         $this->name = $name;
         $this->updateTempHash();
@@ -344,7 +344,7 @@ class User implements UserInterface
      */
     public function getBirthday(): ?\DateTime
     {
-        return $this->birthday;
+        return clone $this->birthday;
     }
 
     /**
@@ -368,22 +368,22 @@ class User implements UserInterface
     }
 
     /**
-     * @return ArrayCollection|EventPartyHistory[]
+     * @return ArrayCollection|EPHistory[]
      */
-    public function getEventPartyHistories(): ArrayCollection
+    public function getEpHistories(): ArrayCollection
     {
-        return $this->eventPartyHistories;
+        return $this->epHistories;
     }
 
     /**
-     * @param EventPartyHistory $history
+     * @param EPHistory $history
      *
      * @return User
      */
-    public function addEventPartyHistory(EventPartyHistory $history): self
+    public function addEventPartyHistory(EPHistory $history): self
     {
-        if (!$this->eventPartyHistories->contains($history)) {
-            $this->eventPartyHistories[] = $history;
+        if (!$this->epHistories->contains($history)) {
+            $this->epHistories[] = $history;
         }
 
         return $this;
@@ -472,7 +472,7 @@ class User implements UserInterface
      */
     public function joinToEventParty(EventParty $eventParty): self
     {
-        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} не заполнил все данные");
+        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} не заполнил не все данные");
 
         if (!$this->eventParties->contains($eventParty)) {
             $this->eventParties[] = $eventParty;
@@ -511,7 +511,7 @@ class User implements UserInterface
     {
         $skipped = new ArrayCollection();
 
-        foreach ($this->eventPartyHistories as $history) {
+        foreach ($this->epHistories as $history) {
             if ($history->isSkipAction()) {
                 $skipped[] = $history->getEventParty();
             }
@@ -531,7 +531,7 @@ class User implements UserInterface
         $nextDay = $day ? (clone $day)->modify('+1 day') : null;
 
         $events = new ArrayCollection();
-        foreach ($this->eventPartyHistories as $history) {
+        foreach ($this->epHistories as $history) {
             if (!$history->isSkipAction()) {
                 continue;
             }
@@ -565,11 +565,13 @@ class User implements UserInterface
      * @param EventParty $eventParty
      * @param int        $action
      *
-     * @return EventPartyHistory|null
+     * @return EPHistory|null
      */
-    public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EventPartyHistory
+    public function getLastEPHistoryFor(EventParty $eventParty, int $action): ?EPHistory
     {
-        foreach ($this->eventPartyHistories as $history) {
+        WebmozAssert::oneOf($action, EPHistory::ACTIONS);
+
+        foreach ($this->epHistories as $history) {
             if ($history->getEventParty() === $eventParty && $history->getAction() === $action) {
                 return $history;
             }
@@ -585,7 +587,7 @@ class User implements UserInterface
      */
     public function getNicknameIn(EventParty $eventParty): string
     {
-        if ($history = $this->getLastEPHistoryFor($eventParty, EventPartyHistory::ACTION_JOIN)) {
+        if ($history = $this->getLastEPHistoryFor($eventParty, EPHistory::ACTION_JOIN)) {
             return $history->getData()->getNickname() ?? $this->getName();
         }
 

@@ -47,9 +47,12 @@ class VkUserProvider
         $first   = $userData['first_name'];
         $last    = $userData['last_name'];
         $city    = $userInfo['city']['title'] ?? null;
-        $sex     = isset(self::SEX[$userData['sex']]) ? new Sex(self::SEX[$userData['sex']]) : null;
         $photo50 = $userData['photo_50'];
-        $bdate   = \preg_match('#^\d{1,2}\.\d{1,2}.\d{1,4}$#', $userData['bdate'] ?? '')
+
+        $sexVal = $userData['sex'] ?? null;
+        $sex    = isset(self::SEX[$sexVal]) ? new Sex(self::SEX[$sexVal]) : null;
+
+        $bdate = \preg_match('#^\d{1,2}\.\d{1,2}.\d{1,4}$#', $userData['bdate'] ?? '')
             ? new \DateTime($userData['bdate'])
             : null;
 

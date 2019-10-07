@@ -11,5 +11,5 @@ class UserAgeRange extends Constraint
 {
     public $tooYoung = 'Сайт доступен только с {{ minAge }} лет.';
 
-    public $tooOld = 'Сайт доступен только до {{ maxAge }} лет.';
+    public $tooOld = 'Сайт доступен до {{ maxAge }} лет.';
 }

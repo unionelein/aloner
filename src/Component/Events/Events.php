@@ -4,17 +4,17 @@ namespace App\Component\Events;
 
 class Events
 {
-    public const LOAD_EVENT_PARTY = 'event_party.load';
+    public const EP_LOAD = 'event_party.load';
 
-    public const JOIN_TO_EVENT_PARTY = 'event_party.join';
+    public const EP_JOIN = 'event_party.join';
 
-    public const SKIP_EVENT_PARTY = 'event_party.skip';
+    public const EP_SKIP = 'event_party.skip';
 
-    public const EVENT_PARTY_FILLED = 'event_party.filled';
+    public const EP_FILLED = 'event_party.filled';
 
-    public const MEETING_POINT_OFFERED = 'event_party.meeting_point_offered';
+    public const MO_OFFERED = 'meeting_options.offered';
 
-    public const MEETING_POINT_OFFER_ANSWERED = 'event_party.meeting_point_offer_answered';
+    public const MO_ANSWERED = 'meeting_options.answered';
 
-    public const MEETING_POINT_OFFER_ACCEPTED = 'event_party.meeting_point_offer_accepted';
+    public const MO_ACCEPTED = 'meeting_options.accepted';
 }

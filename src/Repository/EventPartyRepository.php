@@ -15,6 +15,9 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class EventPartyRepository extends ServiceEntityRepository
 {
+    /**
+     * @param RegistryInterface $registry
+     */
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, EventParty::class);
@@ -25,14 +28,14 @@ class EventPartyRepository extends ServiceEntityRepository
      *
      * @return EventParty[]
      */
-    public function findAvailableEventPartiesForUser(User $user): array
+    public function findAvailableForUser(User $user): array
     {
-        return $this->createQueryBuilder('event_party')
-            ->select('event_party, event')
-            ->innerJoin('event_party.event', 'event')
-            ->andWhere('event_party.status = :pendingStatus')
+        return $this->createQueryBuilder('ep')
+            ->select('ep, event')
+            ->innerJoin('ep.event', 'event')
+            ->andWhere('ep.status = :statusPending')
             ->andWhere('event.city = :userCity')
-            ->setParameter('pendingStatus', EventParty::STATUS_PENDING)
+            ->setParameter('statusPending', EventParty::STATUS_PENDING)
             ->setParameter('userCity', $user->getCity())
             ->getQuery()
             ->getResult();
