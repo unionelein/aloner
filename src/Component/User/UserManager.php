@@ -21,6 +21,7 @@ use App\Entity\User;
 use App\Entity\VO\History\MOAnswerData;
 use App\Entity\VO\History\MOOfferData;
 use App\Entity\VO\MeetingOptions;
+use App\Entity\VO\SearchCriteria;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -144,13 +145,16 @@ class UserManager
      */
     public function offerDefaultMO(EventParty $eventParty): void
     {
-        $event     = $eventParty->getEvent();
-        $web       = $this->userRepo->getWebUser();
-        $timetable = $event->findAvailableTimetableForSC($eventParty->getUsersSearchCriteria());
-        $address   = $event->getContacts()->getAddress();
+        /** @var SearchCriteria $usersSC */
+        $usersSC = $eventParty->getUsersSearchCriteria();
+        $event   = $eventParty->getEvent();
+        $web     = $this->userRepo->getWebUser();
 
-        if ($timetable) {
-            $this->offerMO($web, $eventParty, new MeetingOptions($timetable->getTimeFrom(), $address));
+        if ($timetable = $event->findAvailableTimetableForSC($usersSC)) {
+            $address = $event->getContacts()->getAddress();
+            $time    = \max($timetable->getTimeFrom(), $usersSC->getTimeFrom());
+
+            $this->offerMO($web, $eventParty, new MeetingOptions($time, $address));
         }
     }
 
