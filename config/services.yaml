@@ -32,8 +32,9 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
     # Param converters
     meeting_options_converter:
-        class: InternalSite\PharmacyBundle\ParamConverter\ReverseBillingOptionsParamConverter
+        class: App\ParamConverter\MeetingOptionsConverter
         tags:
-            - { name: request.param_converter, priority: 1, converter: reverse_bill_options_converter }
+            - { name: request.param_converter, priority: 1, converter: meeting_options_converter }
