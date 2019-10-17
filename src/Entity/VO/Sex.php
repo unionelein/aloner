@@ -27,7 +27,7 @@ class Sex
     /**
      * @var bool
      *
-     * @ORM\Column(type="boolean", name="Sex")
+     * @ORM\Column(type="boolean", name="Sex", nullable=true)
      */
     private $sex;
 

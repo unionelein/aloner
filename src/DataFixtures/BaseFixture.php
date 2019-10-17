@@ -15,9 +15,12 @@ abstract class BaseFixture extends Fixture
     /** @var Generator */
     protected $faker;
 
-    abstract protected function loadData();
+    abstract protected function loadData(): void;
 
-    public function load(ObjectManager $manager)
+    /**
+     * @param ObjectManager $manager
+     */
+    public function load(ObjectManager $manager): void
     {
         $this->manager = $manager;
         $this->faker   = Factory::create();
@@ -27,13 +30,18 @@ abstract class BaseFixture extends Fixture
         $this->manager->flush();
     }
 
-    public function createMany(string $alias, int $count, callable $factory)
+    /**
+     * @param string   $alias
+     * @param int      $count
+     * @param callable $factory
+     */
+    public function createMany(string $alias, int $count, callable $factory): void
     {
         for ($i = 1; $i <= $count; $i++) {
             $entity = $factory($i);
 
             $this->manager->persist($entity);
-            $this->addReference($alias . '_' . $i, $entity);
+            $this->addReference("{$alias}_{$i}", $entity);
         }
     }
 }

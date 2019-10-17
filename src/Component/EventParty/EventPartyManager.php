@@ -50,7 +50,7 @@ class EventPartyManager
             throw new NoEventsForUserException('No events for user found');
         }
 
-        $numOfPeople = $event->getNumberOfPeople()->randomEven();
+        $numOfPeople = $event->getPeopleRange()->randomEven();
         $composition = new PeopleComposition($numOfPeople / 2, $numOfPeople / 2);
 
         $eventParty = new EventParty($event, $composition);

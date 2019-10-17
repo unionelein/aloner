@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Webmozart\Assert\Assert as WebmozAssert;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Table(name="event_party")
@@ -122,6 +123,9 @@ class EventParty
      */
     public function __construct(Event $event, PeopleComposition $composition)
     {
+        Assert::greaterThanEq($composition->getNumberOfPeople(), $event->getPeopleRange()->getMin());
+        Assert::lessThanEq($composition->getNumberOfPeople(), $event->getPeopleRange()->getMax());
+
         $this->users     = new ArrayCollection();
         $this->histories = new ArrayCollection();
         $this->messages  = new ArrayCollection();

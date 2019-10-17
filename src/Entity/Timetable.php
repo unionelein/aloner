@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Component\Model\VO\TimeInterval;
 use App\Component\Util\Date;
 use App\Component\Util\Week;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,16 +42,16 @@ class Timetable
     /**
      * @var int
      *
-     * @ORM\Column(type="smallint", name="timetable_week_day")
+     * @ORM\Column(type="smallint", name="timetable_type")
      */
-    private $weekDay;
+    private $type;
 
     /**
      * @var int
      *
-     * @ORM\Column(type="smallint", name="timetable_type")
+     * @ORM\Column(type="smallint", name="timetable_week_day")
      */
-    private $type;
+    private $weekDay;
 
     /**
      * @var \DateTime
@@ -70,17 +69,17 @@ class Timetable
 
     /**
      * @param Event     $event
-     * @param int       $weekDay
+     * @param int       $type
+     * @param int       $weekDay @see Week::weekDay
      * @param \DateTime $timeFrom
      * @param \DateTime $timeTo
-     * @param int       $type
      */
     public function __construct(
         Event $event,
+        int $type,
         int $weekDay,
         \DateTime $timeFrom,
-        \DateTime $timeTo,
-        int $type
+        \DateTime $timeTo
     ) {
         Assert::keyExists(Week::DAYS, $weekDay);
         Assert::oneOf($type, self::TYPES);

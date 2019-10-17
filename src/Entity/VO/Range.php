@@ -8,6 +8,7 @@
 namespace App\Entity\VO;
 
 use Doctrine\ORM\Mapping as ORM;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Embeddable
@@ -34,6 +35,8 @@ class Range
      */
     public function __construct(int $min, int $max)
     {
+        Assert::greaterThanEq($max, $min);
+
         $this->min = $min;
         $this->max = $max;
     }

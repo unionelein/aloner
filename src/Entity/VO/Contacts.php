@@ -8,6 +8,7 @@
 namespace App\Entity\VO;
 
 use App\Entity\City;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Embeddable
@@ -17,7 +18,7 @@ class Contacts
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="address", length=255)
+     * @ORM\Column(type="string", name="address", length=100)
      */
     private $address;
 
@@ -32,14 +33,14 @@ class Contacts
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="site", length=255, nullable=true)
+     * @ORM\Column(type="string", name="site", length=100, nullable=true)
      */
     private $site;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="phone", length=15, nullable=true)
+     * @ORM\Column(type="string", name="phone", length=30, nullable=true)
      */
     private $phone;
 
@@ -85,11 +86,11 @@ class Contacts
     }
 
     /**
-     * @param string $site
+     * @param null|string $site
      *
      * @return Contacts
      */
-    public function setSite(string $site): self
+    public function setSite(?string $site): self
     {
         $this->site = $site;
 
@@ -105,11 +106,11 @@ class Contacts
     }
 
     /**
-     * @param string $phone
+     * @param null|string $phone
      *
      * @return Contacts
      */
-    public function setPhone(string $phone): self
+    public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
 
@@ -125,11 +126,11 @@ class Contacts
     }
 
     /**
-     * @param string $yandexMap
+     * @param null|string $yandexMap
      *
      * @return Contacts
      */
-    public function setYandexMap(string $yandexMap): self
+    public function setYandexMap(?string $yandexMap): self
     {
         $this->yandexMap = $yandexMap;
 

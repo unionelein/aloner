@@ -10,6 +10,7 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 /**
  * @ORM\Table(name="ep_history")
  * @ORM\Entity(repositoryClass="App\Repository\EPHistoryRepository")
+ * @ORM\InheritanceType("SINGLE_TABLE")
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class EPHistory

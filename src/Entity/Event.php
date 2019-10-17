@@ -62,7 +62,7 @@ class Event
      *
      * @ORM\Embedded(class="App\Entity\VO\Range", columnPrefix="event_people_")
      */
-    private $numberOfPeople;
+    private $peopleRange;
 
     /**
      * Contains unit
@@ -74,6 +74,8 @@ class Event
     private $price;
 
     /**
+     * Duration of event in minutes
+     *
      * @var int
      *
      * @ORM\Column(type="integer", name="event_duration")
@@ -100,19 +102,19 @@ class Event
 
     /**
      * @param string   $name
-     * @param int      $duration
+     * @param int      $duration    Duration of event in minutes.
      * @param Contacts $contacts
-     * @param Range    $numberOfPeople
+     * @param Range    $peopleRange Min and max count of people.
      */
-    public function __construct(string $name, int $duration, Contacts $contacts, Range $numberOfPeople)
+    public function __construct(string $name, int $duration, Contacts $contacts, Range $peopleRange)
     {
         $this->timetables = new ArrayCollection();
         $this->media      = new ArrayCollection();
 
-        $this->name           = $name;
-        $this->duration       = $duration;
-        $this->contacts       = $contacts;
-        $this->numberOfPeople = $numberOfPeople;
+        $this->name        = $name;
+        $this->duration    = $duration;
+        $this->contacts    = $contacts;
+        $this->peopleRange = $peopleRange;
     }
 
     /**
@@ -182,9 +184,9 @@ class Event
     /**
      * @return Range
      */
-    public function getNumberOfPeople(): Range
+    public function getPeopleRange(): Range
     {
-        return $this->numberOfPeople;
+        return $this->peopleRange;
     }
 
     /**

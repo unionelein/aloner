@@ -17,14 +17,14 @@ class MeetingOptions
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime", name="meeting_at")
+     * @ORM\Column(type="datetime", name="meeting_at", nullable=true)
      */
     private $meetingAt;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="meeting_place", length=255)
+     * @ORM\Column(type="string", name="meeting_place", length=255, nullable=true)
      */
     private $meetingPlace;
 

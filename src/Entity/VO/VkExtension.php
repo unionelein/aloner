@@ -15,14 +15,14 @@ class VkExtension
     /**
      * @var int
      *
-     * @ORM\Column(type="integer", name="vk_user_id")
+     * @ORM\Column(type="integer", name="vk_user_id", nullable=true)
      */
     private $userId;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="vk_token", length=255)
+     * @ORM\Column(type="string", name="vk_token", length=255, nullable=true)
      */
     private $token;
 

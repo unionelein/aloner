@@ -20,7 +20,7 @@ class SearchCriteria
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="date", name="sc_day")
+     * @ORM\Column(type="date", name="sc_day", nullable=true)
      */
     private $day;
 
@@ -28,7 +28,7 @@ class SearchCriteria
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="time", name="sc_time_from")
+     * @ORM\Column(type="time", name="sc_time_from", nullable=true)
      */
     private $timeFrom;
 
@@ -36,7 +36,7 @@ class SearchCriteria
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="time", name="sc_time_to")
+     * @ORM\Column(type="time", name="sc_time_to", nullable=true)
      */
     private $timeTo;
 

@@ -6,7 +6,15 @@ use App\Entity\City;
 
 class CityFixture extends BaseFixture
 {
-    public const CITIES = [
+    /**
+     * @return int
+     */
+    public static function citiesCount(): int
+    {
+        return \count(self::CITIES);
+    }
+
+    private const CITIES = [
         'Гомель',
         'Минск',
         'Витебск',
@@ -14,13 +22,12 @@ class CityFixture extends BaseFixture
         'Могилев',
     ];
 
-    protected function loadData()
+    protected function loadData(): void
     {
-        $this->createMany('city', \count(self::CITIES), function (int $index) {
-            $name = self::CITIES[$index - 1];
+        $this->createMany('city', self::citiesCount(), function (int $index) {
+            $name = self::CITIES[$index - 1] ?? self::CITIES[0];
 
             return new City($name);
         });
     }
-
 }

@@ -6,7 +6,7 @@ use App\Entity\User;
 
 class UserFixture extends BaseFixture
 {
-    protected function loadData()
+    protected function loadData(): void
     {
         $this->createMany('user', 1, function (int $index) {
             $user = new User('WEB');
