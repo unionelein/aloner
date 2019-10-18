@@ -8,19 +8,14 @@
 namespace App\Entity\VO;
 
 use App\Component\Util\Date;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Embeddable
- */
 class SearchCriteria
 {
     /**
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="date", name="sc_day", nullable=true)
      */
     private $day;
 
@@ -28,7 +23,6 @@ class SearchCriteria
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="time", name="sc_time_from", nullable=true)
      */
     private $timeFrom;
 
@@ -36,7 +30,6 @@ class SearchCriteria
      * @var \DateTime
      *
      * @Assert\NotNull()
-     * @ORM\Column(type="time", name="sc_time_to", nullable=true)
      */
     private $timeTo;
 
@@ -57,7 +50,7 @@ class SearchCriteria
      */
     public function getTimeFrom(): \DateTime
     {
-        return clone $this->timeFrom;
+        return Date::time($this->timeFrom);
     }
 
     /**
@@ -77,7 +70,7 @@ class SearchCriteria
      */
     public function getTimeTo(): \DateTime
     {
-        return clone $this->timeTo;
+        return Date::time($this->timeTo);
     }
 
     /**
@@ -97,7 +90,7 @@ class SearchCriteria
      */
     public function getDay(): \DateTime
     {
-        return clone $this->day;
+        return Date::date($this->day);
     }
 
     /**

@@ -3,33 +3,23 @@
 namespace App\Entity\VO;
 
 use App\Component\Vk\DTO\AccessToken;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Embeddable
- */
 class VkExtension
 {
     private const VK_URL = 'https://vk.com';
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer", name="vk_user_id", nullable=true)
      */
     private $userId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", name="vk_token", length=255, nullable=true)
      */
     private $token;
 
     /**
      * @var null|\DateTime
-     *
-     * @ORM\Column(type="datetime", name="vk_expires_at", nullable=true)
      */
     private $expiresAt;
 

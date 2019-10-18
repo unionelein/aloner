@@ -38,7 +38,7 @@ class SkipData extends PusherData
     {
         return [
             'userId'      => $this->user->getId(),
-            'statusTitle' => EventParty::STATUSES[$this->eventParty->getStatus()],
+            'statusTitle' => $this->eventParty->getStatusName(),
         ];
     }
 }

@@ -24,9 +24,6 @@ class Contacts
 
     /**
      * @var City
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\City")
-     * @ORM\JoinColumn(name="city_id", referencedColumnName="city_id", nullable=false)
      */
     private $city;
 

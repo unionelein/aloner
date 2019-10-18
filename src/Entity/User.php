@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Component\Infrastructure\HashGenerator;
 use App\Component\Infrastructure\ResourceLocator;
 use App\Component\Util\Date;
+use App\Component\Vk\DTO\AccessToken;
 use App\Entity\VO\SearchCriteria;
 use App\Entity\VO\Sex;
 use App\Entity\VO\VkExtension;
@@ -61,11 +62,25 @@ class User implements UserInterface
     private $roles = [];
 
     /**
-     * @var null|VkExtension
+     * @var int
      *
-     * @ORM\Embedded(class="App\Entity\VO\VkExtension", columnPrefix="user_")
+     * @ORM\Column(type="integer", name="user_vk_user_id", nullable=true)
      */
-    private $vk;
+    private $vkUserId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", name="user_vk_token", length=255, nullable=true)
+     */
+    private $vkToken;
+
+    /**
+     * @var null|\DateTime
+     *
+     * @ORM\Column(type="datetime", name="user_vk_expires_at", nullable=true)
+     */
+    private $vkExpiresAt;
 
     /**
      * @var null|Sex
@@ -79,7 +94,7 @@ class User implements UserInterface
      * @var null|City
      *
      * @Assert\NotNull()
-     * @ORM\ManyToOne(targetEntity="App\Entity\City", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="App\Entity\City")
      * @ORM\JoinColumn(name="user_city_id", referencedColumnName="city_id", nullable=true)
      */
     private $city;
@@ -100,11 +115,25 @@ class User implements UserInterface
     private $avatarPath;
 
     /**
-     * @var null|SearchCriteria
+     * @var \DateTime
      *
-     * @ORM\Embedded(class="App\Entity\VO\SearchCriteria", columnPrefix="user_")
+     * @ORM\Column(type="date", name="user_sc_day", nullable=true)
      */
-    private $searchCriteria;
+    private $scDay;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="time", name="user_sc_time_from", nullable=true)
+     */
+    private $scTimeFrom;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="time", name="user_sc_time_to", nullable=true)
+     */
+    private $scTimeTo;
 
     /**
      * @var ArrayCollection|EventParty[]
@@ -273,7 +302,11 @@ class User implements UserInterface
      */
     public function getVk(): ?VkExtension
     {
-        return $this->vk;
+        if (null === $this->vkUserId || null === $this->vkToken) {
+            return null;
+        }
+
+        return new VkExtension(new AccessToken($this->vkUserId, $this->vkToken, $this->vkExpiresAt));
     }
 
     /**
@@ -283,7 +316,9 @@ class User implements UserInterface
      */
     public function setVk(VkExtension $vk): self
     {
-        $this->vk = $vk;
+        $this->vkUserId    = $vk->getUserId();
+        $this->vkToken     = $vk->getToken();
+        $this->vkExpiresAt = $vk->getExpiresAt();
 
         return $this;
     }
@@ -316,7 +351,7 @@ class User implements UserInterface
         return $this->city
             && $this->birthday
             && $this->sex
-            && $this->vk;
+            && $this->getVk();
     }
 
     /**
@@ -362,7 +397,7 @@ class User implements UserInterface
     /**
      * @return ArrayCollection|EventParty[]
      */
-    public function getEventParties(): ArrayCollection
+    public function getEventParties(): Collection
     {
         return $this->eventParties;
     }
@@ -370,7 +405,7 @@ class User implements UserInterface
     /**
      * @return ArrayCollection|EPHistory[]
      */
-    public function getEpHistories(): ArrayCollection
+    public function getEpHistories(): Collection
     {
         return $this->epHistories;
     }
@@ -422,7 +457,11 @@ class User implements UserInterface
      */
     public function getSearchCriteria(): ?SearchCriteria
     {
-        return $this->searchCriteria;
+        if (null === $this->scDay || null === $this->scTimeFrom || null === $this->scTimeTo) {
+            return null;
+        }
+
+        return new SearchCriteria($this->scDay, $this->scTimeFrom, $this->scTimeTo);
     }
 
     /**
@@ -432,7 +471,9 @@ class User implements UserInterface
      */
     public function setSearchCriteria(SearchCriteria $searchCriteria): self
     {
-        $this->searchCriteria = $searchCriteria;
+        $this->scDay      = $searchCriteria->getDay();
+        $this->scTimeFrom = $searchCriteria->getTimeFrom();
+        $this->scTimeTo   = $searchCriteria->getTimeTo();
 
         return $this;
     }
@@ -507,7 +548,7 @@ class User implements UserInterface
     /**
      * @return ArrayCollection|EventParty[]
      */
-    public function getSkippedEventParties(): ArrayCollection
+    public function getSkippedEventParties(): Collection
     {
         $skipped = new ArrayCollection();
 

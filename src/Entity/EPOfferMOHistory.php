@@ -9,6 +9,7 @@ namespace App\Entity;
 
 use App\Entity\VO\History\MOOfferData;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -51,7 +52,7 @@ class EPOfferMOHistory extends EPHistory
     /**
      * @return ArrayCollection|EPAnswerMOHistory[]
      */
-    public function getAnswerHistories(): ArrayCollection
+    public function getAnswerHistories(): Collection
     {
         return $this->answerHistories;
     }

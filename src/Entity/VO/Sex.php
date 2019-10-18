@@ -20,8 +20,8 @@ class Sex
     public const FEMALE = false;
 
     public const SEX = [
-        self::MALE      => 'Парень',
-        self::FEMALE    => 'Девушка',
+        self::MALE   => 'Парень',
+        self::FEMALE => 'Девушка',
     ];
 
     /**
@@ -36,7 +36,7 @@ class Sex
      */
     public function __construct(bool $sex)
     {
-        Assert::keyExists($sex, self::SEX);
+        Assert::keyExists(self::SEX, $sex);
 
         $this->sex = $sex;
     }

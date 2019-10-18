@@ -53,7 +53,7 @@ class Week
     public static function weekDay(\DateTime $day): int
     {
         $weekDay = (int) $day->format('w');
-        Assert::keyExists($weekDay, self::DAYS);
+        Assert::keyExists(self::DAYS, $weekDay);
 
         return $weekDay;
     }

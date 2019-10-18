@@ -26,7 +26,7 @@ class FilledData extends PusherData
     public function toArray(): array
     {
         return [
-            'statusTitle' => EventParty::STATUSES[$this->eventParty->getStatus()],
+            'statusTitle' => $this->eventParty->getStatusName(),
         ];
     }
 }

@@ -43,10 +43,10 @@ class VkUserProvider
         $userData = \reset($users);
         Assert::notNull($userData, 'VK User not found');
 
-        $userId  = (int) $userData['uid'];
+        $userId  = (int) $userData['id'];
         $first   = $userData['first_name'];
         $last    = $userData['last_name'];
-        $city    = $userInfo['city']['title'] ?? null;
+        $city    = $userData['city']['title'] ?? null;
         $photo50 = $userData['photo_50'];
 
         $sexVal = $userData['sex'] ?? null;

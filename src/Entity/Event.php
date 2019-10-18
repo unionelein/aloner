@@ -7,6 +7,7 @@ use App\Entity\VO\Contacts;
 use App\Entity\VO\Range;
 use App\Entity\VO\SearchCriteria;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -42,6 +43,14 @@ class Event
      * @ORM\Column(type="text", name="event_desc", nullable=true)
      */
     private $description;
+
+    /**
+     * @var City
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\City")
+     * @ORM\JoinColumn(name="event_city_id", referencedColumnName="city_id")
+     */
+    private $city;
 
     /**
      * @var Contacts
@@ -113,6 +122,7 @@ class Event
 
         $this->name        = $name;
         $this->duration    = $duration;
+        $this->city        = $contacts->getCity();
         $this->contacts    = $contacts;
         $this->peopleRange = $peopleRange;
     }
@@ -158,7 +168,10 @@ class Event
      */
     public function getContacts(): Contacts
     {
-        return $this->contacts;
+        return (new Contacts($this->contacts->getAddress(), $this->city))
+            ->setSite($this->contacts->getSite())
+            ->setPhone($this->contacts->getPhone())
+            ->setYandexMap($this->contacts->getYandexMap());
     }
 
     /**
@@ -214,7 +227,7 @@ class Event
      *
      * @return ArrayCollection|Timetable[]
      */
-    public function getTimetables(int $weekDay = null): ArrayCollection
+    public function getTimetables(int $weekDay = null): Collection
     {
         if (null === $weekDay) {
             return $this->timetables;
@@ -266,7 +279,7 @@ class Event
     /**
      * @return ArrayCollection|Media[]
      */
-    public function getMedia(): ArrayCollection
+    public function getMedia(): Collection
     {
         return $this->media;
     }

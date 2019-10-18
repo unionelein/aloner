@@ -33,7 +33,7 @@ class MOAcceptedData extends PusherData
     public function toArray(): array
     {
         return [
-            'statusTitle'  => EventParty::STATUSES[$this->eventParty->getStatus()],
+            'statusTitle'  => $this->eventParty->getStatusName(),
             'meetingPlace' => $this->meetingOptions->getMeetingPlace(),
             'meetingAt'    => Date::rusFormat($this->meetingOptions->getMeetingAt()),
         ];

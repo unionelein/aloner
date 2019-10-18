@@ -1,15 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace App\Form;
+namespace App\Form\Type;
 
 use App\Component\Util\Date;
 use App\Entity\VO\SearchCriteria;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -60,7 +58,7 @@ class SearchCriteriaType extends AbstractType
         $resolver->setDefaults([
             'data_class'  => SearchCriteria::class,
             'constraints' => [new Callback([$this, 'validate'])],
-            'empty_data'  => new SearchCriteria(
+            'data'        => $resolver->getDefinedOptions()['data'] ?? new SearchCriteria(
                 Date::date(self::DEFAULT_DAY),
                 Date::time(self::DEFAULT_TIME_FROM),
                 Date::time(self::DEFAULT_TIME_TO)

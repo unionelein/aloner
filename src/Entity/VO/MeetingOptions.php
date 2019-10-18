@@ -7,24 +7,15 @@
 
 namespace App\Entity\VO;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Embeddable
- */
 class MeetingOptions
 {
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(type="datetime", name="meeting_at", nullable=true)
      */
     private $meetingAt;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", name="meeting_place", length=255, nullable=true)
      */
     private $meetingPlace;
 

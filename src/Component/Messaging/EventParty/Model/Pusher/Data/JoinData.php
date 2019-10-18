@@ -35,7 +35,7 @@ class JoinData extends PusherData
             'userId'      => $this->user->getId(),
             'avatarPath'  => $this->user->getAvatarPath(),
             'nickname'    => $this->user->getNicknameIn($this->eventParty),
-            'statusTitle' => EventParty::STATUSES[$this->eventParty->getStatus()],
+            'statusTitle' => $this->eventParty->getStatusName(),
         ];
     }
 }

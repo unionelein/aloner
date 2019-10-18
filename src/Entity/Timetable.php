@@ -114,7 +114,7 @@ class Timetable
      */
     public function getTimeFrom(): \DateTime
     {
-        return clone $this->timeFrom;
+        return Date::time($this->timeFrom);
     }
 
     /**
@@ -122,7 +122,7 @@ class Timetable
      */
     public function getTimeTo(): \DateTime
     {
-        return clone $this->timeTo;
+        return Date::time($this->timeTo);
     }
 
     /**

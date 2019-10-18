@@ -36,7 +36,7 @@ class SecurityController extends BaseController
                 ]);
             }
 
-            $user = $userRepo->findOneBy(['vk.userId' => $accessToken->getUserId()]);
+            $user = $userRepo->findOneBy(['vkUserId' => $accessToken->getUserId()]);
 
             if (!$user) {
                 $user = $vkSignUpService->execute($accessToken);

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\VO\SearchCriteria;
 use App\Entity\User;
-use App\Form\SearchCriteriaType;
+use App\Form\Type\SearchCriteriaType;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,14 +2,13 @@
 
 namespace App\Entity;
 
-use App\Component\Model\VO\TimeInterval;
-use App\Component\Util\Date;
 use App\Entity\VO\History\JoinData;
 use App\Entity\VO\PeopleComposition;
 use App\Entity\VO\MeetingOptions;
 use App\Entity\VO\SearchCriteria;
 use App\Entity\VO\Sex;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
@@ -98,11 +97,18 @@ class EventParty
     private $peopleComposition;
 
     /**
-     * @var MeetingOptions
+     * @var \DateTime
      *
-     * @ORM\Embedded(class="App\Entity\VO\MeetingOptions", columnPrefix="ep_")
+     * @ORM\Column(type="datetime", name="ep_meeting_at", nullable=true)
      */
-    private $meetingOptions;
+    private $meetingAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", name="ep_meeting_place", length=255, nullable=true)
+     */
+    private $meetingPlace;
 
     /**
      * @var EPHistory[]|ArrayCollection
@@ -145,7 +151,7 @@ class EventParty
     /**
      * @return ArrayCollection|User[]
      */
-    public function getUsers(): ArrayCollection
+    public function getUsers(): Collection
     {
         return $this->users;
     }
@@ -174,7 +180,7 @@ class EventParty
     /**
      * @return ArrayCollection|EPHistory[]
      */
-    public function getHistories(): ArrayCollection
+    public function getHistories(): Collection
     {
         return $this->histories;
     }
@@ -188,11 +194,15 @@ class EventParty
     }
 
     /**
-     * @return MeetingOptions
+     * @return null|MeetingOptions
      */
-    public function getMeetingOptions(): MeetingOptions
+    public function getMeetingOptions(): ?MeetingOptions
     {
-        return $this->meetingOptions;
+        if (null === $this->meetingAt || null === $this->meetingPlace) {
+            return null;
+        }
+
+        return new MeetingOptions($this->meetingAt, $this->meetingPlace);
     }
 
     /**
@@ -202,7 +212,8 @@ class EventParty
      */
     public function setMeetingOptions(MeetingOptions $meetingOptions): self
     {
-        $this->meetingOptions = $meetingOptions;
+        $this->meetingAt    = $meetingOptions->getMeetingAt();
+        $this->meetingPlace = $meetingOptions->getMeetingPlace();
 
         if ($this->isPlaning()) {
             $this->status = self::STATUS_READY;
@@ -214,7 +225,7 @@ class EventParty
     /**
      * @return ArrayCollection|EPMessage[]
      */
-    public function getMessages(): ArrayCollection
+    public function getMessages(): Collection
     {
         return $this->messages;
     }
@@ -249,6 +260,14 @@ class EventParty
     public function isDone(): bool
     {
         return self::STATUS_DONE === $this->status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusName(): string
+    {
+        return self::STATUSES[$this->status];
     }
 
     /**
@@ -445,7 +464,8 @@ class EventParty
         $this->addHistory(new EPLeaveHistory($this, $user));
 
         $this->status         = self::STATUS_PENDING;
-        $this->meetingOptions = null;
+        $this->meetingAt = null;
+        $this->meetingPlace = null;
         $this->resetOfferHistories();
 
         if ($this->users->count() === 0) {
@@ -506,7 +526,7 @@ class EventParty
      *
      * @return ArrayCollection|EPMessage
      */
-    public function getMessagesFor(User $user): ArrayCollection
+    public function getMessagesFor(User $user): Collection
     {
         $historyJoin = $user->getLastEPHistoryFor($this, EPHistory::ACTION_JOIN);
 

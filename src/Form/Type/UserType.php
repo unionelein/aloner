@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\Form;
+namespace App\Form\Type;
 
 use App\Entity\City;
 use App\Entity\User;
 use App\Entity\VO\Sex;
+use App\Form\DataTransformer\ValueToSexTransformer;
 use App\Validator\UserAgeRange;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -43,10 +44,7 @@ class UserType extends AbstractType
             ->add('sex', ChoiceType::class, [
                 'label'       => false,
                 'placeholder' => 'Пол',
-                'choices'     => [
-                    Sex::SEX[Sex::MALE]   => new Sex(Sex::MALE),
-                    Sex::SEX[Sex::FEMALE] => new Sex(Sex::FEMALE),
-                ],
+                'choices'     => \array_flip(Sex::SEX),
             ])
             ->add('birthday', DateType::class, [
                 'widget'      => 'single_text',
@@ -62,6 +60,8 @@ class UserType extends AbstractType
                     new IsTrue(['message' => 'Для использования сервиса вы должны согласиться с правилами']),
                 ],
             ]);
+
+        $builder->get('sex')->addModelTransformer(new ValueToSexTransformer());
     }
 
     /**

@@ -44,7 +44,7 @@ class EPHistory
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="eventPartyHistories")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="epHistories")
      * @ORM\JoinColumn(name="history_user_id", referencedColumnName="user_id", nullable=false)
      */
     protected $user;
@@ -75,7 +75,7 @@ class EPHistory
     /**
      * @var null|EPHistory
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\EPOfferMOHistory", inversedBy="an")
+     * @ORM\ManyToOne(targetEntity="App\Entity\EPOfferMOHistory", inversedBy="answerHistories")
      * @ORM\JoinColumn(name="history_related_history_id", referencedColumnName="history_id", nullable=true)
      */
     protected $offerHistory;
