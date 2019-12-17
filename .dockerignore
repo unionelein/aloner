@@ -1,0 +1,13 @@
+## SCM
+.git/
+
+## IDE/Editor
+.idea/
+
+## Application service configs
+.aws/
+#.docker/
+
+## Cache
+node_modules/
+#.gradle/
