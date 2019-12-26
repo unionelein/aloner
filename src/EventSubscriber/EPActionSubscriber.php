@@ -2,11 +2,11 @@
 
 namespace App\EventSubscriber;
 
-use App\Component\Events\Events;
-use App\Component\Events\EPActionEvent;
-use App\Component\Events\MOAcceptedEvent;
-use App\Component\Events\MOAnsweredEvent;
-use App\Component\Events\MOOfferedEvent;
+use App\Event\EPActionEvent;
+use App\Event\EPJoinedEvent;
+use App\Event\MOAcceptedEvent;
+use App\Event\MOAnsweredEvent;
+use App\Event\MOOfferedEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\Data\JoinData;
 use App\Component\Messaging\EventParty\Model\Pusher\Data\MOAcceptedData;
 use App\Component\Messaging\EventParty\Model\Pusher\Data\MOAnswerData;
@@ -14,6 +14,7 @@ use App\Component\Messaging\EventParty\Model\Pusher\Data\MOOfferData;
 use App\Component\Messaging\EventParty\Model\Pusher\Data\SkipData;
 use App\Component\Messaging\EventParty\PusherFacade;
 use App\Entity\VO\MeetingOptions;
+use App\Event\EPSkippedEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,11 +51,11 @@ class EPActionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            Events::EP_JOIN     => 'onEventPartyJoin',
-            Events::EP_SKIP     => 'onEventPartySkip',
-            Events::MO_OFFERED  => 'onMOOffered',
-            Events::MO_ANSWERED => 'onMOAnswered',
-            Events::MO_ACCEPTED => 'onMOAccepted',
+            EPJoinedEvent::class   => 'onEventPartyJoin',
+            EPSkippedEvent::class  => 'onEventPartySkip',
+            MOOfferedEvent::class  => 'onMOOffered',
+            MOAnsweredEvent::class => 'onMOAnswered',
+            MOAcceptedEvent::class => 'onMOAccepted',
         ];
     }
 
@@ -97,9 +98,9 @@ class EPActionSubscriber implements EventSubscriberInterface
 
         if ($offer->isAccepted()) {
             $data = $offer->getData();
-            $MO   = new MeetingOptions($data->getMeetingAt(), $data->getMeetingPlace());
+            $mo   = new MeetingOptions($data->getMeetingAt(), $data->getMeetingPlace());
 
-            $this->dispatcher->dispatch(Events::MO_ACCEPTED, new MOAcceptedEvent($ep, $MO));
+            $this->dispatcher->dispatch(new MOAcceptedEvent($ep, $mo));
         }
     }
 

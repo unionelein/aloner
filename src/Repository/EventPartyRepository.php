@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\EventParty;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method EventParty|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,7 +18,7 @@ class EventPartyRepository extends ServiceEntityRepository
     /**
      * @param RegistryInterface $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EventParty::class);
     }

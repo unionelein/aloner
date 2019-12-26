@@ -4,13 +4,12 @@ namespace App\Controller;
 
 use App\Component\EventParty\EventPartyManager;
 use App\Component\EventParty\Exception\NoEventsForUserException;
-use App\Component\Events\Events;
-use App\Component\Events\EPActionEvent;
 use App\Component\User\UserManager;
 use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
 use App\Entity\User;
 use App\Entity\VO\MeetingOptions;
+use App\Event\EPLoadedEvent;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,12 +27,17 @@ class EventPartyController extends BaseController
     /** @var UserManager */
     private $userManager;
 
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
+
     /**
-     * @param UserManager $userManager
+     * @param EventDispatcherInterface $dispatcher
+     * @param UserManager              $userManager
      */
-    public function __construct(UserManager $userManager)
+    public function __construct(EventDispatcherInterface $dispatcher, UserManager $userManager)
     {
         $this->userManager = $userManager;
+        $this->dispatcher  = $dispatcher;
     }
 
     /**
@@ -52,21 +56,31 @@ class EventPartyController extends BaseController
     }
 
     /**
-     * @Route("/{id}", name="app_event_party", requirements={"id"="\d+"})
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     * @Route("/{id}", name="app_event_party", requirements={"id"="\d+"})
+     *
+     * @var EventParty $eventParty
+     *
+     * @return Response
      */
-    public function eventParty(EventParty $eventParty, EventDispatcherInterface $dispatcher): Response
+    public function eventParty(EventParty $eventParty): Response
     {
         $user = $this->getUser();
 
         $this->userManager->updateTempHash($user);
-        $dispatcher->dispatch(Events::EP_LOAD, new EPActionEvent($user, $eventParty));
+        $this->dispatcher->dispatch(new EPLoadedEvent($user, $eventParty));
 
         return $this->render('eventParty/event_party.html.twig', ['eventParty' => $eventParty]);
     }
 
     /**
      * @Route("/find", name="app_event_party_find")
+     *
+     * @var EventPartyManager $epManager
+     *
+     * @return Response
+     *
+     * @throws
      */
     public function find(EventPartyManager $epManager): Response
     {

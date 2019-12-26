@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Component\Events;
+namespace App\Event;
 
 use App\Entity\EventParty;
 use App\Entity\VO\MeetingOptions;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MOAcceptedEvent extends Event
 {

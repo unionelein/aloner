@@ -7,11 +7,12 @@
 
 namespace App\EventSubscriber;
 
-use App\Component\Events\EPActionEvent;
-use App\Component\Events\EPEvent;
-use App\Component\Events\Events;
+use App\Event\EPActionEvent;
+use App\Event\EPEvent;
 use App\Component\Messaging\EventParty\Model\Pusher\Data\FilledData;
 use App\Component\Messaging\EventParty\PusherFacade;
+use App\Event\EPFilledEvent;
+use App\Event\EPLoadedEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,8 +42,8 @@ class EPProgressSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            Events::EP_FILLED => 'onEventPartyFilled',
-            Events::EP_LOAD   => 'onLoadEventParty',
+            EPFilledEvent::class => 'onEventPartyFilled',
+            EPLoadedEvent::class => 'onLoadEventParty',
         ];
     }
 

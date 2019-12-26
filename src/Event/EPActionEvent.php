@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Component\Events;
+namespace App\Event;
 
 use App\Entity\EventParty;
 use App\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EPActionEvent extends Event
 {

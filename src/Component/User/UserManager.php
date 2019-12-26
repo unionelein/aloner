@@ -2,26 +2,20 @@
 
 namespace App\Component\User;
 
-use App\Component\EventParty\EventPartyManager;
-use App\Component\Events\EPEvent;
-use App\Component\Events\Events;
-use App\Component\Events\EPActionEvent;
-use App\Component\Events\MOAnsweredEvent;
-use App\Component\Events\MOOfferedEvent;
+use App\Event\EPFilledEvent;
+use App\Event\EPJoinedEvent;
+use App\Event\MOAnsweredEvent;
+use App\Event\MOOfferedEvent;
 use App\Component\Infrastructure\TransactionalService;
-use App\Component\Model\DTO\EventPartyHistory\AnswerToMeetingPointOfferHistory;
-use App\Component\Model\DTO\EventPartyHistory\MeetingPointOfferHistory;
-use App\Component\Model\DTO\Form\MeetingPointData;
-use App\Component\Model\VO\TimeInterval;
 use App\Entity\EPAnswerMOHistory;
 use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
-use App\Entity\EPHistory;
 use App\Entity\User;
 use App\Entity\VO\History\MOAnswerData;
 use App\Entity\VO\History\MOOfferData;
 use App\Entity\VO\MeetingOptions;
 use App\Entity\VO\SearchCriteria;
+use App\Event\EPSkippedEvent;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -86,10 +80,10 @@ class UserManager
             $em->flush();
         });
 
-        $this->dispatcher->dispatch(Events::EP_JOIN, new EPActionEvent($user, $eventParty));
+        $this->dispatcher->dispatch(new EPJoinedEvent($user, $eventParty));
 
         if ($eventParty->isFilled()) {
-            $this->dispatcher->dispatch(Events::EP_FILLED, new EPEvent($eventParty));
+            $this->dispatcher->dispatch(new EPFilledEvent($eventParty));
 
             if (false === $eventParty->getEvent()->isReservationRequired()) {
                 $this->offerDefaultMO($eventParty);
@@ -111,7 +105,7 @@ class UserManager
             $em->flush();
         });
 
-        $this->dispatcher->dispatch(Events::EP_SKIP, new EPActionEvent($user, $eventParty));
+        $this->dispatcher->dispatch(new EPSkippedEvent($user, $eventParty));
     }
 
     /**
@@ -137,7 +131,7 @@ class UserManager
         $this->em->persist($offer);
         $this->em->flush();
 
-        $this->dispatcher->dispatch(Events::MO_OFFERED, new MOOfferedEvent($offer));
+        $this->dispatcher->dispatch(new MOOfferedEvent($offer));
     }
 
     /**
@@ -177,6 +171,6 @@ class UserManager
         $this->em->persist($answerHistory);
         $this->em->flush();
 
-        $this->dispatcher->dispatch(Events::MO_ANSWERED, new MOAnsweredEvent($answerHistory));
+        $this->dispatcher->dispatch(new MOAnsweredEvent($answerHistory));
     }
 }
