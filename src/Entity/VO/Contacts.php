@@ -75,9 +75,9 @@ class Contacts
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getSite(): string
+    public function getSite(): ?string
     {
         return $this->site;
     }
@@ -95,9 +95,9 @@ class Contacts
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
@@ -115,9 +115,9 @@ class Contacts
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getYandexMap(): string
+    public function getYandexMap(): ?string
     {
         return $this->yandexMap;
     }

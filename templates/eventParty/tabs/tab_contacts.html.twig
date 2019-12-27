@@ -2,22 +2,22 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <b>Время работы {{ eventParty.usersSearchCriteriaDate|dateToString }}:</b>
+        <b>Время работы {{ eventParty.usersSearchCriteria.day|rusDate }}:</b>
         <p class="mb-1">
-            {% for timetable in eventParty.event.timetables.forWeekDay(eventParty.usersSearchCriteriaDate|date('w')) %}
-                {{ printTimetableMacro.print(timetable, eventParty.event.timetableType) }}
+            {% for timetable in eventParty.event.timetables(eventParty.usersSearchCriteria.day|date('w')) %}
+                {{ printTimetableMacro.print(timetable) }}
             {% endfor %}
         </p>
         <a href="#fullTimetable" data-toggle="collapse" role="button">Подробнее</a>
     </div>
 
     <div class="col-sm-6">
-        {% if eventParty.event.phone %}
-            <div><b>Телефон:</b> {{ eventParty.event.phone }}</div>
+        {% if eventParty.event.contacts.phone %}
+            <div><b>Телефон:</b> {{ eventParty.event.contacts.phone }}</div>
         {% endif %}
 
-        {% if eventParty.event.site %}
-            <div><b>Сайт:</b> <a href="{{ eventParty.event.site }}">{{ eventParty.event.site }}</a></div>
+        {% if eventParty.event.contacts.site %}
+            <div><b>Сайт:</b> <a href="{{ eventParty.event.contacts.site }}">{{ eventParty.event.contacts.site }}</a></div>
         {% endif %}
     </div>
 
@@ -25,12 +25,12 @@
         <div class="timetable-wrapper">
             <div class="collapse" id="fullTimetable">
                 <table>
-                    {% for day, dayName in constant('App\\Entity\\Timetable::SHORT_WEEK_DAYS') %}
+                    {% for day, dayName in constant('App\\Component\\Util\\Week::SHORT_DAYS') %}
                         <tr class="pb-3">
                             <td class="pr-1"><b>{{ dayName }}:</b></td>
                             <td>
-                                {% for timetable in eventParty.event.timetables.forWeekDay(day) %}
-                                    {{ printTimetableMacro.print(timetable, eventParty.event.timetableType) }}
+                                {% for timetable in eventParty.event.timetables(day) %}
+                                    {{ printTimetableMacro.print(timetable) }}
                                 {% endfor %}
                             </td>
                         </tr>
@@ -42,10 +42,10 @@
 </div>
 
 <div class="row col-sm-12 mt-1">
-    <p><b>Адрес:</b> <i>{{ eventParty.event.address }}</i></p>
+    <p><b>Адрес:</b> <i>{{ eventParty.event.contacts.address }}</i></p>
 
-    {% if eventParty.event.yandexMapSrc %}
-        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.yandexMapSrc }}"></script>
+    {% if eventParty.event.contacts.yandexMap %}
+        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.contacts.yandexMap }}"></script>
     {% endif %}
 </div>
 

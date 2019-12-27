@@ -30,7 +30,7 @@
 
                             {% if offersCount > 0  %}
                                 <span class="badge badge-info">{{ offersCount }}</span>
-                            {% elseif eventParty.event.reserveRequired and eventParty.activeOffers()|length == 0 and eventParty.planing %}
+                            {% elseif eventParty.event.reservationRequired and eventParty.activeOffers()|length == 0 and eventParty.isPlaning %}
                                 <span class="badge badge-info">1</span>
                             {% endif %}
                         </a>
@@ -62,20 +62,20 @@
             </div>
 
             <div class="col-sm-4">
-                <div class="participants-wrapper">
+                <div class="users-block">
                     {% for user in eventParty.users %}
-                        <a href="{{ user.vkExtension.VkPageUrl }}" target="_blank" class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %}current-user{% endif %}">
-                            <img class="user-icon-img" src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
-                            <div class="user-icon-name">{{ user.nicknameIn(eventParty) }}</div>
+                        <a href="{{ user.vk.userUrl }}" target="_blank" class="user-icon-block js-user-icon-block-{{ user.id }} {% if user == app.user %}current-user{% endif %}">
+                            <img src="{{ asset(user.avatarPath) }}" alt="Аватар пользователя {{ user.nicknameIn(eventParty) }}">
+                            <div>{{ user.nicknameIn(eventParty) }}</div>
                         </a>
                     {% endfor %}
+                    <div class="clearfix"></div>
                 </div>
-                <div class="clearfix"></div>
 
                 <div class="block chat-block">
                     <div class="block-body chat-wrapper">
                         <div class="chat-messages-block invisible">
-                            {% for message in eventParty.messageHistoryFor(app.user) %}
+                            {% for message in eventParty.messagesFor(app.user) %}
                                 <p>
                                     <b>{{ message.user.name }}: </b>
                                     {{ message.message }}
@@ -86,7 +86,7 @@
                         <div class="delimiter"></div>
 
                         <textarea class="chat-message-input"
-                                  maxlength="{{ constant('App\\Entity\\EventPartyMessage::MAX_MESSAGE_LENGTH') }}"
+                                  maxlength="{{ constant('App\\Entity\\EPMessage::MAX_MSG_LENGTH') }}"
                                   placeholder="Напишите что-нибудь..."
                         ></textarea>
 
@@ -161,7 +161,7 @@
             ></div>
             <div id="event-party-data"
                  data-id="{{ eventParty.id }}"
-                 data-reserve-required="{{ eventParty.event.reserveRequired }}"
+                 data-reserve-required="{{ eventParty.event.reservationRequired }}"
             ></div>
 
             <div class="load-spinner">

@@ -33,6 +33,7 @@ class Week
         self::FRIDAY    => 'Пятница',
         self::SATURDAY  => 'Суббота',
         self::SUNDAY    => 'Воскресенье',
+        7               => 'Воскресенье',
     ];
 
     public const SHORT_DAYS = [
@@ -43,6 +44,7 @@ class Week
         self::FRIDAY    => 'Пт',
         self::SATURDAY  => 'Сб',
         self::SUNDAY    => 'Вс',
+        7               => 'Вс',
     ];
 
     /**

@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 tab-plan-body">
-            {% if eventParty.event.reserveRequired %}
+            {% if eventParty.event.reservationRequired %}
                 <div class="alert alert-info reserve-required-alert {% if eventParty.activeOffers()|length or not eventParty.planing %}d-none{% endif %}">
                     <p class="font-weight-bold">Здесь нужно будет занять места. Что нужно сделать:</p>
                     <ul>
@@ -29,13 +29,13 @@
 
             <p class="mb-1">
                 <b>Место встречи:</b>
-                <span class="plan-place" data-default="Не выбрано">{{ eventParty.meetingPlace ?? 'Не выбрано' }}</span>
+                <span class="plan-place" data-default="Не выбрано">{{ eventParty.meetingOptions.meetingPlace ?? 'Не выбрано' }}</span>
             </p>
             <p>
                 <b>Время встречи:</b>
                 <span class="plan-time" data-default="Не выбрано">
-                    {% if eventParty.meetingAt %}
-                        {{ eventParty.meetingAt|dateToString }} в {{  eventParty.meetingAt|date('H:i') }}
+                    {% if eventParty.meetingOptions %}
+                        {{ eventParty.meetingOptions.meetingAt|rusDate }} в {{  eventParty.meetingOptions.meetingAt|date('H:i') }}
                     {% else %}
                         Не выбрано
                     {% endif %}
@@ -47,7 +47,7 @@
                 <button class="btn btn-sm btn-primary open-meeting-point-offer"
                         data-toggle="modal"
                         data-target="#meetingPointOfferModal"
-                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                        data-url="{{ path('app_offer_mo', {id: eventParty.id}) }}"
                 >Предложить</button>
             </p>
 
@@ -59,7 +59,7 @@
                 </a>
                 <div class="collapse" id="meeting-point-offers">
                     {% for offer in offers|reverse %}
-                        {% set offerAccepted = eventParty.offerAccepted(offer) %}
+                        {% set offerAccepted = offer.isAccepted %}
                         {% set offerRejected = eventParty.offerRejected(offer) %}
 
                         {% include 'eventParty/_meeting_point_offer.html.twig' with {
@@ -67,24 +67,24 @@
                             color: offerAccepted ? 'green' : (offerRejected ? 'red' : 'inherit'),
                             iconClass: offerAccepted ? 'fa fa-check' : (offerRejected ? 'fa fa-close' : 'fa fa-clock-o'),
                             text: offer.generateOfferLines.point,
-                            usersCount: eventParty.numberOfPeople,
+                            usersCount: eventParty.peopleComposition.numberOfPeople,
                             acceptedAnswersCount: eventParty.acceptedOfferUsers(offer)|length
                         } %}
                     {% endfor %}
                 </div>
             </div>
 
-            {% if eventParty.event.cafe %}
-                <div class="plan-near-cafe {% if not (eventParty.ready or eventParty.done) %}d-none{% endif %}">
-                    <p>
-                        Рядом есть {{ eventParty.event.cafe.name }} ({{ eventParty.event.cafe.address }}).<br>
-                        Вы можете встретится там после развлечений и лучше узнать друг дурга
-                    </p>
-                    {% if eventParty.event.pathToCafeYandexMapSrc %}
-                        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.pathToCafeYandexMapSrc }}"></script>
-                    {% endif %}
-                </div>
-            {% endif %}
+{#            {% if eventParty.event.cafe %}#}
+{#                <div class="plan-near-cafe {% if not (eventParty.ready or eventParty.done) %}d-none{% endif %}">#}
+{#                    <p>#}
+{#                        Рядом есть {{ eventParty.event.cafe.name }} ({{ eventParty.event.cafe.address }}).<br>#}
+{#                        Вы можете встретится там после развлечений и лучше узнать друг дурга#}
+{#                    </p>#}
+{#                    {% if eventParty.event.pathToCafeYandexMapSrc %}#}
+{#                        <script type="text/javascript" charset="utf-8" async src="{{ eventParty.event.pathToCafeYandexMapSrc }}"></script>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{#            {% endif %}#}
 
         </div>
     </div>
@@ -105,7 +105,7 @@
             color: 'inherit',
             iconClass: 'fa fa-clock-o',
             text: '',
-            usersCount: eventParty.numberOfPeople,
+            usersCount: eventParty.peopleComposition.numberOfPeople,
             acceptedAnswersCount: '1'
         } %}
     </div>
@@ -126,7 +126,7 @@
             <div class="modal-footer meeting-point-offer-footer">
                 <button type="button"
                         class="btn btn-primary send-meeting-point-offer"
-                        data-url="{{ path('app_meeting_point_offer', {id: eventParty.id}) }}"
+                        data-url="{{ path('app_offer_mo', {id: eventParty.id}) }}"
                 >Предложить</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
             </div>

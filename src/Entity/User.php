@@ -553,7 +553,7 @@ class User implements UserInterface
         $skipped = new ArrayCollection();
 
         foreach ($this->epHistories as $history) {
-            if ($history->isSkipAction()) {
+            if ($history->getAction() === EPHistory::ACTION_LEAVE) {
                 $skipped[] = $history->getEventParty();
             }
         }
@@ -573,7 +573,7 @@ class User implements UserInterface
 
         $events = new ArrayCollection();
         foreach ($this->epHistories as $history) {
-            if (!$history->isSkipAction()) {
+            if ($history->getAction() !== EPHistory::ACTION_LEAVE) {
                 continue;
             }
 

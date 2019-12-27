@@ -110,6 +110,14 @@ class Timetable
     }
 
     /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getTimeFrom(): \DateTime

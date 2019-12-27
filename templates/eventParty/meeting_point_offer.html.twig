@@ -13,7 +13,7 @@
         <div class="col-sm-4">{{ form_row(form.day, {attr: {class: 'form-control-sm'}}) }}</div>
         <div class="col-sm-4">{{ form_row(form.time, {attr: {class: 'form-control-sm'}}) }}</div>
         <div class="col-sm-12">
-            {% set usersDay = eventParty.usersSearchCriteriaDate|dateToString %}
+            {% set usersDay = eventParty.usersSearchCriteria.day|rusDate %}
             {% set usersTime = eventParty.usersTimeInterval %}
 
             <div class="help">*Нужно позвонить и узнать, свободно ли это время</div>
@@ -25,13 +25,13 @@
             <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#timetable-tomorrow" aria-expanded="false" aria-controls="timetable-tomorrow">Завтра</button>
 
             <div id="timetable-today" class="collapse" data-parent="#timetable-info">
-                {% for timetable in eventParty.event.timetables.forWeekDay('now'|date('w')) %}
+                {% for timetable in eventParty.event.timetables.('now'|date('w')) %}
                     {{ printTimetableMacro.print(timetable) }}
                 {% endfor %}
             </div>
 
             <div id="timetable-tomorrow" class="collapse" data-parent="#timetable-info">
-                {% for timetable in eventParty.event.timetables.forWeekDay('+1 day'|date('w')) %}
+                {% for timetable in eventParty.event.timetables('+1 day'|date('w')) %}
                     {{ printTimetableMacro.print(timetable) }}
                 {% endfor %}
             </div>

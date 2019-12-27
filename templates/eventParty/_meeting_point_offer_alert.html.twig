@@ -7,13 +7,13 @@
 
     <div class="text-center">
         <button type="button" class="btn btn-sm btn-primary accept-meeting-point-offer"
-                data-url="{{ path('app_meeting_point_offer_answer', {id: epId}) }}"
+                data-url="{{ path('app_answer_mo', {epId: epId, offerId: epId, answer: 1}) }}"
         >Подходит</button>
 
         <button type="button" class="btn btn-sm btn-secondary offer-another-meeting-point"
                 data-toggle="modal"
                 data-target="#meetingPointOfferModal"
-                data-url="{{ path('app_meeting_point_offer', {id: epId}) }}"
+                data-url="{{ path('app_offer_mo', {id: epId}) }}"
         >Нет, предложить другое</button>
     </div>
 </div>

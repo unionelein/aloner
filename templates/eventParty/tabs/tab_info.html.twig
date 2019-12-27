@@ -1,4 +1,4 @@
-<h4 class="event-title"><b>{{ eventParty.event.title }}</b></h4>
+<h4 class="event-title"><b>{{ eventParty.event.name }}</b></h4>
 
 <div class="event-description">{{ eventParty.event.description|e|markdown }}</div>
 
@@ -13,9 +13,9 @@
         {% endif %}
     </div>
 
-    {% if eventParty.event.site %}
+    {% if eventParty.event.contacts.site %}
     <div class="col-sm-6 text-right">
-        Сайт: <a href="{{ eventParty.event.site }}">{{ eventParty.event.site }}</a>
+        Сайт: <a href="{{ eventParty.event.contacts.site }}">{{ eventParty.event.contacts.site }}</a>
     </div>
     {% endif %}
 </div>
