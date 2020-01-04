@@ -7,4 +7,10 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     php-yaml \
     php-zmq \
     php-amqp \
-    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    supervisor
+
+RUN apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+RUN mkdir -p /var/log/supervisor
+
+CMD /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

@@ -62,7 +62,6 @@ class EPProgressSubscriber implements EventSubscriberInterface
      */
     public function onLoadEventParty(EPActionEvent $event): void
     {
-
         $eventParty = $event->getEventParty();
 
         if ($eventParty->isReady() && new \DateTime() > $eventParty->getMeetingOptions()->getMeetingAt()) {
