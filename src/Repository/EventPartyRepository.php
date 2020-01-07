@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class EventPartyRepository extends ServiceEntityRepository
 {
     /**
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -28,7 +28,7 @@ class EventPartyRepository extends ServiceEntityRepository
      *
      * @return EventParty[]
      */
-    public function findAvailableForUser(User $user): array
+    public function findEPsForUser(User $user): array
     {
         return $this->createQueryBuilder('ep')
             ->select('ep, event')

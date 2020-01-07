@@ -69,7 +69,7 @@ class EventPartyManager
      */
     public function findForUser(User $user): ?EventParty
     {
-        $eventParties = $this->epRepo->findAvailableForUser($user);
+        $eventParties = $this->epRepo->findEPsForUser($user);
         $this->sortByRelevance($eventParties);
 
         $today = new \DateTime();

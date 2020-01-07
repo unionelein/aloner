@@ -7,6 +7,7 @@
 
 namespace App\Component\Event;
 
+use App\Component\Util\Date;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
@@ -16,9 +17,12 @@ class EventManager
     /** @var EventRepository */
     private $eventRepo;
 
+    /**
+     * @param EventRepository $eventRepo
+     */
     public function __construct(EventRepository $eventRepo)
     {
-        $this->eventRepo     = $eventRepo;
+        $this->eventRepo = $eventRepo;
     }
 
     /**
@@ -28,16 +32,16 @@ class EventManager
      */
     public function findForUser(User $user): ?Event
     {
-        $events = $this->eventRepo->findAppropriateEventsForUser($user);
+        $events = $this->eventRepo->findEventsForUser($user);
 
-        if (\count($events) === 0) {
+        if (count($events) === 0) {
             return null;
         }
 
-        \shuffle($events);
+        shuffle($events);
 
         foreach ($events as $event) {
-            if ($user->getSkippedEvents(new \DateTime())->contains($event)) {
+            if ($user->getSkippedEvents(Date::date('now'))->contains($event)) {
                 continue;
             }
 

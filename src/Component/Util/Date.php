@@ -2,6 +2,10 @@
 
 namespace App\Component\Util;
 
+use DateTime;
+use Webmozart\Assert\Assert;
+use LogicException;
+
 class Date
 {
     private const RESET_TIME = '00:00:00';
@@ -9,47 +13,57 @@ class Date
     private const RESET_DATE = '0000-01-01';
 
     /**
-     * @param string|\DateTime $date
+     * @param string|DateTime $date
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public static function date($date): \DateTime
+    public static function date($date): DateTime
     {
-        if ($date instanceof \DateTime) {
-            return (clone $date)->modify(self::RESET_TIME);
-        }
+        $date = self::toDateTime($date);
 
-        if (\is_string($date)) {
-            return (new \DateTime($date))->modify(self::RESET_TIME);
-        }
-
-        throw new \InvalidArgumentException('Invalid date argument given');
+        return (clone $date)->modify(self::RESET_TIME);
     }
 
     /**
-     * @param string|\DateTime $date
+     * @param string|DateTime $time
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public static function time($date): \DateTime
+    public static function time($time): DateTime
     {
-        if ($date instanceof \DateTime) {
-            return (clone $date)->modify(self::RESET_DATE);
-        }
+        $time = self::toDateTime($time);
 
-        if (\is_string($date)) {
-            return (new \DateTime($date))->modify(self::RESET_DATE);
-        }
-
-        throw new \InvalidArgumentException('Invalid date argument given');
+        return $time->modify(self::RESET_DATE);
     }
 
     /**
-     * @param \DateTime $dateTime
+     * @param string|DateTime $dateTime1
+     * @param string|DateTime $dateTime2
+     * @param string          $unit available units: "sec", "min", "hour"
+     *
+     * @return int floor value of dateTime difference
+     */
+    public static function diff($dateTime1, $dateTime2, string $unit = 'min'): int
+    {
+        $timestamp1 = self::toDateTime($dateTime1)->getTimestamp();
+        $timestamp2 = self::toDateTime($dateTime2)->getTimestamp();
+
+        $diffSec = $timestamp2 - $timestamp1;
+
+        switch ($unit) {
+            case 'sec':  return $diffSec;
+            case 'min':  return (int) floor($diffSec / 60);
+            case 'hour': return (int) floor($diffSec / (60 * 60));
+            default: throw new LogicException("Invalid time diff unit given: {$unit}");
+        }
+    }
+
+    /**
+     * @param DateTime $dateTime
      *
      * @return string
      */
-    public static function rusFormat(\DateTime $dateTime): string
+    public static function rusFormat(DateTime $dateTime): string
     {
         $time = $dateTime->format('H:i');
 
@@ -65,5 +79,19 @@ class Date
         }
 
         return "{$date} в {$time}";
+    }
+
+    /**
+     * @param string|DateTime $dateTime
+     *
+     * @return DateTime
+     */
+    public static function toDateTime($dateTime): DateTime
+    {
+        $dateTime = $dateTime instanceof DateTime ? $dateTime : new DateTime($dateTime);
+
+        Assert::isInstanceOf($dateTime, DateTime::class);
+
+        return $dateTime;
     }
 }

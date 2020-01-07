@@ -8,6 +8,7 @@
 namespace App\Component\Util;
 
 use Webmozart\Assert\Assert;
+use DateTime;
 
 class Week
 {
@@ -33,7 +34,7 @@ class Week
         self::FRIDAY    => 'Пятница',
         self::SATURDAY  => 'Суббота',
         self::SUNDAY    => 'Воскресенье',
-        7               => 'Воскресенье',
+        7               => 'Воскресенье', // TODO: fix usages
     ];
 
     public const SHORT_DAYS = [
@@ -48,13 +49,15 @@ class Week
     ];
 
     /**
-     * @param \DateTime $day
+     * @param string|DateTime $day
      *
      * @return int
      */
-    public static function weekDay(\DateTime $day): int
+    public static function weekDay($day): int
     {
+        $day     = Date::toDateTime($day);
         $weekDay = (int) $day->format('w');
+
         Assert::keyExists(self::DAYS, $weekDay);
 
         return $weekDay;

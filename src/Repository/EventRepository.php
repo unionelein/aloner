@@ -24,7 +24,7 @@ class EventRepository extends ServiceEntityRepository
      * @param User $user
      * @return Event[]
      */
-    public function findAppropriateEventsForUser(User $user): array
+    public function findEventsForUser(User $user): array
     {
         return $this->createQueryBuilder('event')
             ->andWhere('event.city = :userCity')

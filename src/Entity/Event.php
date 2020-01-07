@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Component\Util\Date;
 use App\Component\Util\Week;
 use App\Entity\VO\Contacts;
 use App\Entity\VO\Range;
@@ -322,16 +323,15 @@ class Event
         $dayTimetables = $this->getTimetables(Week::weekDay($searchCriteria->getDay()));
 
         foreach ($dayTimetables as $timetable) {
-            $startTime = $timetable->getTimeFrom();
+            $startTime = max($searchCriteria->getTimeFrom(), $timetable->getTimeFrom());
+            $endTime   = min($searchCriteria->getTimeTo(), $timetable->getTimeTo());
 
-            if ($searchCriteria->getTimeFrom() >= $startTime || $searchCriteria->getTimeTo() < $startTime) {
-                continue;
-            }
+            $availableTime = Date::diff($startTime, $endTime, 'min');
+            $requiredTime  = ($timetable->getType() === Timetable::TYPE_VISIT)
+                ? Date::diff($timetable->getTimeFrom(), $timetable->getTimeTo(), 'min')
+                : $this->duration;
 
-            $availableTime = $searchCriteria->getTimeTo()->diff($timetable->getTimeFrom());
-            $availableMins = $availableTime->h * 60 + $availableTime->i;
-
-            if ($availableMins > $this->duration/2) {
+            if ($availableTime >= $requiredTime) {
                 return $timetable;
             }
         }

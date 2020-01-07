@@ -6,7 +6,7 @@ services:
         container_name: aloner-mysql
         environment:
             MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: aloner
+            #MYSQL_DATABASE: aloner
             MYSQL_USER: aloner
             MYSQL_PASSWORD: aloner
         ports:
@@ -31,6 +31,7 @@ services:
         links:
             - mysql
         environment:
+            PHP_IDE_CONFIG: "serverName=aloner" # xdebug for phpstorm (you need create server with right path under Setting -> PHP -> Servers)
             MYSQL_HOST: mysql
             MYSQL_USER: aloner
             MYSQL_PASS: aloner
