@@ -6,5 +6,6 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     php-xdebug \
     php-yaml \
     php-zmq \
-    php-amqp \
-    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    php-amqp
+
+RUN apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
