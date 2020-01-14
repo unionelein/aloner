@@ -9,6 +9,9 @@ use App\Tests\MotherObject\EventMother;
 use App\Tests\MotherObject\UserMother;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group unit
+ */
 class EventManagerTest extends TestCase
 {
     /** @var EventRepository|\PHPUnit\Framework\MockObject\MockObject */
