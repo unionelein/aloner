@@ -1,14 +1,17 @@
-version: "3.1"
+version: "3.2"
 
 services:
-    mysql:
+    db:
         image: mysql:5.7
-        container_name: aloner-mysql
+        container_name: aloner-db
+        restart: on-failure:2
         environment:
             MYSQL_ROOT_PASSWORD: root
-            #MYSQL_DATABASE: aloner
-            MYSQL_USER: aloner
-            MYSQL_PASSWORD: aloner
+            # From docker documentation (https://docs.docker.com/compose/env-file). Compose supports declaring default
+            # environment variables in an environment file named .env placed in the folder where the docker-compose command is executed
+            MYSQL_DATABASE: "${DATABASE_SCHEMA}"
+            MYSQL_USER: "${DATABASE_USER}"
+            MYSQL_PASSWORD: "${DATABASE_PASSWORD}"
         ports:
             - "8002:3306"
         volumes:
@@ -17,6 +20,7 @@ services:
     webserver:
         image: nginx:alpine
         container_name: aloner-webserver
+        restart: on-failure:2
         links:
             - php-fpm
         volumes:
@@ -26,15 +30,16 @@ services:
             - "8000:80"
 
     php-fpm:
-        build: .docker/php-fpm
-        container_name: aloner-php-fpm
+        build: ./.docker/php-fpm
+        container_name: aloner-php
+        restart: on-failure:2
         links:
-            - mysql
+            - db
         environment:
-            PHP_IDE_CONFIG: "serverName=aloner" # xdebug for phpstorm (you need create server with right path under Setting -> PHP -> Servers)
-            MYSQL_HOST: mysql
-            MYSQL_USER: aloner
-            MYSQL_PASS: aloner
+            # XDebug for PHPStorm.
+            # To map paths between PHPStorm project and docker app
+            # you need to create server with redirect path under Setting -> PHP -> Servers
+            PHP_IDE_CONFIG: "serverName=aloner"
         volumes:
             - .:/application
             - ./.docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
@@ -42,13 +47,8 @@ services:
     supervisor:
         build: .docker/supervisor
         container_name: aloner-supervisor
-        environment:
-            MYSQL_HOST: mysql
-            MYSQL_USER: aloner
-            MYSQL_PASS: aloner
+        restart: on-failure:2
         links:
-            - mysql
-        depends_on:
             - php-fpm
         volumes:
             - .:/application
@@ -57,6 +57,7 @@ services:
 
     mercure:
         container_name: aloner-mercure
+        restart: on-failure:2
         image: dunglas/mercure
         environment:
             - JWT_KEY=YourSecretKey
