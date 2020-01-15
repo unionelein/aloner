@@ -56,15 +56,4 @@ class Range
     {
         return $this->max;
     }
-
-    /**
-     * @return int
-     */
-    public function randomEven(): int
-    {
-        $min = (int) \ceil($this->min / 2);
-        $max = (int) \floor($this->max / 2);
-
-        return \random_int($min, $max) * 2;
-    }
 }

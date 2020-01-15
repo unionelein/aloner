@@ -21,7 +21,7 @@ class City
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="city_name", length=255)
+     * @ORM\Column(type="string", name="city_name", length=255, unique=true)
      */
     private $name;
 

@@ -513,7 +513,7 @@ class User implements UserInterface
      */
     public function joinToEventParty(EventParty $eventParty): self
     {
-        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} не заполнил не все данные");
+        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} заполнил не все данные");
 
         if (!$this->eventParties->contains($eventParty)) {
             $this->eventParties[] = $eventParty;

@@ -3,10 +3,12 @@
 namespace App\Tests\MotherObject;
 
 use App\Component\Util\Date;
+use App\Component\Vk\DTO\AccessToken;
 use App\Entity\City;
 use App\Entity\User;
 use App\Entity\VO\SearchCriteria;
 use App\Entity\VO\Sex;
+use App\Entity\VO\VkExtension;
 use \DateTime;
 
 class UserMother
@@ -18,10 +20,13 @@ class UserMother
      */
     public static function create(City $city): User
     {
+        $accessToken = new AccessToken(1123, 'token', new DateTime('+1 year'));
+
         $user = new User('Vitaliy Cal\'');
         $user->setCity($city)
             ->setBirthday(new DateTime('19.10.1999'))
-            ->setSex(new Sex(Sex::MALE));
+            ->setSex(new Sex(Sex::MALE))
+            ->setVk(new VkExtension($accessToken));
 
         return $user;
     }

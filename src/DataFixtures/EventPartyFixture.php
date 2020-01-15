@@ -2,9 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Component\EventParty\Helper\PeopleCompositionFiller;
 use App\Entity\Event;
 use App\Entity\EventParty;
-use App\Entity\VO\PeopleComposition;
 
 class EventPartyFixture extends BaseFixture
 {
@@ -12,13 +12,13 @@ class EventPartyFixture extends BaseFixture
 
     public function loadData(): void
     {
-        $this->createMany('event_party', 5, function (int $index) {
+        $this->createMany('event_party', self::EP_COUNT, function (int $index) {
             /** @var Event $event */
             $event = $this->getReference('event_' . $this->faker->numberBetween(1, EventFixture::EVENTS_COUNT));
 
-            $numberOfEachSex = $event->getPeopleRange()->randomEven() / 2;
+            $composition = PeopleCompositionFiller::fillFromRange($event->getPeopleRange());
 
-            return new EventParty($event, new PeopleComposition($numberOfEachSex, $numberOfEachSex));
+            return new EventParty($event, $composition);
         });
     }
 

@@ -132,10 +132,18 @@ EOF
      */
     private function addMedia(Event $event): void
     {
-        $event->addMedia(new Media('build/static/img/event/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты'));
-        $event->addMedia(new Media('build/static/img/event/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики'));
-        $event->addMedia(new Media('build/static/img/event/neoland_3.jpg', Media::TYPE_IMAGE));
-        $event->addMedia(new Media('build/static/video/event/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', 'build/static/img/event/neoland_3.jpg'));
+        static $media = [];
+
+        if (!$media) {
+            $media[] = new Media('build/static/img/event/neoland_1.jpg', Media::TYPE_IMAGE, 'батуты');
+            $media[] = new Media('build/static/img/event/neoland_2.jpg', Media::TYPE_IMAGE, 'паралоновые кубики');
+            $media[] = new Media('build/static/img/event/neoland_3.jpg', Media::TYPE_IMAGE);
+            $media[] = new Media('build/static/video/event/gorka.mp4', Media::TYPE_VIDEO, 'Видео прыжков', 'build/static/img/event/neoland_3.jpg');
+        }
+
+        foreach ($media as $oneMedia) {
+            $event->addMedia($oneMedia);
+        }
     }
 
     /**

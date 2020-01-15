@@ -22,9 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UserManager
 {
-    /** @var TransactionalService */
-    private $transactional;
-
     /** @var EventDispatcherInterface */
     private $dispatcher;
 
@@ -35,18 +32,15 @@ class UserManager
     private $userRepo;
 
     /**
-     * @param TransactionalService     $transactional
      * @param UserRepository           $userRepo
      * @param EventDispatcherInterface $dispatcher
      * @param EntityManagerInterface   $em
      */
     public function __construct(
-        TransactionalService $transactional,
         UserRepository $userRepo,
         EventDispatcherInterface $dispatcher,
         EntityManagerInterface $em
     ) {
-        $this->transactional = $transactional;
         $this->dispatcher    = $dispatcher;
         $this->em            = $em;
         $this->userRepo      = $userRepo;
@@ -62,6 +56,7 @@ class UserManager
         $user = new User($name);
 
         $this->em->persist($user);
+        $this->em->flush();
 
         return $user;
     }
@@ -72,13 +67,8 @@ class UserManager
      */
     public function join(User $user, EventParty $eventParty): void
     {
-        $this->transactional->execute(static function (EntityManagerInterface $em) use ($user, $eventParty) {
-            $user->joinToEventParty($eventParty);
-
-            $em->persist($user);
-            $em->persist($eventParty);
-            $em->flush();
-        });
+        $user->joinToEventParty($eventParty);
+        $this->em->flush();
 
         $this->dispatcher->dispatch(new EPJoinedEvent($user, $eventParty));
 
@@ -97,13 +87,8 @@ class UserManager
      */
     public function skip(User $user, EventParty $eventParty): void
     {
-        $this->transactional->execute(static function (EntityManagerInterface $em) use ($user, $eventParty) {
-            $user->skipEventParty($eventParty);
-
-            $em->persist($user);
-            $em->persist($eventParty);
-            $em->flush();
-        });
+        $user->skipEventParty($eventParty);
+        $this->em->flush();
 
         $this->dispatcher->dispatch(new EPSkippedEvent($user, $eventParty));
     }
@@ -114,8 +99,6 @@ class UserManager
     public function updateTempHash(User $user): void
     {
         $user->updateTempHash();
-
-        $this->em->persist($user);
         $this->em->flush();
     }
 

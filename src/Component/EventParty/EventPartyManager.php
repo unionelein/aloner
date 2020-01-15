@@ -4,9 +4,9 @@ namespace App\Component\EventParty;
 
 use App\Component\Event\EventManager;
 use App\Component\EventParty\Exception\NoEventsForUserException;
+use App\Component\EventParty\Helper\PeopleCompositionFiller;
 use App\Entity\EventParty;
 use App\Entity\User;
-use App\Entity\VO\PeopleComposition;
 use App\Repository\EventPartyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -50,8 +50,7 @@ class EventPartyManager
             throw new NoEventsForUserException('No events for user found');
         }
 
-        $numOfPeople = $event->getPeopleRange()->randomEven();
-        $composition = new PeopleComposition($numOfPeople / 2, $numOfPeople / 2);
+        $composition = PeopleCompositionFiller::fillFromRange($event->getPeopleRange());
 
         $eventParty = new EventParty($event, $composition);
 
