@@ -18,7 +18,7 @@ class UserController extends BaseController
 {
     /**
      * @IsGranted(User::ROLE_PARTIAL_REG)
-     * @Route("/fill_user", name="app_fill_user")
+     * @Route("/account", name="app_account")
      */
     public function fillUser(
         Request $request,
@@ -50,7 +50,7 @@ class UserController extends BaseController
             return $response;
         }
 
-        return $this->render('user/fill_user.html.twig', [
+        return $this->render('user/account.html.twig', [
             'form' => $form->createView(),
         ]);
     }

@@ -26,8 +26,8 @@ Encore
     .addEntry('app', './assets/js/app.js')
     //.addEntry('page1', './assets/js/page1.js')
     //.addEntry('page2', './assets/js/page2.js')
-    .addStyleEntry('vk_auth', './assets/css/vk_auth.scss')
-    .addStyleEntry('fill_user', './assets/css/fill_user.scss')
+    .addStyleEntry('login', './assets/css/login.scss')
+    .addStyleEntry('account', './assets/css/account.scss')
     .addStyleEntry('home', './assets/css/home.scss')
     .addEntry('event_party', './assets/js/event_party.js')
 

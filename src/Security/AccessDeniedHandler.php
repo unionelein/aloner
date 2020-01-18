@@ -35,11 +35,11 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
         $user = $this->security->getUser();
 
         if (!$user) {
-            return new RedirectResponse($this->urlGenerator->generate('app_vk_auth'));
+            return new RedirectResponse($this->urlGenerator->generate('app_login'));
         }
 
         if (!$user->hasRole(User::ROLE_FULL_REG) || !$user->isFilled()) {
-            return new RedirectResponse($this->urlGenerator->generate('app_fill_user'));
+            return new RedirectResponse($this->urlGenerator->generate('app_account'));
         }
 
         return new Response('no access', 403);

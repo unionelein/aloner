@@ -11,12 +11,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 
-class SecurityController extends BaseController
+class LoginController extends BaseController
 {
     /**
-     * @Route("/vk_auth", name="app_vk_auth")
+     * @Route("/login", name="app_login")
      */
-    public function vkAuth(
+    public function login(
         Request $request,
         UserRepository $userRepo,
         VkAuthService $vkAuth,
@@ -25,13 +25,13 @@ class SecurityController extends BaseController
         VkAuthenticator $vkAuthenticator
     ) {
         $accessCode  = $request->get('code');
-        $redirectUrl = $this->generateUrl('app_vk_auth', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $redirectUrl = $this->generateUrl('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         if ($accessCode) {
             try {
                 $accessToken = $vkAuth->getAccessToken($accessCode, $redirectUrl);
             } catch (\Exception $e) {
-                return $this->render('security/vk_auth.html.twig', [
+                return $this->render('login/login.html.twig', [
                     'vk_auth_url' => $vkAuth->getAuthorizeUrl($redirectUrl),
                 ]);
             }
@@ -45,7 +45,7 @@ class SecurityController extends BaseController
             return $guardHandler->authenticateUserAndHandleSuccess($user, $request, $vkAuthenticator, 'main');
         }
 
-        return $this->render('security/vk_auth.html.twig', [
+        return $this->render('login/login.html.twig', [
             'vk_auth_url' => $vkAuth->getAuthorizeUrl($redirectUrl),
         ]);
     }

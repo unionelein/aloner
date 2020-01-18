@@ -44,7 +44,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new RedirectResponse($this->urlGenerator->generate('app_vk_auth'));
+        return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -53,7 +53,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
         $user = $token->getUser();
 
         if ($user && !$user->isFilled()) {
-            return new RedirectResponse($this->urlGenerator->generate('app_fill_user'));
+            return new RedirectResponse($this->urlGenerator->generate('app_account'));
         }
 
         if ($targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path')) {
@@ -65,7 +65,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return new RedirectResponse($this->urlGenerator->generate('app_vk_auth'));
+        return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 
     public function supportsRememberMe()

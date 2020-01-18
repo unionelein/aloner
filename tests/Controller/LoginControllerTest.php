@@ -7,12 +7,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * @group functional
  */
-class SecurityControllerTest extends WebTestCase
+class LoginControllerTest extends WebTestCase
 {
-    public function testVkPageReturnsValidPage(): void
+    public function testThatLoginPageWorksCorrectly(): void
     {
         $client  = self::createClient();
-        $crawler = $client->request('GET', '/vk_auth');
+        $crawler = $client->request('GET', '/login');
 
         self::assertResponseIsSuccessful();
 
