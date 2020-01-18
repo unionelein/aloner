@@ -9,6 +9,9 @@ docker-compose exec 'php-fpm' sh -c 'composer install'
 printf 'Clear cache...\n'
 docker-compose exec 'php-fpm' sh -c 'php bin/console cache:clear'
 
+printf 'Build webpack...\n'
+docker-compose exec 'php-fpm' sh -c 'yarn && yarn build'
+
 printf 'Up database...\n'
 docker-compose exec 'php-fpm' sh -c 'php bin/console doctrine:database:create --if-not-exists'
 docker-compose exec 'php-fpm' sh -c 'php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration'
