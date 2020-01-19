@@ -15,6 +15,7 @@ services:
         ports:
             - "8002:3306"
         volumes:
+            - ./.docker/db:/etc/mysql/conf.d:ro
             - container-volume:/var/lib/mysql
 
     webserver:
@@ -22,16 +23,16 @@ services:
         container_name: aloner-webserver
         restart: on-failure:2
         links:
-            - php-fpm
+            - app
         volumes:
             - .:/application
             - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
         ports:
             - "8000:80"
 
-    php-fpm:
-        build: ./.docker/php-fpm
-        container_name: aloner-php
+    app:
+        build: ./.docker/app
+        container_name: aloner-app
         restart: on-failure:2
         links:
             - db
@@ -42,18 +43,8 @@ services:
             PHP_IDE_CONFIG: "serverName=aloner"
         volumes:
             - .:/application
-            - ./.docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
-
-    supervisor:
-        build: .docker/supervisor
-        container_name: aloner-supervisor
-        restart: on-failure:2
-        links:
-            - php-fpm
-        volumes:
-            - .:/application
-            - ./.docker/supervisor/supervisor.conf:/etc/supervisor/conf.d/supervisor.conf
-            - ./.docker/supervisor/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+            - ./.docker/app/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+            - ./.docker/app/supervisor.conf:/etc/supervisor/conf.d/supervisor.conf
 
     mercure:
         container_name: aloner-mercure

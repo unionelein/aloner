@@ -10,18 +10,18 @@ GREEN_BGC='\e[42m'
 GREEN_OK="${GREEN_BGC}${BLACK_COLOR} OK ${DEFAULT_BGC}${DEFAULT_COLOR}"
 
 echo 'Start unit tests...'
-docker-compose exec 'php-fpm' sh -c 'bin/phpunit --group=unit'
+docker-compose exec 'app' sh -c 'bin/phpunit --group=unit'
 
 printf '\nSetup database...'
-docker-compose exec 'php-fpm' sh -c 'php bin/console app:empty_schema:create --env=test --quiet'
+docker-compose exec 'app' sh -c 'php bin/console app:empty_schema:create --env=test --quiet'
 printf " ${GREEN_OK}\n\n"
 
 printf 'Start integration tests...'
-docker-compose exec 'php-fpm' sh -c 'bin/phpunit --group=integration'
+docker-compose exec 'app' sh -c 'bin/phpunit --group=integration'
 
 printf '\nLoad fixtures...'
-docker-compose exec 'php-fpm' sh -c 'php bin/console doctrine:fixtures:load --env=test --no-interaction --quiet'
+docker-compose exec 'app' sh -c 'php bin/console doctrine:fixtures:load --env=test --no-interaction --quiet'
 printf " ${GREEN_OK}\n\n"
 
 printf 'Start functional tests...\n'
-docker-compose exec 'php-fpm' sh -c 'bin/phpunit --group=functional'
+docker-compose exec 'app' sh -c 'bin/phpunit --group=functional'
