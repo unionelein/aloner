@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% trans_default_domain 'home' %}
+
 {% block stylesheets %}
     {{ parent() }}
 
@@ -12,22 +14,22 @@
         <div class="col-sm-8 ">
             <div class="block">
                 <div class="block-header">
-                    Здесь ты сможешь найти полезную информацию и новости сайта
+                    {% trans %}Здесь ты сможешь найти полезную информацию и новости сайта{% endtrans %}
                 </div>
 
                 <div class="block-body ml-4">
-                    + Чтобы начать поиск компании нажми кнопку [Поиск] справа<br>
-                    + Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку [Дальше]. Так можно сделать только 3 раза в день.<br>
-                    + Ну вроде пока все :) И помни:<br>
-                    - Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление
+                    + {% trans %}Чтобы начать поиск компании нажми кнопку [Поиск] справа{% endtrans %}<br>
+                    + {% trans %}Не понравилась компания или место? Ты можешь пропустить ее, нажав кнопку [Дальше]. Так можно сделать только 3 раза в день{% endtrans %}<br>
+                    + {% trans %}Ну вроде пока все :) И помни:{% endtrans %}<br>
+                    - {% trans %}Доброта и позитивное настроение - лучший способ создать хорошее первое впечатление{% endtrans %}
 
                     <div class="text-center">
                         <img src="{{ asset('build/static/img/gatsby_motivation.png') }}" class="m-3">
                     </div>
 
                     <div class="text-right">
-                        - Живешь ведь только раз! Решайся!<br>
-                        Великий Гэтсби
+                        - {% trans %}Живешь ведь только раз! Решайся!{% endtrans %}<br>
+                        {% trans %}Великий Гэтсби{% endtrans %}
                     </div>
                 </div>
             </div>
@@ -50,12 +52,12 @@
                     {{ form_start(searchCriteriaForm) }}
 
                     <div class="search-criteria-wrapper">
-                        <b class="ml-1">День:</b>
+                        <b class="ml-1">{% trans %}День:{% endtrans %}</b>
                         <div class="row mb-1 mt-1">
                             <div class="col-sm-12 form-group">{{ form_widget(searchCriteriaForm.day) }}</div>
                         </div>
 
-                        <b class="ml-1">Время:</b>
+                        <b class="ml-1">{% trans %}Время:{% endtrans %}</b>
                         <div class="row mt-1">
                             <div class="col-sm-6 form-group mb-2">{{ form_widget(searchCriteriaForm.timeFrom) }}</div>
                             <div class="col-sm-6 form-group mb-2">{{ form_widget(searchCriteriaForm.timeTo) }}</div>
@@ -69,7 +71,7 @@
                     <hr>
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary search-event-party-btn">Поиск</button>
+                        <button type="submit" class="btn btn-primary search-event-party-btn">{% trans %}Поиск{% endtrans %}</button>
                     </div>
 
                     {{ form_end(searchCriteriaForm) }}

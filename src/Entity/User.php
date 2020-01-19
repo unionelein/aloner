@@ -379,7 +379,7 @@ class User implements UserInterface
      */
     public function getBirthday(): ?\DateTime
     {
-        return clone $this->birthday;
+        return $this->birthday ? clone $this->birthday : null;
     }
 
     /**

@@ -15,10 +15,11 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
+            anonymous: lazy
             guard:
                 authenticators:
                     - App\Security\Authenticator\VkAuthenticator
+
                 entry_point: App\Security\Authenticator\VkAuthenticator
 
             logout:

@@ -50,7 +50,7 @@ class UserType extends AbstractType
                 'widget'      => 'single_text',
                 'format'      => 'dd/MM/yyyy',
                 'label'       => false,
-                'help'        => 'Дата рождения',
+                'attr'        => ['placeholder' => 'Дата рождения'],
                 'constraints' => [new UserAgeRange()],
             ])
             ->add('acceptLicense', CheckboxType::class, [

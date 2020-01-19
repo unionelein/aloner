@@ -63,6 +63,7 @@ class SearchCriteriaType extends AbstractType
                 Date::time(self::DEFAULT_TIME_FROM),
                 Date::time(self::DEFAULT_TIME_TO)
             ),
+            'translation_domain' => 'search_criteria_form',
         ]);
     }
 
@@ -81,7 +82,9 @@ class SearchCriteriaType extends AbstractType
         $minRangeMinutes = self::MIN_TIME_RANGE_MIN;
 
         if ($criteria->getTimeFrom()->modify("+{$minRangeMinutes} min") > $criteria->getTimeTo()) {
-            $context->buildViolation("Минимальный промежуток времени - {$minRangeMinutes} мин")->addViolation();
+            $context->buildViolation('Минимальный промежуток времени - {{ min_range }} мин')
+                ->setParameter('{{ min_range }}', $minRangeMinutes)
+                ->addViolation();
 
             return;
         }
@@ -89,7 +92,9 @@ class SearchCriteriaType extends AbstractType
         $minOffsetMinutes = self::MIN_TIME_OFFSET_MIN;
 
         if ($criteria->getDay() == Date::date('') && Date::time("+{$minOffsetMinutes} min") > $criteria->getTimeTo()) {
-            $context->buildViolation("Минимальный запас времени для поиска - {$minOffsetMinutes} мин")->addViolation();
+            $context->buildViolation('Минимальный запас времени для поиска - {{ min_time }} мин')
+                ->setParameter('{{ min_time }}', $minOffsetMinutes)
+                ->addViolation();
 
             return;
         }

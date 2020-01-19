@@ -1,0 +1,4 @@
+#search criteria form
+"Начальное время больше конечного": "Init time greater than begin time"
+"Минимальный запас времени для поиска - {{ min_time }} мин": "Minimum time to search - {{ min_time }} min"
+"Минимальный промежуток времени - {{ min_range }} мин": "Minimum time span - {{ min_range }} min"

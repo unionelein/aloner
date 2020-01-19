@@ -5,7 +5,7 @@ namespace App\Security\Authenticator;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,12 +14,12 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class VkAuthenticator extends AbstractGuardAuthenticator
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    /** @var RouterInterface */
+    private $router;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(RouterInterface $router)
     {
-        $this->urlGenerator = $urlGenerator;
+        $this->router = $router;
     }
 
     public function supports(Request $request)
@@ -44,7 +44,7 @@ class VkAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new RedirectResponse($this->urlGenerator->generate('app_login'));
+        return new RedirectResponse($this->router->generate('app_login'));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -53,19 +53,19 @@ class VkAuthenticator extends AbstractGuardAuthenticator
         $user = $token->getUser();
 
         if ($user && !$user->isFilled()) {
-            return new RedirectResponse($this->urlGenerator->generate('app_account'));
+            return new RedirectResponse($this->router->generate('app_account'));
         }
 
         if ($targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path')) {
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_main'));
+        return new RedirectResponse($this->router->generate('app_main'));
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return new RedirectResponse($this->urlGenerator->generate('app_login'));
+        return new RedirectResponse($this->router->generate('app_login'));
     }
 
     public function supportsRememberMe()
