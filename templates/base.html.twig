@@ -34,8 +34,12 @@
         <footer class="app-footer">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-12">
-                        2019 &copy; Aloner | {% trans %}Поддержка{% endtrans %}
+                    <div class="col-sm-6">
+                        {% trans %}Поддержка{% endtrans %}
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        {% set year = 'now'|date('Y') %}
+                        &copy; {{ creationYear == year ? year : creationYear ~ ' - ' ~ year }} Aloner
                     </div>
                 </div>
             </div>
