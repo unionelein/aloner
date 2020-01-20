@@ -3,17 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\VO\SearchCriteria;
-use App\Entity\User;
 use App\Form\Type\SearchCriteriaType;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted(User::ROLE_PARTIAL_REG)
- * @Route("/")
- */
 class HomeController extends BaseController
 {
     /**
@@ -24,7 +18,7 @@ class HomeController extends BaseController
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->redirectToRoute('app_event_party_current');
+            return $this->redirectToRoute('app_ep_current');
         }
 
         $searchCriteriaForm = $this->createForm(SearchCriteriaType::class, $user->getSearchCriteria())
@@ -39,7 +33,7 @@ class HomeController extends BaseController
             $em->persist($user);
             $em->flush();
 
-            return $this->redirectToRoute('app_event_party_find');
+            return $this->redirectToRoute('app_find_ep');
         }
 
         return $this->render('home/home.html.twig', [

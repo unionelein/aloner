@@ -19,7 +19,7 @@
                             <span class="logo-text">Aloner</span>
                         </a>
 
-                        {% if is_granted(constant('App\\Entity\\User::ROLE_FULL_REG')) %}
+                        {% if app.user %}
                             <a class="float-right" href="{{ path('app_logout') }}">{% trans %}Выйти{% endtrans %}</a>
                         {% endif %}
                     </div>

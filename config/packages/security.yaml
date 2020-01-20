@@ -8,7 +8,7 @@ security:
                 property: login
 
     role_hierarchy:
-        ROLE_FULL_REG: [ROLE_PARTIAL_REG]
+        ROLE_ADMIN: [ROLE_USER]
 
     firewalls:
         dev:
@@ -27,6 +27,7 @@ security:
 
             remember_me:
                 secret: '%kernel.secret%'
+                lifetime: 2592000 # 30 days in seconds
                 always_remember_me: true
 
 
@@ -44,6 +45,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/account, roles: ROLE_PARTIAL_REG}
-        - { path: ^/, roles: ROLE_FULL_REG }
+        - { path: ^/account, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/, roles: ROLE_USER }
 

@@ -25,9 +25,7 @@ class User implements UserInterface
 {
     public const WEB_ID = 1;
 
-    public const ROLE_PARTIAL_REG = 'ROLE_PARTIAL_REG';
-
-    public const ROLE_FULL_REG = 'ROLE_FULL_REG';
+    public const ROLE_USER = 'ROLE_USER';
 
     /**
      * @var int
@@ -168,8 +166,6 @@ class User implements UserInterface
 
         $this->name = $name;
         $this->updateTempHash();
-
-        $this->addRole(self::ROLE_PARTIAL_REG);
     }
 
     /**
@@ -211,9 +207,7 @@ class User implements UserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-
-        return \array_unique($roles);
+        return $this->roles;
     }
 
     /**
@@ -223,7 +217,7 @@ class User implements UserInterface
      */
     public function setRoles(array $roles): self
     {
-        $this->roles = \array_unique($roles);
+        $this->roles = array_unique($roles);
 
         return $this;
     }
@@ -235,7 +229,7 @@ class User implements UserInterface
      */
     public function addRole(string $role): self
     {
-        if (!\in_array($role, $this->roles, true)) {
+        if (!in_array($role, $this->roles, true)) {
             $this->roles[] = $role;
         }
 
@@ -249,7 +243,7 @@ class User implements UserInterface
      */
     public function hasRole(string $role): bool
     {
-        return \in_array($role, $this->roles, true);
+        return in_array($role, $this->roles, true);
     }
 
     /**
@@ -341,17 +335,6 @@ class User implements UserInterface
         $this->sex = $sex;
 
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFilled(): bool
-    {
-        return $this->city
-            && $this->birthday
-            && $this->sex
-            && $this->getVk();
     }
 
     /**
@@ -513,8 +496,6 @@ class User implements UserInterface
      */
     public function joinToEventParty(EventParty $eventParty): self
     {
-        WebmozAssert::true($this->isFilled(), "Пользователь #{$this->id} заполнил не все данные");
-
         if (!$this->eventParties->contains($eventParty)) {
             $this->eventParties[] = $eventParty;
             $eventParty->addUser($this);

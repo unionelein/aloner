@@ -26,7 +26,8 @@ class UserMother
         $user->setCity($city)
             ->setBirthday(new DateTime('19.10.1999'))
             ->setSex(new Sex(Sex::MALE))
-            ->setVk(new VkExtension($accessToken));
+            ->setVk(new VkExtension($accessToken))
+            ->addRole(User::ROLE_USER);
 
         return $user;
     }

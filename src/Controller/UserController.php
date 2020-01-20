@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Form\Type\UserType;
 use App\Security\Authenticator\VkAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,10 +16,9 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 class UserController extends BaseController
 {
     /**
-     * @IsGranted(User::ROLE_PARTIAL_REG)
-     * @Route("/account", name="app_account")
+     * @Route("/account", name="app_user_account")
      */
-    public function fillUser(
+    public function account(
         Request $request,
         EntityManagerInterface $em,
         GuardAuthenticatorHandler $guardHandler,
@@ -34,10 +32,7 @@ class UserController extends BaseController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
-
-            if ($user->isFilled()) {
-                $user->addRole(User::ROLE_FULL_REG);
-            }
+            $user->addRole(User::ROLE_USER);
 
             $em->persist($user);
             $em->flush();

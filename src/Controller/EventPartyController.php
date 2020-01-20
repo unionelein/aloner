@@ -19,7 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Security\Voter\EventPartyVoter;
 
 /**
- * @IsGranted(User::ROLE_FULL_REG)
  * @Route("/event_party")
  */
 class EventPartyController extends BaseController
@@ -41,7 +40,7 @@ class EventPartyController extends BaseController
     }
 
     /**
-     * @Route("/", name="app_event_party_current")
+     * @Route("/", name="app_ep_current")
      */
     public function current(): Response
     {
@@ -52,12 +51,12 @@ class EventPartyController extends BaseController
             return $this->redirectToRoute('app_main');
         }
 
-        return $this->redirectToRoute('app_event_party', ['id' => $eventParty->getId()]);
+        return $this->redirectToRoute('app_ep', ['id' => $eventParty->getId()]);
     }
 
     /**
      * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
-     * @Route("/{id}", name="app_event_party", requirements={"id"="\d+"})
+     * @Route("/{id}", name="app_ep", requirements={"id"="\d+"})
      *
      * @var EventParty $eventParty
      *
@@ -74,7 +73,7 @@ class EventPartyController extends BaseController
     }
 
     /**
-     * @Route("/find", name="app_event_party_find")
+     * @Route("/find", name="app_find_ep")
      *
      * @var EventPartyManager $epManager
      *
@@ -87,7 +86,7 @@ class EventPartyController extends BaseController
         $user = $this->getUser();
 
         if ($user->hasActiveEventParty()) {
-            return $this->redirectToRoute('app_event_party_current');
+            return $this->redirectToRoute('app_ep_current');
         }
 
         try {
@@ -98,21 +97,21 @@ class EventPartyController extends BaseController
 
         $this->userManager->join($user, $eventParty);
 
-        return $this->redirectToRoute('app_event_party_current');
+        return $this->redirectToRoute('app_ep_current');
     }
 
     /**
-     * @Route("/skip/{id}", name="app_skip_event_party")
+     * @Route("/skip/{id}", name="app_skip_ep")
      */
     public function skip(EventParty $eventParty): Response
     {
         $this->userManager->skip($this->getUser(), $eventParty);
 
-        return $this->redirectToRoute('app_event_party_find');
+        return $this->redirectToRoute('app_find_ep');
     }
 
     /**
-     * @Route("/leave/{id}", name="app_leave_event_party")
+     * @Route("/leave/{id}", name="app_leave_ep")
      */
     public function leave(EventParty $eventParty): Response
     {
@@ -144,19 +143,15 @@ class EventPartyController extends BaseController
 
     /**
      * @Route("/answer_mo/{epId}/{offerId}/{answer}", name="app_answer_mo")
-     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="ep")
      *
-     * @ParamConverter("eventParty", class="App\Entity\EventParty", options={"id": "epId"})
+     * @ParamConverter("ep", class="App\Entity\EventParty", options={"id": "epId"})
      * @ParamConverter("offer", class="App\Entity\EPOfferMOHistory", options={"id": "offerId"})
      * @ParamConverter("newMO", class="App\Entity\VO\MeetingOptions")
      */
-    public function answerMO(
-        EventParty $eventParty,
-        EPOfferMOHistory $offer,
-        bool $answer,
-        MeetingOptions $newMO = null
-    ): JsonResponse {
-        $this->userManager->answerMO($this->getUser(), $eventParty, $offer, $answer, $newMO);
+    public function answerMO(EventParty $ep, EPOfferMOHistory $offer, bool $answer, MeetingOptions $newMO = null): JsonResponse
+    {
+        $this->userManager->answerMO($this->getUser(), $ep, $offer, $answer, $newMO);
 
         return new JsonResponse(['success' => true]);
     }

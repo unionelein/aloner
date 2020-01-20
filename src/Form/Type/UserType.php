@@ -25,6 +25,9 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var User $user */
+        $user = $options['data'];
+
         $builder
             ->add('name', TextType::class, [
                 'label'       => false,
@@ -44,7 +47,7 @@ class UserType extends AbstractType
             ->add('sex', ChoiceType::class, [
                 'label'       => false,
                 'placeholder' => 'Пол',
-                'choices'     => \array_flip(Sex::SEX),
+                'choices'     => array_flip(Sex::SEX),
             ])
             ->add('birthday', DateType::class, [
                 'widget'      => 'single_text',
@@ -52,14 +55,18 @@ class UserType extends AbstractType
                 'label'       => false,
                 'attr'        => ['placeholder' => 'Дата рождения'],
                 'constraints' => [new UserAgeRange()],
-            ])
-            ->add('acceptLicense', CheckboxType::class, [
+            ]);
+
+        // if user fill account first time need accept license
+        if (!$user->hasRole(User::ROLE_USER)) {
+            $builder->add('acceptLicense', CheckboxType::class, [
                 'label'       => 'Я согласен с правилами сайта',
                 'mapped'      => false,
                 'constraints' => [
                     new IsTrue(['message' => 'Для использования сервиса вы должны согласиться с правилами']),
                 ],
             ]);
+        }
 
         $builder->get('sex')->addModelTransformer(new ValueToSexTransformer());
     }

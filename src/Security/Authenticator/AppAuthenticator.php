@@ -11,9 +11,12 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class VkAuthenticator extends AbstractGuardAuthenticator
+class AppAuthenticator extends AbstractGuardAuthenticator
 {
+    use TargetPathTrait;
+
     /** @var RouterInterface */
     private $router;
 
@@ -22,49 +25,8 @@ class VkAuthenticator extends AbstractGuardAuthenticator
         $this->router = $router;
     }
 
-    public function supports(Request $request)
-    {
-        return false;
-    }
-
-    public function getCredentials(Request $request)
-    {
-        return [];
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
-        return null;
-    }
-
-    public function checkCredentials($credentials, UserInterface $user)
-    {
-        return true;
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
-    {
-        return new RedirectResponse($this->router->generate('app_login'));
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
-    {
-        /** @var null|User $user */
-        $user = $token->getUser();
-
-        if (!$user->hasRole(User::ROLE_USER)) {
-            return new RedirectResponse($this->router->generate('app_user_account'));
-        }
-
-        if ($targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path')) {
-            return new RedirectResponse($targetPath);
-        }
-
-        return new RedirectResponse($this->router->generate('app_main'));
-    }
-
     /**
-     * Calls when user has no access.
+     * Calls when user has no access to requested page.
      *
      * {@inheritdoc}
      */
@@ -73,8 +35,43 @@ class VkAuthenticator extends AbstractGuardAuthenticator
         return new RedirectResponse($this->router->generate('app_login'));
     }
 
+    public function supports(Request $request)
+    {
+        // TODO: Implement supports() method.
+    }
+
+    public function getCredentials(Request $request)
+    {
+        // TODO: Implement getCredentials() method.
+    }
+
+    public function getUser($credentials, UserProviderInterface $userProvider)
+    {
+        // TODO: Implement getUser() method.
+    }
+
+    public function checkCredentials($credentials, UserInterface $user)
+    {
+        // TODO: Implement checkCredentials() method.
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    {
+        // TODO: Implement onAuthenticationFailure() method.
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    {
+        // Initial requested url by user
+        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
+            return new RedirectResponse($targetPath);
+        }
+
+        return new RedirectResponse($this->router->generate('app_main'));
+    }
+
     public function supportsRememberMe()
     {
-        return true;
+        // TODO: Implement supportsRememberMe() method.
     }
 }

@@ -35,7 +35,9 @@
             </div>
         <div class="row">
             <div class="col-sm-4 offset-sm-3 abc-checkbox abc-checkbox-primary">
-                {{ form_row(form.acceptLicense) }}
+                {% if form.acceptLicense is defined %}
+                    {{ form_row(form.acceptLicense) }}
+                {% endif %}
             </div>
             <div class="col-sm-2">
                 <button class="btn btn-md btn-primary float-right" type="submit">
