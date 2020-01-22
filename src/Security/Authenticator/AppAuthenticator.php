@@ -20,13 +20,16 @@ class AppAuthenticator extends AbstractGuardAuthenticator
     /** @var RouterInterface */
     private $router;
 
+    /**
+     * @param RouterInterface $router
+     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
     /**
-     * Calls when user has no access to requested page.
+     * Calls when user has no access to requested page. Only for entry_point authenticator
      *
      * {@inheritdoc}
      */
@@ -35,31 +38,45 @@ class AppAuthenticator extends AbstractGuardAuthenticator
         return new RedirectResponse($this->router->generate('app_login'));
     }
 
-    public function supports(Request $request)
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): bool
     {
-        // TODO: Implement supports() method.
+        return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCredentials(Request $request)
     {
-        // TODO: Implement getCredentials() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        // TODO: Implement getUser() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function checkCredentials($credentials, UserInterface $user)
     {
-        // TODO: Implement checkCredentials() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        // TODO: Implement onAuthenticationFailure() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         // Initial requested url by user
@@ -70,8 +87,11 @@ class AppAuthenticator extends AbstractGuardAuthenticator
         return new RedirectResponse($this->router->generate('app_main'));
     }
 
-    public function supportsRememberMe()
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsRememberMe(): bool
     {
-        // TODO: Implement supportsRememberMe() method.
+        return true;
     }
 }
