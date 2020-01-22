@@ -29,7 +29,7 @@ class AppAuthenticator extends AbstractGuardAuthenticator
     }
 
     /**
-     * Calls when user has no access to requested page. Only for entry_point authenticator
+     * Called when authentication is needed, but it's not sent (no user). Only for entry_point authenticator
      *
      * {@inheritdoc}
      */

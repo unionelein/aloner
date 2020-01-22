@@ -31,6 +31,8 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
     }
 
     /**
+     * User exists, but has no access
+     *
      * {@inheritdoc}
      */
     public function handle(Request $request, AccessDeniedException $accessDeniedException)
