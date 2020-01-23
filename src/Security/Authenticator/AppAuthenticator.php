@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class AppAuthenticator extends AbstractGuardAuthenticator
@@ -19,12 +20,17 @@ class AppAuthenticator extends AbstractGuardAuthenticator
     /** @var RouterInterface */
     private $router;
 
+    /** @var RememberMeServicesInterface */
+    private $rememberMeService;
+
     /**
-     * @param RouterInterface $router
+     * @param RouterInterface             $router
+     * @param RememberMeServicesInterface $rememberMeServices
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, RememberMeServicesInterface $rememberMeServices)
     {
-        $this->router = $router;
+        $this->router            = $router;
+        $this->rememberMeService = $rememberMeServices;
     }
 
     /**
@@ -78,19 +84,28 @@ class AppAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // Initial requested url by user
+        $response = null;
+
+        // Initial requested by user url
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
-            return new RedirectResponse($targetPath);
+            $response = new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->router->generate('app_main'));
+        if (!$response) {
+            $response = new RedirectResponse($this->router->generate('app_main'));
+        }
+
+        $this->rememberMeService->loginSuccess($request, $response, $token);
+
+        return $response;
     }
 
     /**
+     * This will be executed only if supports method will return true. Not for authenticateUserAndHandleSuccess.
+     *
      * {@inheritdoc}
      */
-    public function supportsRememberMe(): bool
+    public function supportsRememberMe()
     {
-        return true;
     }
 }
