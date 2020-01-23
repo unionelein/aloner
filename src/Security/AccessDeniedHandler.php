@@ -37,17 +37,14 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
      */
     public function handle(Request $request, AccessDeniedException $accessDeniedException)
     {
-        /** @var null|User $user */
+        /** @var User $user */
         $user = $this->security->getUser();
-
-        if (!$user) {
-            return new RedirectResponse($this->router->generate('app_login'));
-        }
 
         if (!$user->hasRole(User::ROLE_USER)) {
             return new RedirectResponse($this->router->generate('app_user_account'));
         }
 
-        return new Response('no access', 403);
+        // user has no access rights to requested page
+        return new RedirectResponse($this->router->generate('app_login'));
     }
 }

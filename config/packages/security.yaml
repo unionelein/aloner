@@ -18,9 +18,9 @@ security:
             anonymous: lazy
             guard:
                 authenticators:
-                    - App\Security\Authenticator\VkAuthenticator
+                    - App\Security\Authenticator\AppAuthenticator
 
-                entry_point: App\Security\Authenticator\VkAuthenticator
+                entry_point: App\Security\Authenticator\AppAuthenticator
 
             logout:
                 path: app_logout
