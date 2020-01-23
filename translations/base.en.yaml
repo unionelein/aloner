@@ -1,2 +1,2 @@
-"Выйти": "Logout"
-"Поддержка": "Support"
+base.exit: "Logout"
+base.support: "Support"

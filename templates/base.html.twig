@@ -20,7 +20,7 @@
                         </a>
 
                         {% if app.user %}
-                            <a class="float-right" href="{{ path('app_logout') }}">{% trans %}Выйти{% endtrans %}</a>
+                            <a class="float-right" href="{{ path('app_logout') }}">{% trans %}base.exit{% endtrans %}</a>
                         {% endif %}
                     </div>
                 </div>
@@ -35,7 +35,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6">
-                        {% trans %}Поддержка{% endtrans %}
+                        {% trans %}base.support{% endtrans %}
                     </div>
                     <div class="col-sm-6 text-right">
                         {% set year = 'now'|date('Y') %}
