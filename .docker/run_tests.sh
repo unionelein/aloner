@@ -1,3 +1,6 @@
+# exit when any command fails
+set -e
+
 cd ..
 
 # output colors

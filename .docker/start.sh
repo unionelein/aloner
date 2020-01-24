@@ -1,3 +1,6 @@
+# exit when any command fails
+set -e
+
 cd ..
 
 printf 'Up docker services...\n'

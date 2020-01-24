@@ -56,8 +56,8 @@ class CreateEmptySchemaCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->runCommand('doctrine:database:create --if-not-exists');
+        $this->runCommand('doctrine:schema:update --force --no-interaction');
         $this->purger->purge(); // clear tables data
-        $this->runCommand('doctrine:schema:update --no-interaction');
     }
 
     /**
