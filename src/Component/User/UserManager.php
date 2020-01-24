@@ -6,7 +6,6 @@ use App\Event\EPFilledEvent;
 use App\Event\EPJoinedEvent;
 use App\Event\MOAnsweredEvent;
 use App\Event\MOOfferedEvent;
-use App\Component\Infrastructure\TransactionalService;
 use App\Entity\EPAnswerMOHistory;
 use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
@@ -18,11 +17,12 @@ use App\Entity\VO\SearchCriteria;
 use App\Event\EPSkippedEvent;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UserManager
 {
-    /** @var EventDispatcherInterface */
+    /** @var EventDispatcher */
     private $dispatcher;
 
     /** @var EntityManagerInterface */
@@ -83,14 +83,22 @@ class UserManager
 
     /**
      * @param User       $user
-     * @param EventParty $eventParty
+     * @param EventParty $ep
+     *
+     * @return bool
      */
-    public function skip(User $user, EventParty $eventParty): void
+    public function skip(User $user, EventParty $ep): bool
     {
-        $user->skipEventParty($eventParty);
+        if (!$ep->getUsers()->contains($user)) {
+            return false;
+        }
+
+        $user->skipEventParty($ep);
         $this->em->flush();
 
-        $this->dispatcher->dispatch(new EPSkippedEvent($user, $eventParty));
+        $this->dispatcher->dispatch(new EPSkippedEvent($user, $ep));
+
+        return true;
     }
 
     /**
@@ -137,19 +145,14 @@ class UserManager
 
     /**
      * @param User                $user
-     * @param EventParty          $eventParty
+     * @param EventParty          $ep
      * @param EPOfferMOHistory    $offer
      * @param bool                $answer
      * @param MeetingOptions|null $newMO
      */
-    public function answerMO(
-        User $user,
-        EventParty $eventParty,
-        EPOfferMOHistory $offer,
-        bool $answer,
-        MeetingOptions $newMO = null
-    ): void {
-        $answerHistory = new EPAnswerMOHistory($eventParty, $user, $offer, new MOAnswerData($answer, $newMO));
+    public function answerMO(User $user, EventParty $ep, EPOfferMOHistory $offer, bool $answer, MeetingOptions $newMO = null): void
+    {
+        $answerHistory = new EPAnswerMOHistory($ep, $user, $offer, new MOAnswerData($answer, $newMO));
 
         $this->em->persist($answerHistory);
         $this->em->flush();

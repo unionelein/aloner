@@ -7,11 +7,11 @@ use App\Component\EventParty\Exception\NoEventsForUserException;
 use App\Component\User\UserManager;
 use App\Entity\EPOfferMOHistory;
 use App\Entity\EventParty;
-use App\Entity\User;
 use App\Entity\VO\MeetingOptions;
 use App\Event\EPLoadedEvent;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +26,7 @@ class EventPartyController extends BaseController
     /** @var UserManager */
     private $userManager;
 
-    /** @var EventDispatcherInterface */
+    /** @var EventDispatcher */
     private $dispatcher;
 
     /**
@@ -44,32 +44,32 @@ class EventPartyController extends BaseController
      */
     public function current(): Response
     {
-        $user       = $this->getUser();
-        $eventParty = $user->findLastActiveEventParty();
+        $user = $this->getUser();
+        $ep   = $user->findLastActiveEventParty();
 
-        if (!$eventParty) {
+        if (!$ep) {
             return $this->redirectToRoute('app_main');
         }
 
-        return $this->redirectToRoute('app_ep', ['id' => $eventParty->getId()]);
+        return $this->redirectToRoute('app_ep', ['id' => $ep->getId()]);
     }
 
     /**
-     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
+     * @IsGranted(EventPartyVoter::SEE, subject="ep")
      * @Route("/{id}", name="app_ep", requirements={"id"="\d+"})
      *
-     * @var EventParty $eventParty
+     * @var EventParty $ep
      *
      * @return Response
      */
-    public function eventParty(EventParty $eventParty): Response
+    public function eventParty(EventParty $ep): Response
     {
         $user = $this->getUser();
 
         $this->userManager->updateTempHash($user);
-        $this->dispatcher->dispatch(new EPLoadedEvent($user, $eventParty));
+        $this->dispatcher->dispatch(new EPLoadedEvent($user, $ep));
 
-        return $this->render('eventParty/event_party.html.twig', ['eventParty' => $eventParty]);
+        return $this->render('eventParty/event_party.html.twig', ['eventParty' => $ep]);
     }
 
     /**
@@ -79,7 +79,7 @@ class EventPartyController extends BaseController
      *
      * @return Response
      *
-     * @throws
+     * @throws \Throwable
      */
     public function find(EventPartyManager $epManager): Response
     {
@@ -101,21 +101,23 @@ class EventPartyController extends BaseController
     }
 
     /**
+     * @IsGranted(EventPartyVoter::PARTICIPANT, subject="ep")
      * @Route("/skip/{id}", name="app_skip_ep")
      */
-    public function skip(EventParty $eventParty): Response
+    public function skip(EventParty $ep): Response
     {
-        $this->userManager->skip($this->getUser(), $eventParty);
+        $this->userManager->skip($this->getUser(), $ep);
 
         return $this->redirectToRoute('app_find_ep');
     }
 
     /**
+     * @IsGranted(EventPartyVoter::PARTICIPANT, subject="ep")
      * @Route("/leave/{id}", name="app_leave_ep")
      */
-    public function leave(EventParty $eventParty): Response
+    public function leave(EventParty $ep): Response
     {
-        $this->userManager->skip($this->getUser(), $eventParty);
+        $this->userManager->skip($this->getUser(), $ep);
 
         return $this->redirectToRoute('app_main');
     }
@@ -129,21 +131,21 @@ class EventPartyController extends BaseController
     }
 
     /**
+     * @IsGranted(EventPartyVoter::OFFER_MO, subject="ep")
      * @Route("/offer_mo/{id}", name="app_offer_mo")
-     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="eventParty")
      *
      * @ParamConverter("MO", class="App\Entity\VO\MeetingOptions")
      */
-    public function offerMO(EventParty $eventParty, MeetingOptions $MO): JsonResponse
+    public function offerMO(EventParty $ep, MeetingOptions $MO): JsonResponse
     {
-        $this->userManager->offerMO($this->getUser(), $eventParty, $MO);
+        $this->userManager->offerMO($this->getUser(), $ep, $MO);
 
         return new JsonResponse(['success' => true]);
     }
 
     /**
+     * @IsGranted(EventPartyVoter::PARTICIPANT, subject="ep")
      * @Route("/answer_mo/{epId}/{offerId}/{answer}", name="app_answer_mo")
-     * @IsGranted(EventPartyVoter::DO_ACTIONS, subject="ep")
      *
      * @ParamConverter("ep", class="App\Entity\EventParty", options={"id": "epId"})
      * @ParamConverter("offer", class="App\Entity\EPOfferMOHistory", options={"id": "offerId"})
