@@ -9,15 +9,15 @@ namespace App\Component\Vk;
 
 use App\Component\Vk\DTO\VkUserData;
 use App\Entity\VO\Sex;
-use VK\Actions\Enums\AuthSignupSex;
+use VK\Actions\Enums\AccountSex;
 use VK\Client\VKApiClient;
 use Webmozart\Assert\Assert;
 
 class VkUserProvider
 {
     private const SEX = [
-        AuthSignupSex::MALE   => Sex::MALE,
-        AuthSignupSex::FEMALE => Sex::FEMALE,
+        AccountSex::MALE   => Sex::MALE,
+        AccountSex::FEMALE => Sex::FEMALE,
     ];
 
     public const ADDITIONAL_FIELDS = [

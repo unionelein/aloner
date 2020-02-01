@@ -9,8 +9,6 @@ use App\Entity\User;
 use App\Entity\VO\VkExtension;
 use App\Repository\CityRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use VK\Actions\Enums\AuthSignupSex;
-use VK\Client\VKApiClient;
 
 class VkSignUpService
 {

@@ -29,7 +29,7 @@ class ChatRunCommand extends Command
 
         $chat = new Chat($this->em);
 
-        $app = new App();
+        $app = @new App();
         $app->route('/chat', $chat);
 
         $app->run();
