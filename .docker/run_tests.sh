@@ -1,5 +1,4 @@
-# exit when any command fails
-set -e
+set -e # exit when any command fails
 
 cd ..
 
